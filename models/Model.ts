@@ -5,9 +5,11 @@ const BarnameSchema = new Schema(
   {
     ref: { type: String },
     bargah: { type: String },
+
     havalehCode: { type: String },
     havaleDate: { type: String },
 
+    meli: { type: String },
     custCode: { type: String },
     custName: { type: String },
 
@@ -15,12 +17,12 @@ const BarnameSchema = new Schema(
     vahed: { type: String },
 
     serial: { type: String },
-    carNo: { type: String },
     code: { type: String },
+
+    carNo: { type: String },
 
     tel: { type: String },
     postCode: { type: String },
-    meli: { type: String },
     telAddress: { type: String },
 
     hamlName: { type: String },
@@ -30,6 +32,7 @@ const BarnameSchema = new Schema(
     dscp: { type: String },
 
     barNoCode: { type: String },
+
     barNo: { type: String, unique: true, required: true, dropDups: true },
     barDate: { type: String },
     date: { type: Date },
