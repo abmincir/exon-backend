@@ -14,8 +14,6 @@ const SPSWS = require('../services/SPSWSService');
 const SQLService = require('../services/SQLService');
 exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userName, pass, kharidId, toDate, fromDate } = req.body;
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Content-Type', 'application/json');
     SPSWS.estelam({ userName, pass, kharidId, toDate, fromDate })
         .then((result) => {
         return res.send({});
@@ -24,8 +22,6 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { Amount, CallbackURL, Description, Email, Mobile } = req.body;
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Content-Type', 'application/json');
     SPSWS.estelam({ Amount, CallbackURL, Description, Email, Mobile })
         .then((result) => {
         console.log(result);
@@ -70,62 +66,52 @@ exports.fetch = (req, res) => {
         res.send(result);
     }, (error) => console.error(error));
 };
-exports.fetchSql = (req, res) => {
+exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { startDate, endDate } = req.body;
     if (!startDate || !endDate) {
         startDate = moment().locale('fa').format('YYYY/MM/DD');
         endDate = moment().locale('fa').add(1, 'day').format('YYYY/MM/DD');
     }
-    const startDateG = moment
+    const startDateSql = startDate.substring(2);
+    const endDateSql = endDate.substring(2);
+    const startDateMongo = moment
         .from(startDate, 'fa', 'YYYY/MM/DD')
         .locale('en')
         .format('YYYY-M-D HH:mm:ss');
-    const endDateG = moment
+    const endDateMongo = moment
         .from(endDate, 'fa', 'YYYY/MM/DD')
         .locale('en')
         .format('YYYY-M-D HH:mm:ss');
-    console.log('Start Date Is -> ', startDate, startDateG, new Date(startDateG));
-    console.log('-----------------');
-    console.log('End Date Is -> ', endDate, endDateG, new Date(endDateG));
-    //? Procedure
-    const sql = require('mssql');
-    // config for your database
-    const config = {
-        user: 'sa',
-        password: 'mis',
-        server: 'srv-siniran\\SRV_SINIRAN',
-        database: 'XData',
-    };
-    // connect to your database
-    sql.connect(config, (err) => {
-        if (err)
-            console.log(err);
-        // create Request object
-        const request = new sql.Request();
-        // add input variables
-        request.input('City', sql.VarChar(30), 'Cbe');
-        request.input('NameNew', sql.VarChar(30), 'Cbe');
-        // execute the procedure
-        request
-            .execute('spTest')
-            .then((err, recordSets, returnValue, affected) => {
-            if (err) {
-                console.dir(err);
-            }
-            console.dir(recordSets);
-            Barname.insertMany([{ size: 'small' }], (err) => {
-                console.log(err);
-            });
-        })
-            .catch((err) => {
-            console.log(err);
-        });
+    console.log('+++++++++++++++++');
+    console.log('Start Date Is -> ', {
+        startDate,
+        startDateSql,
+        startDateMongo,
+        dateObj: new Date(startDateMongo),
     });
-    //? Procedure
+    console.log('-----------------');
+    console.log('End Date Is -> ', {
+        endDate,
+        endDateSql,
+        endDateMongo,
+        dateObj: new Date(endDateMongo),
+    });
+    console.log('+++++++++++++++++');
+    try {
+        const result = yield SQLService.FetchData({
+            startDate: startDateSql,
+            endDate: endDateSql,
+        });
+        console.log(result);
+        // res.send(result);
+    }
+    catch (error) {
+        console.error(error);
+    }
     let query = {
         date: {
-            $gte: new Date(startDateG),
-            $lt: new Date(endDateG),
+            $gte: new Date(startDateMongo),
+            $lt: new Date(endDateMongo),
         },
     };
     Barname.find(query)
@@ -134,4 +120,4 @@ exports.fetchSql = (req, res) => {
         .exec()
         .then((foundedBarname) => res.json({ barname: foundedBarname }))
         .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
-};
+});

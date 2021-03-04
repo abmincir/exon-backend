@@ -5,8 +5,6 @@ const SQLService = require('../services/SQLService');
 
 exports.estelam = async (req: any, res: any) => {
   const { userName, pass, kharidId, toDate, fromDate } = req.body;
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Content-Type', 'application/json');
 
   SPSWS.estelam({ userName, pass, kharidId, toDate, fromDate })
     .then((result: any) => {
@@ -19,8 +17,6 @@ exports.estelam = async (req: any, res: any) => {
 
 exports.edit = async (req: any, res: any) => {
   const { Amount, CallbackURL, Description, Email, Mobile } = req.body;
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Content-Type', 'application/json');
 
   SPSWS.estelam({ Amount, CallbackURL, Description, Email, Mobile })
     .then((result: any) => {
@@ -83,7 +79,7 @@ exports.fetch = (req: any, res: any) => {
   );
 };
 
-exports.fetchSql = (req: any, res: any) => {
+exports.updateDb = async (req: any, res: any) => {
   let { startDate, endDate } = req.body;
 
   if (!startDate || !endDate) {
@@ -91,63 +87,60 @@ exports.fetchSql = (req: any, res: any) => {
     endDate = moment().locale('fa').add(1, 'day').format('YYYY/MM/DD');
   }
 
-  const startDateG = moment
+  const startDateSql = startDate.substring(2);
+  const endDateSql = endDate.substring(2);
+
+  const startDateMongo = moment
     .from(startDate, 'fa', 'YYYY/MM/DD')
     .locale('en')
     .format('YYYY-M-D HH:mm:ss');
 
-  const endDateG = moment
+  const endDateMongo = moment
     .from(endDate, 'fa', 'YYYY/MM/DD')
     .locale('en')
     .format('YYYY-M-D HH:mm:ss');
 
-  console.log('Start Date Is -> ', startDate, startDateG, new Date(startDateG));
-  console.log('-----------------');
-  console.log('End Date Is -> ', endDate, endDateG, new Date(endDateG));
+  console.log('+++++++++++++++++');
 
-  //? Procedure
-  const sql = require('mssql');
-  // config for your database
-  const config = {
-    user: 'sa',
-    password: 'mis',
-    server: 'srv-siniran\\SRV_SINIRAN',
-    database: 'XData',
-  };
-
-  // connect to your database
-  sql.connect(config, (err: Error) => {
-    if (err) console.log(err);
-
-    // create Request object
-    const request = new sql.Request();
-
-    // add input variables
-    request.input('City', sql.VarChar(30), 'Cbe');
-    request.input('NameNew', sql.VarChar(30), 'Cbe');
-
-    // execute the procedure
-    request
-      .execute('spTest')
-      .then((err: any, recordSets: any, returnValue: any, affected: any) => {
-        if (err) {
-          console.dir(err);
-        }
-        console.dir(recordSets);
-        Barname.insertMany([{ size: 'small' }], (err: any) => {
-          console.log(err);
-        });
-      })
-      .catch((err: any) => {
-        console.log(err);
-      });
+  console.log('Start Date Is -> ', {
+    startDate,
+    startDateSql,
+    startDateMongo,
+    dateObj: new Date(startDateMongo),
   });
-  //? Procedure
+  console.log('-----------------');
+  console.log('End Date Is -> ', {
+    endDate,
+    endDateSql,
+    endDateMongo,
+    dateObj: new Date(endDateMongo),
+  });
+
+  console.log('+++++++++++++++++');
+
+  try {
+    const result = await SQLService.FetchData({
+      startDate: startDateSql,
+      endDate: endDateSql,
+    });
+
+    console.log(result);
+
+    const newBarname = new Barname({});
+
+    Barname.insertMany([], (err: any) => {
+      console.log(err);
+    });
+
+    // res.send(result);
+  } catch (error: any) {
+    console.error(error);
+  }
 
   let query = {
     date: {
-      $gte: new Date(startDateG),
-      $lt: new Date(endDateG),
+      $gte: new Date(startDateMongo),
+      $lt: new Date(endDateMongo),
     },
   };
 

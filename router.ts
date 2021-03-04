@@ -12,6 +12,7 @@ module.exports = (app: any) => {
 
   app.post('/barname/all', jsonParser, BarnameController.getAll);
   app.post('/barname/fetch', jsonParser, BarnameController.getAll);
+  app.post('/barname/update-db', jsonParser, BarnameController.updateDb);
 
   app.post('/barname/estelam', jsonParser, BarnameController.estelam);
 

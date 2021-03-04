@@ -11,6 +11,7 @@ module.exports = (app) => {
     app.post('/user/changePassword', jsonParser, UserController.changePassword);
     app.post('/barname/all', jsonParser, BarnameController.getAll);
     app.post('/barname/fetch', jsonParser, BarnameController.getAll);
+    app.post('/barname/update-db', jsonParser, BarnameController.updateDb);
     app.post('/barname/estelam', jsonParser, BarnameController.estelam);
     app.post('/sql', jsonParser, BarnameController.fetch);
 };
