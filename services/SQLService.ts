@@ -1,33 +1,50 @@
-exports.FetchData = () => {
-  const sql = require('mssql');
+const sql = require('mssql');
+
+exports.FetchData = (input: { startDate: string; endDate: string }) => {
+  const { startDate, endDate } = input;
+
   // config for your database
   const config = {
     user: 'sa',
     password: 'mis',
     server: 'srv-siniran\\SRV_SINIRAN',
     database: 'XData',
+    options: {
+      encrypt: true,
+      enableArithAbort: true,
+      cryptoCredentialsDetails: {
+        minVersion: 'TLSv1',
+      },
+    },
   };
 
   // connect to your database
-  sql.connect(config, (err: Error) => {
-    if (err) console.log(err);
+  return new Promise((res, rej) => {
+    sql.connect(config, (error: Error) => {
+      if (error) {
+        console.log(error);
+        rej(error);
+      }
+      // create Request object
+      const request = new sql.Request();
+      request.input('StartDate', sql.VarChar(64), startDate);
+      request.input('EndDate', sql.VarChar(64), endDate);
 
-    // create Request object
-    const request = new sql.Request();
+      // query to the database and get the records
+      return request
+        .execute('__BarnameProc__')
+        .then((result: any, error: any) => {
+          if (error) {
+            console.log(error);
+            rej(error);
+          }
 
-    // add input variables
-    request.input('City', sql.VarChar(30), 'Cbe');
-    request.input('NameNew', sql.VarChar(30), 'Cbe');
-
-    // execute the procedure
-    request
-      .execute('spTest')
-      .then((err: any, recordSets: any, returnValue: any, affected: any) => {
-        console.dir(recordSets);
-        console.dir(err);
-      })
-      .catch((err: any) => {
-        console.log(err);
-      });
+          res(result.recordset);
+        })
+        .catch((error: any) => {
+          console.log(error);
+          rej(error);
+        });
+    });
   });
 };

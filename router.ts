@@ -14,26 +14,6 @@ module.exports = (app: any) => {
   app.post('/barname/fetch', jsonParser, BarnameController.getAll);
 
   app.post('/barname/estelam', jsonParser, BarnameController.estelam);
-  // app.get(
-  //   '/purchase/get/own/purchases',
-  //   jsonParser,
-  //   PurchaseController.getOwnPurchases
-  // );
-  // app.get(
-  //   '/purchase/get/all/purchases',
-  //   jsonParser,
-  //   PurchaseController.getAllPurchases
-  // );
-  // app.get(
-  //   '/purchase/get/unverified/purchases',
-  //   jsonParser,
-  //   PurchaseController.getAllUnverified
-  // );
-  // app.post('/purchase/refund', jsonParser, PurchaseController.refund);
-  // app.post(
-  //   '/purchase/send/zarinpal',
-  //   jsonParser,
-  //   PurchaseController.payPurchase
-  // );
-  // app.post('/purchase/check/zarinpal', jsonParser, PurchaseController.checkPay);
+
+  app.post('/sql', jsonParser, BarnameController.fetch);
 };

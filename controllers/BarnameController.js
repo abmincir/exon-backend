@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 const { Barname } = require('../models/Model');
 const moment = require('jalali-moment');
 const SPSWS = require('../services/SPSWSService');
+const SQLService = require('../services/SQLService');
 exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userName, pass, kharidId, toDate, fromDate } = req.body;
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -62,6 +63,13 @@ exports.getAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         .then((foundedBarname) => res.json({ barname: foundedBarname }))
         .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
 });
+exports.fetch = (req, res) => {
+    const { startDate, endDate } = req.body;
+    SQLService.FetchData({ startDate, endDate }).then((result) => {
+        console.log(result);
+        res.send(result);
+    }, (error) => console.error(error));
+};
 exports.fetchSql = (req, res) => {
     let { startDate, endDate } = req.body;
     if (!startDate || !endDate) {

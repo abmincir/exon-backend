@@ -1,6 +1,7 @@
 const { Barname } = require('../models/Model');
 const moment = require('jalali-moment');
 const SPSWS = require('../services/SPSWSService');
+const SQLService = require('../services/SQLService');
 
 exports.estelam = async (req: any, res: any) => {
   const { userName, pass, kharidId, toDate, fromDate } = req.body;
@@ -68,6 +69,18 @@ exports.getAll = async (req: any, res: any) => {
     .catch((err: any) =>
       res.status(422).send({ error: 'we have an issue', err })
     );
+};
+
+exports.fetch = (req: any, res: any) => {
+  const { startDate, endDate } = req.body;
+
+  SQLService.FetchData({ startDate, endDate }).then(
+    (result: any) => {
+      console.log(result);
+      res.send(result);
+    },
+    (error: any) => console.error(error)
+  );
 };
 
 exports.fetchSql = (req: any, res: any) => {
