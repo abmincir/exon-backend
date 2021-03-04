@@ -13,7 +13,7 @@ module.exports = (app: any) => {
   app.post('/barname/all', jsonParser, BarnameController.getAll);
   app.post('/barname/fetch', jsonParser, BarnameController.getAll);
 
-  // app.get('/test', jsonParser, BarnameController.estelam);
+  app.post('/barname/estelam', jsonParser, BarnameController.estelam);
   // app.get(
   //   '/purchase/get/own/purchases',
   //   jsonParser,

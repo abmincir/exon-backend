@@ -3,14 +3,13 @@ const moment = require('jalali-moment');
 const SPSWS = require('../services/SPSWSService');
 
 exports.estelam = async (req: any, res: any) => {
-  const { Amount, CallbackURL, Description, Email, Mobile } = req.body;
+  const { userName, pass, kharidId, toDate, fromDate } = req.body;
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'application/json');
 
-  SPSWS.estelam({ Amount, CallbackURL, Description, Email, Mobile })
+  SPSWS.estelam({ userName, pass, kharidId, toDate, fromDate })
     .then((result: any) => {
-      console.log(result);
-      return res.send({ result });
+      return res.send({});
     })
     .catch((err: any) =>
       res.status(422).send({ error: 'we have an issue', err })

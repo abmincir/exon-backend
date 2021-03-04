@@ -10,7 +10,8 @@ module.exports = (app) => {
     app.post('/user/create', jsonParser, UserController.createUser);
     app.post('/user/changePassword', jsonParser, UserController.changePassword);
     app.post('/barname/all', jsonParser, BarnameController.getAll);
-    app.get('/test', jsonParser, BarnameController.estelam);
+    app.post('/barname/fetch', jsonParser, BarnameController.getAll);
+    app.post('/barname/estelam', jsonParser, BarnameController.estelam);
     // app.get(
     //   '/purchase/get/own/purchases',
     //   jsonParser,

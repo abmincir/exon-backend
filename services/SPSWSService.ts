@@ -7,23 +7,28 @@ exports.estelam = () => {
   const args = {
     userName,
     pass,
+    kharidId: '1',
   };
 
-  soap.createClient(url, (error: any, client: any) => {
-    if (error) {
-      console.error('Error Creating The Soap Client -> ', error);
-      return;
-    }
-
-    client.EstelameBarname(args, (estelamError: any, result: any) => {
-      if (estelamError) {
-        console.error('Error Sending Estelam Request -> ', estelamError);
+  soap.createClient(
+    url,
+    // { endpoint: 'https://spsws.bki.ir/spsws.asmx' },
+    (error: any, client: any) => {
+      if (error) {
+        console.error('Error Creating The Soap Client -> ', error);
+        return;
       }
 
-      const parseData = JSON.parse(JSON.stringify(result));
-      console.log(parseData);
-    });
-  });
+      client.getKharidInfo(args, (estelamError: any, result: any) => {
+        if (estelamError) {
+          console.error('Error Sending Estelam Request -> ', estelamError);
+        }
+
+        // const parseData = JSON.parse(JSON.stringify(result));
+        // console.log(parseData);
+      });
+    }
+  );
 };
 
 // const request = (zpamount, zpemail, zpphone, zpdesc, redirect, zpcallback) => {
