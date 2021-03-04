@@ -103,6 +103,10 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             endDate: endDateSql,
         });
         console.log(result);
+        const newBarname = new Barname({});
+        Barname.insertMany([], (err) => {
+            console.log(err);
+        });
         // res.send(result);
     }
     catch (error) {
