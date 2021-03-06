@@ -1,59 +1,75 @@
-const soap = require('soap');
+const axios = require('axios');
+var xml2js = require('xml2js');
 const url = 'https://spsws.bki.ir/spsws.asmx?WSDL';
 const userName = '10103740920';
 const pass = 'exon@321';
 
-exports.estelam = () => {
+exports.estelam = async () => {
   const args = {
     userName,
     pass,
     kharidId: '1',
   };
 
-  soap.createClient(
-    url,
-    // { endpoint: 'https://spsws.bki.ir/spsws.asmx' },
-    (error: any, client: any) => {
-      if (error) {
-        console.error('Error Creating The Soap Client -> ', error);
-        return;
-      }
+  const xmls = `
+  <x:Envelope
+    xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:tem="http://tempuri.org/">
+    <x:Header/>
+    <x:Body>
+        <tem:EstelameBarname>
+            <tem:userName>10103740920</tem:userName>
+            <tem:pass>exon@321</tem:pass>
+            <tem:fromDate>1399/12/04</tem:fromDate>
+            <tem:toDate>1399/12/04</tem:toDate>
+            <tem:kharidId></tem:kharidId>
+            <tem:TakhsisId></tem:TakhsisId>
+            <tem:KutajNumber></tem:KutajNumber>
+            <tem:IdHaml></tem:IdHaml>
+        </tem:EstelameBarname>
+    </x:Body>
+  </x:Envelope>
+  `;
 
-      client.getKharidInfo(args, (estelamError: any, result: any) => {
-        if (estelamError) {
-          console.error('Error Sending Estelam Request -> ', estelamError);
+  return new Promise(async (res, rej) => {
+    try {
+      const result = await axios.post(
+        'https://spsws.bki.ir/spsws.asmx?op=EstelameBarname',
+        xmls,
+        {
+          headers: {
+            'Content-Type': 'text/xml; charset=utf-8',
+            SOAPAction: 'http://tempuri.org/EstelameBarname',
+          },
         }
+      );
+      // console.log(result);
 
-        // const parseData = JSON.parse(JSON.stringify(result));
-        // console.log(parseData);
-      });
+      var parser = new xml2js.Parser(/* options */);
+      parser
+        .parseStringPromise(result.data)
+        .then(function (jsonResult: any) {
+          const envelope: any = 'soap:Envelope';
+          const body: any = 'soap:Body';
+          const diffgram: any = 'diffgr:diffgram';
+
+          jsonResult[envelope][
+            body
+          ][0].EstelameBarnameResponse[0].EstelameBarnameResult[0][
+            diffgram
+          ][0].NewDataSet[0].Table1.map((barname: any) => {
+            console.log(barname.hamlid[0], '\n\n');
+            // return barname;
+          });
+          // );
+          console.log('Done');
+          res(jsonResult);
+        })
+        .catch(function (err: any) {
+          // Failed
+        });
+    } catch (error: any) {
+      rej(error);
     }
-  );
+  });
 };
-
-// const request = (zpamount, zpemail, zpphone, zpdesc, redirect, zpcallback) => {
-//   const url = appConfig.zarinpalSoapServer;
-//   const args = {
-//     MerchantID: appConfig.zarinpalMerchant,
-//     Amount: zpamount,
-//     Description: zpdesc,
-//     Email: zpemail,
-//     Mobile: zpphone,
-//     CallbackURL: redirect,
-//   };
-//   soap.createClient(url, (err, client) => {
-//     client.PaymentRequest(args, (err, result) => {
-//       const parseData = JSON.parse(JSON.stringify(result));
-//       if (Number(parseData.Status) === 100) {
-//         const status = true;
-//         const url =
-//           'https://www.zarinpal.com/pg/StartPay/' + parseData.Authority;
-//         zpcallback({ status: status, url: url });
-//       } else {
-//         const status = false;
-//         const code = parseData.Status;
-//         zpcallback({ status: status, code: 'خطایی پیش آمد! ' + code });
-//       }
-//     });
-//   });
-// };

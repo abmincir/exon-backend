@@ -13,12 +13,20 @@ const moment = require('jalali-moment');
 const SPSWS = require('../services/SPSWSService');
 const SQLService = require('../services/SQLService');
 exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userName, pass, kharidId, toDate, fromDate } = req.body;
-    SPSWS.estelam({ userName, pass, kharidId, toDate, fromDate })
-        .then((result) => {
-        return res.send({});
-    })
-        .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
+    // const { userName, pass, kharidId, toDate, fromDate } = req.body;
+    try {
+        const result = yield SPSWS.estelam({
+        // userName,
+        // pass,
+        // kharidId,
+        // toDate,
+        // fromDate,
+        });
+        res.send({ result });
+    }
+    catch (error) {
+        console.error(error);
+    }
 });
 exports.edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { Amount, CallbackURL, Description, Email, Mobile } = req.body;
@@ -66,6 +74,12 @@ exports.fetch = (req, res) => {
         res.send(result);
     }, (error) => console.error(error));
 };
+exports.dummy = (req, res) => {
+    SQLService.MockData().then((result) => {
+        console.log(result);
+        res.send(result);
+    }, (error) => console.error(error));
+};
 exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { startDate, endDate } = req.body;
     if (!startDate || !endDate) {
@@ -103,6 +117,10 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             endDate: endDateSql,
         });
         console.log(result);
+        const newBarname = new Barname({});
+        Barname.insertMany([], (err) => {
+            console.log(err);
+        });
         // res.send(result);
     }
     catch (error) {

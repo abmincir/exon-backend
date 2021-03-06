@@ -4,15 +4,20 @@ const SPSWS = require('../services/SPSWSService');
 const SQLService = require('../services/SQLService');
 
 exports.estelam = async (req: any, res: any) => {
-  const { userName, pass, kharidId, toDate, fromDate } = req.body;
+  // const { userName, pass, kharidId, toDate, fromDate } = req.body;
 
-  SPSWS.estelam({ userName, pass, kharidId, toDate, fromDate })
-    .then((result: any) => {
-      return res.send({});
-    })
-    .catch((err: any) =>
-      res.status(422).send({ error: 'we have an issue', err })
-    );
+  try {
+    const result = await SPSWS.estelam({
+      // userName,
+      // pass,
+      // kharidId,
+      // toDate,
+      // fromDate,
+    });
+    res.send({ result });
+  } catch (error: any) {
+    console.error(error);
+  }
 };
 
 exports.edit = async (req: any, res: any) => {
@@ -71,6 +76,16 @@ exports.fetch = (req: any, res: any) => {
   const { startDate, endDate } = req.body;
 
   SQLService.FetchData({ startDate, endDate }).then(
+    (result: any) => {
+      console.log(result);
+      res.send(result);
+    },
+    (error: any) => console.error(error)
+  );
+};
+
+exports.dummy = (req: any, res: any) => {
+  SQLService.MockData().then(
     (result: any) => {
       console.log(result);
       res.send(result);

@@ -3,50 +3,57 @@ const Schema = mongoose.Schema;
 
 const BarnameSchema = new Schema(
   {
-    takhsisId: { type: String },
-    kharidId: { type: String },
+    allocationId: String,
+    purchaseId: String,
 
-    // code mahmule
-    havalehNumber: { type: String },
-    havalehWeight: { type: String },
-    havalehCode: { type: String },
-    havaleDate: { type: String },
+    merchantWeight: String,
+    spsWeight: String,
 
-    receiverMeliCode: { type: String },
-    receiverPostCode: { type: String },
-    receiverTelAddress: { type: String },
+    draft: {
+      number: String,
+      weight: String,
+      code: String,
+      date: String,
+    },
 
-    customerCode: { type: String },
-    customerName: { type: String },
+    customer: {
+      name: String,
+      code: String,
+    },
 
-    sellerCode: { type: String },
+    salesmanCode: String,
 
-    carNumber: { type: String },
+    carNumber: String,
 
-    telephone: { type: String },
+    telephone: String,
 
-    //Destination
-    startName: { type: String },
-    startCode: { type: String },
+    origin: {
+      name: String,
+      code: String,
+    },
 
-    receiverName: { type: String },
-    receiverAddress: { type: String },
+    receiver: {
+      name: String,
+      postCode: String,
+      telAddress: String,
+      nationalId: String,
+    },
 
-    //kala
-    kalaName: { type: String },
-    vahedShomaresh: { type: String },
-    fiForush: { type: String },
+    product: {
+      name: String,
+      unit: String,
+      pricePerSale: String,
+    },
 
-    // todo detect unique field
-    barNo: { type: String, unique: true, required: true, dropDups: true },
+    bill: {
+      row: String,
+      number: String,
+      serial: String,
+      weight: String,
+      date: String,
+    },
 
-    barnameRadif: { type: String },
-    barnameNumber: { type: String },
-    barnameSerial: { type: String },
-    barnameWeight: { type: String },
-    barnameDate: { type: String },
-
-    date: { type: Date },
+    date: Date,
     status: { type: Number, default: -1 },
   },
   { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }

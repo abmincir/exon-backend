@@ -1,5 +1,32 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 const sql = require('mssql');
+const nodeFetch = require('node-fetch');
+exports.MockData = () => __awaiter(void 0, void 0, void 0, function* () {
+    return new Promise((res, rej) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const data = yield nodeFetch('https://github.com/AmirHosein-Farhadi/exon-backend/blob/main/dummy-data.json', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+            });
+            res(data);
+        }
+        catch (error) {
+            console.error(error);
+            rej(error);
+        }
+    }));
+});
 exports.FetchData = (input) => {
     const { startDate, endDate } = input;
     // config for your database

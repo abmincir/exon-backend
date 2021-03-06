@@ -1,4 +1,25 @@
 const sql = require('mssql');
+const nodeFetch = require('node-fetch');
+
+exports.MockData = async () => {
+  return new Promise(async (res, rej) => {
+    try {
+      const data = await nodeFetch(
+        'https://github.com/AmirHosein-Farhadi/exon-backend/blob/main/dummy-data.json',
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        }
+      );
+      res(data);
+    } catch (error: any) {
+      console.error(error);
+      rej(error);
+    }
+  });
+};
 
 exports.FetchData = (input: { startDate: string; endDate: string }) => {
   const { startDate, endDate } = input;
