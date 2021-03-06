@@ -9,17 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const sql = require('mssql');
+const fs = require('fs');
 const nodeFetch = require('node-fetch');
 exports.MockData = () => __awaiter(void 0, void 0, void 0, function* () {
     return new Promise((res, rej) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const data = yield nodeFetch('https://github.com/AmirHosein-Farhadi/exon-backend/blob/main/dummy-data.json', {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-            });
-            res(data);
+            let rawData = fs.readFileSync('dummy-data.json');
+            let bills = JSON.parse(rawData);
+            res(bills);
         }
         catch (error) {
             console.error(error);

@@ -3,11 +3,16 @@ const Schema = mongoose.Schema;
 
 const BarnameSchema = new Schema(
   {
-    allocationId: String,
+    allocationId: String, //spsId
     purchaseId: String,
 
     merchantWeight: String,
     spsWeight: String,
+    cottageNumber: String,
+
+    salesmanCode: String,
+    carNumber: String,
+    telephone: String,
 
     draft: {
       number: String,
@@ -20,12 +25,6 @@ const BarnameSchema = new Schema(
       name: String,
       code: String,
     },
-
-    salesmanCode: String,
-
-    carNumber: String,
-
-    telephone: String,
 
     origin: {
       name: String,
