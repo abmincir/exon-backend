@@ -36,13 +36,19 @@ const BillSchema = new Schema({
         pricePerSale: String,
     },
     bill: {
+        id: {
+            type: String,
+            // unique: true,
+            // index: true,
+            required: true,
+        },
         row: String,
         number: String,
         serial: String,
         weight: String,
         date: String,
     },
-    date: Date,
+    date: { type: Date, required: true },
     status: { type: Number, default: -1 },
 }, { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } });
 exports.Bill = mongoose.model('Bill', BillSchema);

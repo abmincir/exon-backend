@@ -45,6 +45,13 @@ const BillSchema = new Schema(
     },
 
     bill: {
+      id: {
+        type: String,
+        unique: true,
+        index: true,
+        required: true,
+        dropDups: true,
+      },
       row: String,
       number: String,
       serial: String,
@@ -52,7 +59,7 @@ const BillSchema = new Schema(
       date: String,
     },
 
-    date: Date,
+    date: { type: Date, required: true },
     status: { type: Number, default: -1 },
   },
   { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }

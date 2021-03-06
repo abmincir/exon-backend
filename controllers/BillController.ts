@@ -134,21 +134,90 @@ exports.updateDb = async (req: any, res: any) => {
   console.log('+++++++++++++++++');
 
   try {
-    // const result = await SQLService.FetchData({
-    const result = await SQLService.MockData({
+    // const result = await SQLService.MockData({
+    const result = await SQLService.FetchData({
       startDate: startDateSql,
       endDate: endDateSql,
     });
 
-    console.log(result);
+    const bills = [...result].map((bill) => {
+      const calculatedDate =
+        (bill.barDate[0] === '9' ||
+        bill.barDate[0] === '8' ||
+        bill.barDate[0] === '7'
+          ? '13'
+          : '14') + bill.barDate;
+      const mongoDate = new Date(
+        moment
+          .from(calculatedDate, 'fa', 'YYYY/MM/DD')
+          .locale('en')
+          .format('YYYY-M-D HH:mm:ss')
+      );
 
-    const newBill = new Bill({});
+      const newBill = new Bill({
+        allocationId: bill.ref,
+        purchaseId: bill.bargah, //spsId
 
-    // Bill.insertMany([], (err: any) => {
-    //   console.log(err);
-    // });
+        salesmanCode: bill.code,
+        carNumber: bill.Carno,
+        telephone: bill.tel,
 
-    // res.send(result);
+        draft: {
+          number: bill.barnoCode,
+          weight: bill.havaleWeight,
+          code: bill.havalehcode,
+          date: bill.havaleDate,
+        },
+
+        customer: {
+          name: bill.custname,
+          code: bill.custcode,
+        },
+
+        origin: {
+          name: bill.hamlname,
+          code: bill.hamlcode,
+        },
+
+        receiver: {
+          name: bill.recivename,
+          postCode: bill.post_code,
+          telAddress: bill.telAdress,
+          nationalId: bill.meli,
+        },
+
+        product: {
+          name: bill.Dscp,
+          unit: bill.Vahed,
+          pricePerSale: bill.price,
+        },
+
+        bill: {
+          id: bill.Barno,
+          row: bill.serial,
+          number: bill.Barno.split('-')[0],
+          serial: bill.Barno.split('-')[1],
+          weight: bill.weight,
+          date: bill.barDate,
+        },
+
+        date: mongoDate,
+      });
+
+      newBill
+        .save()
+        .then()
+        .catch((err: any) => {
+          console.log(err);
+        });
+      return newBill;
+    });
+
+    Bill.insertMany(bills, (error: any) => {
+      if (error) {
+        console.log(error);
+      }
+    });
   } catch (error: any) {
     console.error(error);
   }
