@@ -134,7 +134,8 @@ exports.updateDb = async (req: any, res: any) => {
   console.log('+++++++++++++++++');
 
   try {
-    const result = await SQLService.FetchData({
+    // const result = await SQLService.FetchData({
+    const result = await SQLService.MockData({
       startDate: startDateSql,
       endDate: endDateSql,
     });
@@ -143,9 +144,9 @@ exports.updateDb = async (req: any, res: any) => {
 
     const newBill = new Bill({});
 
-    Bill.insertMany([], (err: any) => {
-      console.log(err);
-    });
+    // Bill.insertMany([], (err: any) => {
+    //   console.log(err);
+    // });
 
     // res.send(result);
   } catch (error: any) {
