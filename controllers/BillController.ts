@@ -1,4 +1,4 @@
-const { Barname } = require('../models/Model');
+const { Bill } = require('../models/Model');
 const moment = require('jalali-moment');
 const SPSWS = require('../services/SPSWSService');
 const SQLService = require('../services/SQLService');
@@ -62,11 +62,11 @@ exports.getAll = async (req: any, res: any) => {
     },
   };
 
-  Barname.find(query)
+  Bill.find(query)
     .limit(60)
     .sort({ date: 1 })
     .exec()
-    .then((foundedBarname: any) => res.json({ barname: foundedBarname }))
+    .then((foundedBill: any) => res.json({ bill: foundedBill }))
     .catch((err: any) =>
       res.status(422).send({ error: 'we have an issue', err })
     );
@@ -141,9 +141,9 @@ exports.updateDb = async (req: any, res: any) => {
 
     console.log(result);
 
-    const newBarname = new Barname({});
+    const newBill = new Bill({});
 
-    Barname.insertMany([], (err: any) => {
+    Bill.insertMany([], (err: any) => {
       console.log(err);
     });
 
@@ -159,11 +159,11 @@ exports.updateDb = async (req: any, res: any) => {
     },
   };
 
-  Barname.find(query)
+  Bill.find(query)
     .limit(60)
     .sort({ date: 1 })
     .exec()
-    .then((foundedBarname: any) => res.json({ barname: foundedBarname }))
+    .then((foundedBill: any) => res.json({ bill: foundedBill }))
     .catch((err: any) =>
       res.status(422).send({ error: 'we have an issue', err })
     );

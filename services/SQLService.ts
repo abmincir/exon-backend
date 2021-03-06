@@ -1,12 +1,12 @@
 const sql = require('mssql');
 const fs = require('fs');
-const nodeFetch = require('node-fetch');
 
 exports.MockData = async () => {
   return new Promise(async (res, rej) => {
     try {
       let rawData = fs.readFileSync('dummy-data.json');
       let bills = JSON.parse(rawData);
+
       res(bills);
     } catch (error: any) {
       console.error(error);

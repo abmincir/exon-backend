@@ -57,11 +57,9 @@ exports.estelam = async () => {
             body
           ][0].EstelameBarnameResponse[0].EstelameBarnameResult[0][
             diffgram
-          ][0].NewDataSet[0].Table1.map((barname: any) => {
-            console.log(barname.hamlid[0], '\n\n');
-            // return barname;
+          ][0].NewDataSet[0].Table1.map((bill: any) => {
+            console.log(bill.hamlid[0], '\n\n');
           });
-          // );
           console.log('Done');
           res(jsonResult);
         })

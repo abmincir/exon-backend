@@ -1,11 +1,15 @@
 "use strict";
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const BarnameSchema = new Schema({
+const BillSchema = new Schema({
     allocationId: String,
     purchaseId: String,
     merchantWeight: String,
     spsWeight: String,
+    cottageNumber: String,
+    salesmanCode: String,
+    carNumber: String,
+    telephone: String,
     draft: {
         number: String,
         weight: String,
@@ -16,9 +20,6 @@ const BarnameSchema = new Schema({
         name: String,
         code: String,
     },
-    salesmanCode: String,
-    carNumber: String,
-    telephone: String,
     origin: {
         name: String,
         code: String,
@@ -44,7 +45,7 @@ const BarnameSchema = new Schema({
     date: Date,
     status: { type: Number, default: -1 },
 }, { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } });
-exports.Barname = mongoose.model('Barname', BarnameSchema);
+exports.Bill = mongoose.model('Bill', BillSchema);
 const UserSchema = new Schema({
     username: { type: String, unique: true, required: true },
     password: { type: String },

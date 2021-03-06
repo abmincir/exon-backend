@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 const sql = require('mssql');
 const fs = require('fs');
-const nodeFetch = require('node-fetch');
 exports.MockData = () => __awaiter(void 0, void 0, void 0, function* () {
     return new Promise((res, rej) => __awaiter(void 0, void 0, void 0, function* () {
         try {

@@ -54,11 +54,9 @@ exports.estelam = () => __awaiter(void 0, void 0, void 0, function* () {
                 const envelope = 'soap:Envelope';
                 const body = 'soap:Body';
                 const diffgram = 'diffgr:diffgram';
-                jsonResult[envelope][body][0].EstelameBarnameResponse[0].EstelameBarnameResult[0][diffgram][0].NewDataSet[0].Table1.map((barname) => {
-                    console.log(barname.hamlid[0], '\n\n');
-                    // return barname;
+                jsonResult[envelope][body][0].EstelameBarnameResponse[0].EstelameBarnameResult[0][diffgram][0].NewDataSet[0].Table1.map((bill) => {
+                    console.log(bill.hamlid[0], '\n\n');
                 });
-                // );
                 console.log('Done');
                 res(jsonResult);
             })

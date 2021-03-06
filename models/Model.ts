@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const BarnameSchema = new Schema(
+const BillSchema = new Schema(
   {
     allocationId: String, //spsId
     purchaseId: String,
@@ -58,7 +58,7 @@ const BarnameSchema = new Schema(
   { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }
 );
 
-exports.Barname = mongoose.model('Barname', BarnameSchema);
+exports.Bill = mongoose.model('Bill', BillSchema);
 
 const UserSchema = new Schema(
   {
