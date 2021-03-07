@@ -112,8 +112,8 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     });
     console.log('+++++++++++++++++');
     try {
-        // const result = await SQLService.FetchData({
-        const result = yield SQLService.MockData({
+        // const result = await SQLService.MockData({
+        const result = yield SQLService.FetchData({
             startDate: startDateSql,
             endDate: endDateSql,
         });

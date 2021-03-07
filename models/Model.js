@@ -38,9 +38,10 @@ const BillSchema = new Schema({
     bill: {
         id: {
             type: String,
-            // unique: true,
-            // index: true,
+            unique: true,
+            index: true,
             required: true,
+            dropDups: true,
         },
         row: String,
         number: String,
