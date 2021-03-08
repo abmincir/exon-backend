@@ -25,7 +25,7 @@ exports.estelam = (purchaseId) => __awaiter(void 0, void 0, void 0, function* ()
             <tem:pass>exon@321</tem:pass>
             <tem:fromDate></tem:fromDate>
             <tem:toDate></tem:toDate>
-            <tem:kharidId>${401003}</tem:kharidId>
+            <tem:kharidId>${purchaseId}</tem:kharidId>
             <tem:TakhsisId></tem:TakhsisId>
             <tem:KutajNumber></tem:KutajNumber>
             <tem:IdHaml></tem:IdHaml>
@@ -41,7 +41,6 @@ exports.estelam = (purchaseId) => __awaiter(void 0, void 0, void 0, function* ()
                     SOAPAction: 'http://tempuri.org/EstelameBarname',
                 },
             });
-            // console.log(result);
             var parser = new xml2js.Parser( /* options */);
             parser
                 .parseStringPromise(result.data)
@@ -49,24 +48,38 @@ exports.estelam = (purchaseId) => __awaiter(void 0, void 0, void 0, function* ()
                 const envelope = 'soap:Envelope';
                 const body = 'soap:Body';
                 const diffgram = 'diffgr:diffgram';
-                const bills = [
+                const result = [
                     ...jsonResult[envelope][body][0].EstelameBarnameResponse[0]
                         .EstelameBarnameResult[0][diffgram][0].NewDataSet[0].Table1,
                 ];
-                bills.map((bill) => {
-                    console.log(bill);
-                    return {
-                        cottageNumber: bill.kutajnumber[0],
-                        weight: bill.weightk[0],
-                        draftNumber: bill.hamlid[0],
-                        billNumber: bill.barnamen[0],
-                    };
+                const bills = [];
+                const errors = [];
+                result.map((bill, index) => {
+                    if (index < result.length - 1) {
+                        bills.push({
+                            cottageNumber: bill && bill.kutajnumber ? bill.kutajnumber[0] : '',
+                            weight: bill && bill.weightk ? bill.weightk[0] : '',
+                            draftNumber: bill && bill.hamlid ? bill.hamlid[0] : '',
+                            billNumber: bill && bill.barnamen ? bill.barnamen[0] : '',
+                        });
+                    }
+                    else {
+                        errors.push({
+                            errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '',
+                            errorMessage: bill && bill.ErrorMsg ? bill.ErrorMsg[0] : '',
+                        });
+                    }
                 });
-                console.log(bills);
+                if (errors[0].errorCode !== '0') {
+                    rej(errors);
+                }
+                else {
+                    res(bills);
+                }
             })
                 .catch(function (err) {
                 console.error(err);
-                // Failed
+                rej(err);
             });
         }
         catch (error) {

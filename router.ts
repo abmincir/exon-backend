@@ -14,7 +14,7 @@ module.exports = (app: any) => {
   app.post('/bill/fetch', jsonParser, BillController.getAll);
   app.post('/bill/update-db', jsonParser, BillController.updateDb);
 
-  app.post('/bill/estelam', BillController.estelam);
+  app.post('/bill/estelam', jsonParser, BillController.estelam);
 
   app.post('/sql', jsonParser, BillController.fetch);
   app.post('/test', jsonParser, BillController.dummy);

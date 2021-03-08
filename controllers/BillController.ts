@@ -4,19 +4,34 @@ const SPSWS = require('../services/SPSWSService');
 const SQLService = require('../services/SQLService');
 
 exports.estelam = async (req: any, res: any) => {
-  // const { userName, pass, kharidId, toDate, fromDate } = req.body;
+  const { purchaseId, billNumber, draftNumber, weight } = req.body;
 
   try {
-    const result = await SPSWS.estelam({
-      // userName,
-      // pass,
-      // kharidId,
-      // toDate,
-      // fromDate,
-    });
+    const result = await SPSWS.estelam(purchaseId);
+
+    const foundedBill = result.find(
+      (bill: any) =>
+        bill.billNumber === billNumber && bill.draftNumber === draftNumber
+    );
+
+    if (!foundedBill) {
+      res.status(422).send({
+        error: 'we have an issue',
+        err: 'بارنامه مورد نظر موجود نیست',
+      });
+    }
+
+    if (weight !== foundedBill.weight) {
+      res.status(422).send({
+        error: 'we have an issue',
+        err: 'عدم تطابق وزن',
+      });
+    }
+
     res.send({ result });
-  } catch (error: any) {
-    console.error(error);
+  } catch (err: any) {
+    console.error(err);
+    res.status(422).send({ error: 'we have an issue', err });
   }
 };
 
@@ -25,7 +40,6 @@ exports.edit = async (req: any, res: any) => {
 
   SPSWS.estelam({ Amount, CallbackURL, Description, Email, Mobile })
     .then((result: any) => {
-      console.log(result);
       return res.send({ result });
     })
     .catch((err: any) =>

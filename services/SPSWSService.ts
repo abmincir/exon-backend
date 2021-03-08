@@ -16,7 +16,7 @@ exports.estelam = async (purchaseId: string) => {
             <tem:pass>exon@321</tem:pass>
             <tem:fromDate></tem:fromDate>
             <tem:toDate></tem:toDate>
-            <tem:kharidId>${401003}</tem:kharidId>
+            <tem:kharidId>${purchaseId}</tem:kharidId>
             <tem:TakhsisId></tem:TakhsisId>
             <tem:KutajNumber></tem:KutajNumber>
             <tem:IdHaml></tem:IdHaml>
@@ -37,7 +37,6 @@ exports.estelam = async (purchaseId: string) => {
           },
         }
       );
-      // console.log(result);
 
       var parser = new xml2js.Parser(/* options */);
       parser
@@ -47,27 +46,40 @@ exports.estelam = async (purchaseId: string) => {
           const body: any = 'soap:Body';
           const diffgram: any = 'diffgr:diffgram';
 
-          const bills = [
+          const result = [
             ...jsonResult[envelope][body][0].EstelameBarnameResponse[0]
               .EstelameBarnameResult[0][diffgram][0].NewDataSet[0].Table1,
           ];
 
-          bills.map((bill: any) => {
-            console.log(bill);
+          const bills: any = [];
+          const errors: any = [];
 
-            return {
-              cottageNumber: bill.kutajnumber[0],
-              weight: bill.weightk[0],
-              draftNumber: bill.hamlid[0],
-              billNumber: bill.barnamen[0],
-            };
+          result.map((bill: any, index: number) => {
+            if (index < result.length - 1) {
+              bills.push({
+                cottageNumber:
+                  bill && bill.kutajnumber ? bill.kutajnumber[0] : '',
+                weight: bill && bill.weightk ? bill.weightk[0] : '',
+                draftNumber: bill && bill.hamlid ? bill.hamlid[0] : '',
+                billNumber: bill && bill.barnamen ? bill.barnamen[0] : '',
+              });
+            } else {
+              errors.push({
+                errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '',
+                errorMessage: bill && bill.ErrorMsg ? bill.ErrorMsg[0] : '',
+              });
+            }
           });
 
-          console.log(bills);
+          if (errors[0].errorCode !== '0') {
+            rej(errors);
+          } else {
+            res(bills);
+          }
         })
         .catch(function (err: any) {
           console.error(err);
-          // Failed
+          rej(err);
         });
     } catch (error: any) {
       rej(error);

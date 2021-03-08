@@ -13,26 +13,33 @@ const moment = require('jalali-moment');
 const SPSWS = require('../services/SPSWSService');
 const SQLService = require('../services/SQLService');
 exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // const { userName, pass, kharidId, toDate, fromDate } = req.body;
+    const { purchaseId, billNumber, draftNumber, weight } = req.body;
     try {
-        const result = yield SPSWS.estelam({
-        // userName,
-        // pass,
-        // kharidId,
-        // toDate,
-        // fromDate,
-        });
+        const result = yield SPSWS.estelam(purchaseId);
+        const foundedBill = result.find((bill) => bill.billNumber === billNumber && bill.draftNumber === draftNumber);
+        if (!foundedBill) {
+            res.status(422).send({
+                error: 'we have an issue',
+                err: 'بارنامه مورد نظر موجود نیست',
+            });
+        }
+        if (weight !== foundedBill.weight) {
+            res.status(422).send({
+                error: 'we have an issue',
+                err: 'عدم تطابق وزن',
+            });
+        }
         res.send({ result });
     }
-    catch (error) {
-        console.error(error);
+    catch (err) {
+        console.error(err);
+        res.status(422).send({ error: 'we have an issue', err });
     }
 });
 exports.edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { Amount, CallbackURL, Description, Email, Mobile } = req.body;
     SPSWS.estelam({ Amount, CallbackURL, Description, Email, Mobile })
         .then((result) => {
-        console.log(result);
         return res.send({ result });
     })
         .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
@@ -117,8 +124,8 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     });
     console.log('+++++++++++++++++');
     try {
-        const result = yield SQLService.MockData({
-            // const result = await SQLService.FetchData({
+        // const result = await SQLService.MockData({
+        const result = yield SQLService.FetchData({
             startDate: startDateSql,
             endDate: endDateSql,
         });
@@ -132,7 +139,6 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 .from(calculatedDate, 'fa', 'YYYY/MM/DD')
                 .locale('en')
                 .format('YYYY-M-D HH:mm:ss'));
-            console.log(bill.Barno + '@' + bill.barnoCode, mongoDate);
             return new Bill({
                 allocationId: bill.ref,
                 purchaseId: bill.bargah,
@@ -178,6 +184,13 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         Bill.insertMany(bills)
             .then((savedBills) => {
             console.log(bills.length, savedBills.length);
+        })
+            .catch((error) => {
+            if (error) {
+                console.error(error);
+            }
+        })
+            .finally(() => {
             let query = {
                 date: {
                     $gte: new Date(startDateMongo),
@@ -190,11 +203,6 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 .exec()
                 .then((foundedBill) => res.json({ bill: foundedBill }))
                 .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
-        })
-            .catch((error) => {
-            if (error) {
-                console.error(error);
-            }
         });
     }
     catch (error) {
