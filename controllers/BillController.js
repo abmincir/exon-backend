@@ -13,23 +13,49 @@ const moment = require('jalali-moment');
 const SPSWS = require('../services/SPSWSService');
 const SQLService = require('../services/SQLService');
 exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { purchaseId, billNumber, draftNumber, weight } = req.body;
+    const { _id, purchaseId, billNumber, weight } = req.body;
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Type', 'application/json');
     try {
         const result = yield SPSWS.estelam(purchaseId);
-        const foundedBill = result.find((bill) => bill.billNumber === billNumber && bill.draftNumber === draftNumber);
+        const foundedBill = result.find((bill) => bill.billNumber === billNumber);
         if (!foundedBill) {
-            res.status(422).send({
-                error: 'we have an issue',
-                err: 'بارنامه مورد نظر موجود نیست',
+            Bill.findById(_id, (err, doc) => {
+                if (err) {
+                    res.status(422).send({ error: 'we have an issue', err });
+                }
+                doc.status = 2;
+                doc.save().then(() => {
+                    res.status(422).send({
+                        error: 'we have an issue',
+                        err: 'بارنامه مورد نظر موجود نیست',
+                    });
+                });
             });
         }
         if (weight !== foundedBill.weight) {
-            res.status(422).send({
-                error: 'we have an issue',
-                err: 'عدم تطابق وزن',
+            Bill.findById(_id, (err, doc) => {
+                if (err) {
+                    res.status(422).send({ error: 'we have an issue', err });
+                }
+                doc.cottageNumber = foundedBill.cottageNumber;
+                doc.status = 0;
+                doc.save().then(() => {
+                    res.status(422).send({
+                        error: 'we have an issue',
+                        err: 'عدم تطابق وزن',
+                    });
+                });
             });
         }
-        res.send({ result });
+        Bill.findById(_id, (err, doc) => {
+            if (err) {
+                res.status(422).send({ error: 'we have an issue', err });
+            }
+            doc.cottageNumber = foundedBill.cottageNumber;
+            doc.status = 1;
+            doc.save().then(() => res.send({ result }));
+        });
     }
     catch (err) {
         console.error(err);
