@@ -38,7 +38,7 @@ exports.edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
 });
 exports.getAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { startDate, endDate } = req.body;
+    let { startDate, endDate, billNumber } = req.body;
     if (!startDate || !endDate) {
         startDate = moment().locale('fa').format('YYYY/MM/DD');
         endDate = moment().locale('fa').add(1, 'day').format('YYYY/MM/DD');
@@ -54,12 +54,18 @@ exports.getAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('Start Date Is -> ', startDate, startDateG, new Date(startDateG));
     console.log('-----------------');
     console.log('End Date Is -> ', endDate, endDateG, new Date(endDateG));
-    let query = {
-        date: {
-            $gte: new Date(startDateG),
-            $lte: new Date(endDateG),
-        },
-    };
+    let query = billNumber && billNumber.length
+        ? {
+            bill: {
+                number: billNumber,
+            },
+        }
+        : {
+            date: {
+                $gte: new Date(startDateG),
+                $lte: new Date(endDateG),
+            },
+        };
     Bill.find(query)
         // .limit(60)
         .sort({ date: 1 })
@@ -127,7 +133,8 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 .from(calculatedDate, 'fa', 'YYYY/MM/DD')
                 .locale('en')
                 .format('YYYY-M-D HH:mm:ss'));
-            const newBill = new Bill({
+            console.log(bill.Barno + '@' + bill.barnoCode, mongoDate);
+            return new Bill({
                 allocationId: bill.ref,
                 purchaseId: bill.bargah,
                 salesmanCode: bill.code,
@@ -168,17 +175,22 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 },
                 date: mongoDate,
             });
-            // newBill
-            //   .save()
-            //   .then()
-            //   .catch((err: any) => {
-            //     console.log(err);
-            //   });
-            return newBill;
         });
-        Bill.insertMany()
+        Bill.insertMany(bills)
             .then((savedBills) => {
             console.log(bills.length, savedBills.length);
+            let query = {
+                date: {
+                    $gte: new Date(startDateMongo),
+                    $lte: new Date(endDateMongo),
+                },
+            };
+            Bill.find(query)
+                // .limit(60)
+                .sort({ date: 1 })
+                .exec()
+                .then((foundedBill) => res.json({ bill: foundedBill }))
+                .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
         })
             .catch((error) => {
             if (error) {
@@ -189,16 +201,4 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         console.error(error);
     }
-    let query = {
-        date: {
-            $gte: new Date(startDateMongo),
-            $lte: new Date(endDateMongo),
-        },
-    };
-    Bill.find(query)
-        // .limit(60)
-        .sort({ date: 1 })
-        .exec()
-        .then((foundedBill) => res.json({ bill: foundedBill }))
-        .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
 });

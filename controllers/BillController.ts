@@ -34,7 +34,7 @@ exports.edit = async (req: any, res: any) => {
 };
 
 exports.getAll = async (req: any, res: any) => {
-  let { startDate, endDate } = req.body;
+  let { startDate, endDate, billNumber } = req.body;
 
   if (!startDate || !endDate) {
     startDate = moment().locale('fa').format('YYYY/MM/DD');
@@ -55,12 +55,19 @@ exports.getAll = async (req: any, res: any) => {
   console.log('-----------------');
   console.log('End Date Is -> ', endDate, endDateG, new Date(endDateG));
 
-  let query = {
-    date: {
-      $gte: new Date(startDateG),
-      $lte: new Date(endDateG),
-    },
-  };
+  let query =
+    billNumber && billNumber.length
+      ? {
+          bill: {
+            number: billNumber,
+          },
+        }
+      : {
+          date: {
+            $gte: new Date(startDateG),
+            $lte: new Date(endDateG),
+          },
+        };
 
   Bill.find(query)
     // .limit(60)
@@ -154,7 +161,9 @@ exports.updateDb = async (req: any, res: any) => {
           .format('YYYY-M-D HH:mm:ss')
       );
 
-      const newBill = new Bill({
+      console.log(bill.Barno + '@' + bill.barnoCode, mongoDate);
+
+      return new Bill({
         allocationId: bill.ref,
         purchaseId: bill.bargah, //spsId
 
@@ -203,18 +212,9 @@ exports.updateDb = async (req: any, res: any) => {
 
         date: mongoDate,
       });
-
-      // newBill
-      //   .save()
-      //   .then()
-      //   .catch((err: any) => {
-      //     console.log(err);
-      //   });
-
-      return newBill;
     });
 
-    Bill.insertMany()
+    Bill.insertMany(bills)
       .then((savedBills: any) => {
         console.log(bills.length, savedBills.length);
 
