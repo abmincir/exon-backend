@@ -134,8 +134,8 @@ exports.updateDb = async (req: any, res: any) => {
   console.log('+++++++++++++++++');
 
   try {
-    // const result = await SQLService.MockData({
-    const result = await SQLService.FetchData({
+    const result = await SQLService.MockData({
+      // const result = await SQLService.FetchData({
       startDate: startDateSql,
       endDate: endDateSql,
     });
@@ -204,38 +204,42 @@ exports.updateDb = async (req: any, res: any) => {
         date: mongoDate,
       });
 
-      newBill
-        .save()
-        .then()
-        .catch((err: any) => {
-          console.log(err);
-        });
+      // newBill
+      //   .save()
+      //   .then()
+      //   .catch((err: any) => {
+      //     console.log(err);
+      //   });
 
       return newBill;
     });
 
-    // Bill.insertMany(bills, (error: any) => {
-    //   if (error) {
-    //     console.log(error);
-    //   }
-    // });
+    Bill.insertMany()
+      .then((savedBills: any) => {
+        console.log(bills.length, savedBills.length);
+
+        let query = {
+          date: {
+            $gte: new Date(startDateMongo),
+            $lte: new Date(endDateMongo),
+          },
+        };
+
+        Bill.find(query)
+          // .limit(60)
+          .sort({ date: 1 })
+          .exec()
+          .then((foundedBill: any) => res.json({ bill: foundedBill }))
+          .catch((err: any) =>
+            res.status(422).send({ error: 'we have an issue', err })
+          );
+      })
+      .catch((error: any) => {
+        if (error) {
+          console.error(error);
+        }
+      });
   } catch (error: any) {
     console.error(error);
   }
-
-  let query = {
-    date: {
-      $gte: new Date(startDateMongo),
-      $lte: new Date(endDateMongo),
-    },
-  };
-
-  Bill.find(query)
-    // .limit(60)
-    .sort({ date: 1 })
-    .exec()
-    .then((foundedBill: any) => res.json({ bill: foundedBill }))
-    .catch((err: any) =>
-      res.status(422).send({ error: 'we have an issue', err })
-    );
 };

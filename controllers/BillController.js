@@ -112,8 +112,8 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     });
     console.log('+++++++++++++++++');
     try {
-        // const result = await SQLService.MockData({
-        const result = yield SQLService.FetchData({
+        const result = yield SQLService.MockData({
+            // const result = await SQLService.FetchData({
             startDate: startDateSql,
             endDate: endDateSql,
         });
@@ -168,19 +168,23 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 },
                 date: mongoDate,
             });
-            newBill
-                .save()
-                .then()
-                .catch((err) => {
-                console.log(err);
-            });
+            // newBill
+            //   .save()
+            //   .then()
+            //   .catch((err: any) => {
+            //     console.log(err);
+            //   });
             return newBill;
         });
-        // Bill.insertMany(bills, (error: any) => {
-        //   if (error) {
-        //     console.log(error);
-        //   }
-        // });
+        Bill.insertMany()
+            .then((savedBills) => {
+            console.log(bills.length, savedBills.length);
+        })
+            .catch((error) => {
+            if (error) {
+                console.error(error);
+            }
+        });
     }
     catch (error) {
         console.error(error);
