@@ -4,7 +4,7 @@ const SPSWS = require('../services/SPSWSService');
 const SQLService = require('../services/SQLService');
 
 exports.estelam = async (req: any, res: any) => {
-  const { purchaseId, billNumber, draftNumber, weight } = req.body;
+  const { _id, purchaseId, billNumber, draftNumber, weight } = req.body;
 
   try {
     const result = await SPSWS.estelam(purchaseId);
@@ -28,7 +28,14 @@ exports.estelam = async (req: any, res: any) => {
       });
     }
 
-    res.send({ result });
+    Bill.findById(_id, (err: any, doc: any) => {
+      if (err) {
+        res.status(422).send({ error: 'we have an issue', err });
+      }
+
+      doc.cottageNumber = foundedBill.cottageNumber;
+      doc.save().then(() => res.send({ result }));
+    });
   } catch (err: any) {
     console.error(err);
     res.status(422).send({ error: 'we have an issue', err });
