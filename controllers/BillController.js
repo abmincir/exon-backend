@@ -54,11 +54,10 @@ exports.getAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('Start Date Is -> ', startDate, startDateG, new Date(startDateG));
     console.log('-----------------');
     console.log('End Date Is -> ', endDate, endDateG, new Date(endDateG));
+    console.log(billNumber);
     let query = billNumber && billNumber.length
         ? {
-            bill: {
-                number: billNumber,
-            },
+            'bill.number': billNumber,
         }
         : {
             date: {

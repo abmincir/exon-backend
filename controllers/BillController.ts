@@ -55,12 +55,12 @@ exports.getAll = async (req: any, res: any) => {
   console.log('-----------------');
   console.log('End Date Is -> ', endDate, endDateG, new Date(endDateG));
 
+  console.log(billNumber);
+
   let query =
     billNumber && billNumber.length
       ? {
-          bill: {
-            number: billNumber,
-          },
+          'bill.number': billNumber,
         }
       : {
           date: {
@@ -141,8 +141,8 @@ exports.updateDb = async (req: any, res: any) => {
   console.log('+++++++++++++++++');
 
   try {
-    const result = await SQLService.MockData({
-      // const result = await SQLService.FetchData({
+    // const result = await SQLService.MockData({
+    const result = await SQLService.FetchData({
       startDate: startDateSql,
       endDate: endDateSql,
     });
@@ -160,8 +160,6 @@ exports.updateDb = async (req: any, res: any) => {
           .locale('en')
           .format('YYYY-M-D HH:mm:ss')
       );
-
-      console.log(bill.Barno + '@' + bill.barnoCode, mongoDate);
 
       return new Bill({
         allocationId: bill.ref,
@@ -217,7 +215,13 @@ exports.updateDb = async (req: any, res: any) => {
     Bill.insertMany(bills)
       .then((savedBills: any) => {
         console.log(bills.length, savedBills.length);
-
+      })
+      .catch((error: any) => {
+        if (error) {
+          console.error(error);
+        }
+      })
+      .finally(() => {
         let query = {
           date: {
             $gte: new Date(startDateMongo),
@@ -233,11 +237,6 @@ exports.updateDb = async (req: any, res: any) => {
           .catch((err: any) =>
             res.status(422).send({ error: 'we have an issue', err })
           );
-      })
-      .catch((error: any) => {
-        if (error) {
-          console.error(error);
-        }
       });
   } catch (error: any) {
     console.error(error);
