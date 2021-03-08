@@ -58,12 +58,12 @@ exports.getAll = async (req: any, res: any) => {
   let query = {
     date: {
       $gte: new Date(startDateG),
-      $lt: new Date(endDateG),
+      $lte: new Date(endDateG),
     },
   };
 
   Bill.find(query)
-    .limit(60)
+    // .limit(60)
     .sort({ date: 1 })
     .exec()
     .then((foundedBill: any) => res.json({ bill: foundedBill }))
@@ -193,7 +193,7 @@ exports.updateDb = async (req: any, res: any) => {
         },
 
         bill: {
-          id: bill.Barno,
+          id: bill.Barno + '@' + bill.barnoCode,
           row: bill.serial,
           number: bill.Barno.split('-')[0],
           serial: bill.Barno.split('-')[1],
@@ -210,14 +210,15 @@ exports.updateDb = async (req: any, res: any) => {
         .catch((err: any) => {
           console.log(err);
         });
+
       return newBill;
     });
 
-    Bill.insertMany(bills, (error: any) => {
-      if (error) {
-        console.log(error);
-      }
-    });
+    // Bill.insertMany(bills, (error: any) => {
+    //   if (error) {
+    //     console.log(error);
+    //   }
+    // });
   } catch (error: any) {
     console.error(error);
   }
@@ -225,12 +226,12 @@ exports.updateDb = async (req: any, res: any) => {
   let query = {
     date: {
       $gte: new Date(startDateMongo),
-      $lt: new Date(endDateMongo),
+      $lte: new Date(endDateMongo),
     },
   };
 
   Bill.find(query)
-    .limit(60)
+    // .limit(60)
     .sort({ date: 1 })
     .exec()
     .then((foundedBill: any) => res.json({ bill: foundedBill }))
