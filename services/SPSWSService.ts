@@ -4,13 +4,7 @@ const url = 'https://spsws.bki.ir/spsws.asmx?WSDL';
 const userName = '10103740920';
 const pass = 'exon@321';
 
-exports.estelam = async () => {
-  const args = {
-    userName,
-    pass,
-    kharidId: '1',
-  };
-
+exports.estelam = async (purchaseId: string) => {
   const xmls = `
   <x:Envelope
     xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
@@ -20,9 +14,9 @@ exports.estelam = async () => {
         <tem:EstelameBarname>
             <tem:userName>10103740920</tem:userName>
             <tem:pass>exon@321</tem:pass>
-            <tem:fromDate>1399/12/04</tem:fromDate>
-            <tem:toDate>1399/12/04</tem:toDate>
-            <tem:kharidId></tem:kharidId>
+            <tem:fromDate></tem:fromDate>
+            <tem:toDate></tem:toDate>
+            <tem:kharidId>${401003}</tem:kharidId>
             <tem:TakhsisId></tem:TakhsisId>
             <tem:KutajNumber></tem:KutajNumber>
             <tem:IdHaml></tem:IdHaml>
@@ -53,17 +47,26 @@ exports.estelam = async () => {
           const body: any = 'soap:Body';
           const diffgram: any = 'diffgr:diffgram';
 
-          jsonResult[envelope][
-            body
-          ][0].EstelameBarnameResponse[0].EstelameBarnameResult[0][
-            diffgram
-          ][0].NewDataSet[0].Table1.map((bill: any) => {
-            console.log(bill.hamlid[0], '\n\n');
+          const bills = [
+            ...jsonResult[envelope][body][0].EstelameBarnameResponse[0]
+              .EstelameBarnameResult[0][diffgram][0].NewDataSet[0].Table1,
+          ];
+
+          bills.map((bill: any) => {
+            console.log(bill);
+
+            return {
+              cottageNumber: bill.kutajnumber[0],
+              weight: bill.weightk[0],
+              draftNumber: bill.hamlid[0],
+              billNumber: bill.barnamen[0],
+            };
           });
-          console.log('Done');
-          res(jsonResult);
+
+          console.log(bills);
         })
         .catch(function (err: any) {
+          console.error(err);
           // Failed
         });
     } catch (error: any) {
