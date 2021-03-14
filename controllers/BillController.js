@@ -39,6 +39,7 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     res.status(422).send({ error: 'we have an issue', err });
                 }
                 doc.cottageNumber = foundedBill.cottageNumber;
+                doc.spsWeight = foundedBill.weight;
                 doc.status = 0;
                 doc.save().then(() => {
                     res.status(422).send({
@@ -53,6 +54,7 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 res.status(422).send({ error: 'we have an issue', err });
             }
             doc.cottageNumber = foundedBill.cottageNumber;
+            doc.spsWeight = foundedBill.weight;
             doc.spsDraft = foundedBill.draftNumber;
             doc.driver.name = foundedBill.driverName;
             doc.status = 1;
