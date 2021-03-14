@@ -21,7 +21,6 @@ exports.estelam = async (req: any, res: any) => {
         if (err) {
           res.status(422).send({ error: 'we have an issue', err });
         }
-
         doc.status = 2;
         doc.save().then(() => {
           res.status(422).send({
@@ -37,7 +36,6 @@ exports.estelam = async (req: any, res: any) => {
         if (err) {
           res.status(422).send({ error: 'we have an issue', err });
         }
-
         doc.cottageNumber = foundedBill.cottageNumber;
         doc.status = 0;
         doc.save().then(() => {
@@ -53,8 +51,9 @@ exports.estelam = async (req: any, res: any) => {
       if (err) {
         res.status(422).send({ error: 'we have an issue', err });
       }
-
       doc.cottageNumber = foundedBill.cottageNumber;
+      doc.spsDraft = foundedBill.draftNumber;
+      doc.driver.name = foundedBill.driverName;
       doc.status = 1;
       doc.save().then(() => res.send({ result }));
     });
@@ -65,9 +64,16 @@ exports.estelam = async (req: any, res: any) => {
 };
 
 exports.edit = async (req: any, res: any) => {
-  const { Amount, CallbackURL, Description, Email, Mobile } = req.body;
+  const { _id, weight } = req.body;
 
-  SPSWS.estelam({ Amount, CallbackURL, Description, Email, Mobile })
+  let bill;
+  try {
+    bill = await Bill.findById(_id);
+  } catch (err: any) {
+    res.status(422).send({ error: 'we have an issue', err });
+  }
+
+  SPSWS.edit(bill, weight)
     .then((result: any) => {
       return res.send({ result });
     })
@@ -209,8 +215,10 @@ exports.updateDb = async (req: any, res: any) => {
         purchaseId: bill.bargah, //spsId
 
         salesmanCode: bill.code,
-        carNumber: bill.Carno,
-        telephone: bill.tel,
+
+        driver: {
+          carNumber: bill.Carno,
+        },
 
         draft: {
           number: bill.barnoCode,
@@ -232,6 +240,7 @@ exports.updateDb = async (req: any, res: any) => {
         receiver: {
           name: bill.recivename,
           postCode: bill.post_code,
+          telephone: bill.tel,
           telAddress: bill.telAdress,
           nationalId: bill.meli,
         },

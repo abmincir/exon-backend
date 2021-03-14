@@ -53,6 +53,8 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 res.status(422).send({ error: 'we have an issue', err });
             }
             doc.cottageNumber = foundedBill.cottageNumber;
+            doc.spsDraft = foundedBill.draftNumber;
+            doc.driver.name = foundedBill.driverName;
             doc.status = 1;
             doc.save().then(() => res.send({ result }));
         });
@@ -63,8 +65,15 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { Amount, CallbackURL, Description, Email, Mobile } = req.body;
-    SPSWS.estelam({ Amount, CallbackURL, Description, Email, Mobile })
+    const { _id, weight } = req.body;
+    let bill;
+    try {
+        bill = yield Bill.findById(_id);
+    }
+    catch (err) {
+        res.status(422).send({ error: 'we have an issue', err });
+    }
+    SPSWS.edit(bill, weight)
         .then((result) => {
         return res.send({ result });
     })
@@ -169,8 +178,9 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 allocationId: bill.ref,
                 purchaseId: bill.bargah,
                 salesmanCode: bill.code,
-                carNumber: bill.Carno,
-                telephone: bill.tel,
+                driver: {
+                    carNumber: bill.Carno,
+                },
                 draft: {
                     number: bill.barnoCode,
                     weight: bill.havaleWeight,
@@ -188,6 +198,7 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 receiver: {
                     name: bill.recivename,
                     postCode: bill.post_code,
+                    telephone: bill.tel,
                     telAddress: bill.telAdress,
                     nationalId: bill.meli,
                 },

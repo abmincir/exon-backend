@@ -6,10 +6,13 @@ const BillSchema = new Schema({
     purchaseId: String,
     merchantWeight: String,
     spsWeight: String,
+    spsDraft: String,
     cottageNumber: String,
     salesmanCode: String,
-    carNumber: String,
-    telephone: String,
+    driver: {
+        name: String,
+        carNumber: String,
+    },
     draft: {
         number: String,
         weight: String,
@@ -27,6 +30,7 @@ const BillSchema = new Schema({
     receiver: {
         name: String,
         postCode: String,
+        telephone: String,
         telAddress: String,
         nationalId: String,
     },
