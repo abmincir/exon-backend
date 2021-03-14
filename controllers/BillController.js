@@ -75,7 +75,7 @@ exports.edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     catch (err) {
         res.status(422).send({ error: 'we have an issue', err });
     }
-    SPSWS.edit(bill, weight)
+    SPSWS.edit(_id, bill, weight)
         .then((result) => {
         return res.send({ result });
     })

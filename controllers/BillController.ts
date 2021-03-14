@@ -75,7 +75,7 @@ exports.edit = async (req: any, res: any) => {
     res.status(422).send({ error: 'we have an issue', err });
   }
 
-  SPSWS.edit(bill, weight)
+  SPSWS.edit(_id, bill, weight)
     .then((result: any) => {
       return res.send({ result });
     })

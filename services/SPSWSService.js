@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 const axios = require('axios');
 var xml2js = require('xml2js');
+const BillModel = require('../models/Model').Bill;
 const url = 'https://spsws.bki.ir/spsws.asmx?WSDL';
 const userName = '10103740920';
 const pass = 'exon@321';
@@ -88,7 +89,7 @@ exports.estelam = (purchaseId) => __awaiter(void 0, void 0, void 0, function* ()
         }
     }));
 });
-exports.edit = (bill, weight) => __awaiter(void 0, void 0, void 0, function* () {
+exports.edit = (_id, bill, weight) => __awaiter(void 0, void 0, void 0, function* () {
     const { spsDraft } = bill;
     const { name, carNumber } = bill.driver;
     const billNumber = bill.bill.number;
@@ -138,22 +139,23 @@ exports.edit = (bill, weight) => __awaiter(void 0, void 0, void 0, function* () 
                 const errors = [];
                 result.map((bill, index) => __awaiter(this, void 0, void 0, function* () {
                     if (index < result.length - 1) {
-                        if (bill && bill.errorcode && bill.errorcode[0] === '0') {
+                        if (bill && bill.errorcode && bill.errorcode[0] !== '0') {
                             errors.push({
                                 errorCode: bill && bill.errorcode ? bill.errorcode[0] : '',
                                 errorMessage: bill && bill.errormsg ? bill.errormsg[0] : '',
                             });
                         }
                         else {
-                            let changedBill;
                             try {
-                                changedBill = yield Bill.findById(bill._id);
+                                console.log('Editing', _id);
+                                const changedBill = yield BillModel.findById(_id);
+                                changedBill.merchantWeight = weight;
+                                changedBill.save().then(() => console.log(changedBill));
                             }
                             catch (err) {
-                                rej('Not Found After Edit');
+                                console.error(err);
+                                rej({ error: 'Not Found After Edit', err });
                             }
-                            changedBill.merchantWeight = weight;
-                            changedBill.save().then();
                         }
                     }
                     else {

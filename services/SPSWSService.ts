@@ -1,5 +1,6 @@
 const axios = require('axios');
 var xml2js = require('xml2js');
+const BillModel = require('../models/Model').Bill;
 const url = 'https://spsws.bki.ir/spsws.asmx?WSDL';
 const userName = '10103740920';
 const pass = 'exon@321';
@@ -88,7 +89,7 @@ exports.estelam = async (purchaseId: string) => {
   });
 };
 
-exports.edit = async (bill: any, weight: string) => {
+exports.edit = async (_id: string, bill: any, weight: string) => {
   const { spsDraft } = bill;
   const { name, carNumber } = bill.driver;
   const billNumber = bill.bill.number;
@@ -149,20 +150,21 @@ exports.edit = async (bill: any, weight: string) => {
 
           result.map(async (bill: any, index: number) => {
             if (index < result.length - 1) {
-              if (bill && bill.errorcode && bill.errorcode[0] === '0') {
+              if (bill && bill.errorcode && bill.errorcode[0] !== '0') {
                 errors.push({
                   errorCode: bill && bill.errorcode ? bill.errorcode[0] : '',
                   errorMessage: bill && bill.errormsg ? bill.errormsg[0] : '',
                 });
               } else {
-                let changedBill: any;
                 try {
-                  changedBill = await Bill.findById(bill._id);
+                  console.log('Editing', _id);
+                  const changedBill = await BillModel.findById(_id);
+                  changedBill.merchantWeight = weight;
+                  changedBill.save().then(() => console.log(changedBill));
                 } catch (err: any) {
-                  rej('Not Found After Edit');
+                  console.error(err);
+                  rej({ error: 'Not Found After Edit', err });
                 }
-                changedBill.merchantWeight = weight;
-                changedBill.save().then();
               }
             } else {
               errors.push({
