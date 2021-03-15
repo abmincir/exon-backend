@@ -58,6 +58,7 @@ exports.FetchData = (input) => {
                     console.log(error);
                     rej(error);
                 }
+                console.log(result, result.recordset.length());
                 res(result.recordset);
             })
                 .catch((error) => {
