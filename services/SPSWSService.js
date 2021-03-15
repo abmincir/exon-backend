@@ -53,6 +53,7 @@ exports.estelam = (purchaseId) => __awaiter(void 0, void 0, void 0, function* ()
                     ...jsonResult[envelope][body][0].EstelameBarnameResponse[0]
                         .EstelameBarnameResult[0][diffgram][0].NewDataSet[0].Table1,
                 ];
+                console.log(result);
                 const bills = [];
                 const errors = [];
                 result.map((bill, index) => {

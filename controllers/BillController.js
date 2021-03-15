@@ -19,51 +19,53 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield SPSWS.estelam(purchaseId);
         const foundedBill = result.find((bill) => bill.billNumber === billNumber);
-        if (!foundedBill) {
-            Bill.findById(_id, (err, doc) => {
-                if (err) {
-                    res.status(422).send({ error: 'we have an issue', err });
-                }
+        if (foundedBill === null || foundedBill === undefined) {
+            const doc = yield Bill.findById(_id);
+            try {
                 doc.status = 2;
-                doc.save().then(() => {
-                    res.status(422).send({
-                        error: 'we have an issue',
-                        err: 'بارنامه مورد نظر موجود نیست',
-                    });
+                yield doc.save();
+                return res.status(422).send({
+                    error: 'we have an issue',
+                    err: 'بارنامه مورد نظر موجود نیست',
                 });
-            });
+            }
+            catch (err) {
+                return res.status(422).send({ error: 'we have an issue', err });
+            }
         }
         if (weight !== foundedBill.weight) {
-            Bill.findById(_id, (err, doc) => {
-                if (err) {
-                    res.status(422).send({ error: 'we have an issue', err });
-                }
+            try {
+                const doc = yield Bill.findById(_id);
                 doc.cottageNumber = foundedBill.cottageNumber;
                 doc.spsWeight = foundedBill.weight;
                 doc.status = 0;
-                doc.save().then(() => {
-                    res.status(422).send({
-                        error: 'we have an issue',
-                        err: 'عدم تطابق وزن',
-                    });
+                yield doc.save();
+                return res.status(422).send({
+                    error: 'we have an issue',
+                    err: 'عدم تطابق وزن',
                 });
-            });
-        }
-        Bill.findById(_id, (err, doc) => {
-            if (err) {
-                res.status(422).send({ error: 'we have an issue', err });
             }
+            catch (err) {
+                return res.status(422).send({ error: 'we have an issue', err });
+            }
+        }
+        try {
+            const doc = yield Bill.findById(_id);
             doc.cottageNumber = foundedBill.cottageNumber;
             doc.spsWeight = foundedBill.weight;
             doc.spsDraft = foundedBill.draftNumber;
             doc.driver.name = foundedBill.driverName;
             doc.status = 1;
-            doc.save().then(() => res.send({ result }));
-        });
+            yield doc.save();
+            return res.send({ result });
+        }
+        catch (err) {
+            return res.status(422).send({ error: 'we have an issue', err });
+        }
     }
     catch (err) {
         console.error(err);
-        res.status(422).send({ error: 'we have an issue', err });
+        return res.status(422).send({ error: 'we have an issue', err });
     }
 });
 exports.edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -73,7 +75,7 @@ exports.edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         bill = yield Bill.findById(_id);
     }
     catch (err) {
-        res.status(422).send({ error: 'we have an issue', err });
+        return res.status(422).send({ error: 'we have an issue', err });
     }
     SPSWS.edit(_id, bill, weight)
         .then((result) => {

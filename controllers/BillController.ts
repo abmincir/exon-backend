@@ -16,52 +16,59 @@ exports.estelam = async (req: any, res: any) => {
       (bill: any) => bill.billNumber === billNumber
     );
 
-    if (!foundedBill) {
-      Bill.findById(_id, (err: any, doc: any) => {
-        if (err) {
-          res.status(422).send({ error: 'we have an issue', err });
-        }
+    if (foundedBill === null || foundedBill === undefined) {
+      const doc = await Bill.findById(_id);
+      try {
         doc.status = 2;
-        doc.save().then(() => {
-          res.status(422).send({
-            error: 'we have an issue',
-            err: 'بارنامه مورد نظر موجود نیست',
-          });
+
+        await doc.save();
+
+        return res.status(422).send({
+          error: 'we have an issue',
+          err: 'بارنامه مورد نظر موجود نیست',
         });
-      });
+      } catch (err: any) {
+        return res.status(422).send({ error: 'we have an issue', err });
+      }
     }
 
     if (weight !== foundedBill.weight) {
-      Bill.findById(_id, (err: any, doc: any) => {
-        if (err) {
-          res.status(422).send({ error: 'we have an issue', err });
-        }
+      try {
+        const doc = await Bill.findById(_id);
+
         doc.cottageNumber = foundedBill.cottageNumber;
         doc.spsWeight = foundedBill.weight;
         doc.status = 0;
-        doc.save().then(() => {
-          res.status(422).send({
-            error: 'we have an issue',
-            err: 'عدم تطابق وزن',
-          });
+
+        await doc.save();
+
+        return res.status(422).send({
+          error: 'we have an issue',
+          err: 'عدم تطابق وزن',
         });
-      });
+      } catch (err: any) {
+        return res.status(422).send({ error: 'we have an issue', err });
+      }
     }
 
-    Bill.findById(_id, (err: any, doc: any) => {
-      if (err) {
-        res.status(422).send({ error: 'we have an issue', err });
-      }
+    try {
+      const doc = await Bill.findById(_id);
+
       doc.cottageNumber = foundedBill.cottageNumber;
       doc.spsWeight = foundedBill.weight;
       doc.spsDraft = foundedBill.draftNumber;
       doc.driver.name = foundedBill.driverName;
       doc.status = 1;
-      doc.save().then(() => res.send({ result }));
-    });
+
+      await doc.save();
+
+      return res.send({ result });
+    } catch (err: any) {
+      return res.status(422).send({ error: 'we have an issue', err });
+    }
   } catch (err: any) {
     console.error(err);
-    res.status(422).send({ error: 'we have an issue', err });
+    return res.status(422).send({ error: 'we have an issue', err });
   }
 };
 
@@ -72,7 +79,7 @@ exports.edit = async (req: any, res: any) => {
   try {
     bill = await Bill.findById(_id);
   } catch (err: any) {
-    res.status(422).send({ error: 'we have an issue', err });
+    return res.status(422).send({ error: 'we have an issue', err });
   }
 
   SPSWS.edit(_id, bill, weight)

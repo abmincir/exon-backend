@@ -52,6 +52,8 @@ exports.estelam = async (purchaseId: string) => {
               .EstelameBarnameResult[0][diffgram][0].NewDataSet[0].Table1,
           ];
 
+          console.log(result);
+
           const bills: any = [];
           const errors: any = [];
 
