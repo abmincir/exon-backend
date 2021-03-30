@@ -66,6 +66,7 @@ const BillSchema = new Schema(
     },
 
     date: { type: Date, required: true },
+    created: { type: Date, required: true },
     status: { type: Number, default: -1 },
   },
   { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }

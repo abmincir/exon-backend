@@ -162,7 +162,7 @@ exports.getAll = async (req: any, res: any) => {
       .format('YYYY-M-D HH:mm:ss');
 
     Object.assign(query, {
-      saveDate: {
+      created: {
         $gte: new Date(startDateG),
         $lte: new Date(endDateG),
       },
@@ -174,7 +174,7 @@ exports.getAll = async (req: any, res: any) => {
       .format('YYYY-M-D HH:mm:ss');
 
     Object.assign(query, {
-      saveDate: {
+      created: {
         $gte: new Date(startDateG),
       },
     });
@@ -272,6 +272,18 @@ exports.updateDb = async (req: any, res: any) => {
           .format('YYYY-M-D HH:mm:ss')
       );
 
+      const calcCreatedDate =
+        (bill.RegisterDate[0] === '9' ||
+        bill.RegisterDate[0] === '8' ||
+        bill.RegisterDate[0] === '7'
+          ? '13'
+          : '14') + bill.RegisterDate;
+      const mongoCreatedDate = new Date(
+        moment
+          .from(calcCreatedDate, 'fa', 'YYYY/MM/DD')
+          .locale('en')
+          .format('YYYY-M-D HH:mm:ss')
+      );
       return new Bill({
         allocationId: bill.ref,
         purchaseId: bill.bargah, //spsId
@@ -324,6 +336,7 @@ exports.updateDb = async (req: any, res: any) => {
         },
 
         date: mongoDate,
+        created: mongoCreatedDate,
       });
     });
 
