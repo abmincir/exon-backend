@@ -97,7 +97,6 @@ exports.getAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (status !== -2) {
         Object.assign(query, { status });
     }
-    console.log(query);
     if (billNumber) {
         Object.assign(query, { 'bill.number': billNumber });
     }
@@ -161,7 +160,7 @@ exports.getAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     Bill.find(query)
-        // .limit(60)
+        .limit(1000)
         .sort({ date: 1 })
         .exec()
         .then((foundedBill) => res.json({ bill: foundedBill }))

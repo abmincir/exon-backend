@@ -1,5 +1,14 @@
 const Model = require('../models/Model');
 
+exports.getAllUsers = (req: any, res: any) => {
+  Model.User.find({})
+    .exec()
+    .then((foundedUsers: any) => res.json({ users: foundedUsers }))
+    .catch((err: any) =>
+      res.status(422).send({ error: 'we have an issue', err })
+    );
+};
+
 exports.getUser = (req: any, res: any) => {
   Model.User.findById(req.body._id)
     .exec()
@@ -26,8 +35,8 @@ exports.auth = (req: any, res: any) => {
 };
 
 exports.createUser = (req: any, res: any) => {
-  const { username, password } = req.body;
-  Model.User.create({ username, password }, (err: any, user: any) => {
+  const { username, name, password } = req.body;
+  Model.User.create({ username, name, password }, (err: any, user: any) => {
     if (err) return res.status(422).send({ error: 'we have an issue', err });
     res.json({ user });
   });
@@ -46,6 +55,23 @@ exports.changePassword = (req: any, res: any) => {
       } else {
         res.status(401).send({ error: 'Error In Authentication' });
       }
+    })
+    .catch((err: any) =>
+      res.status(422).send({ error: 'we have an issue', err })
+    );
+};
+
+exports.changeUser = (req: any, res: any) => {
+  const { username, newUsername, name, password } = req.body;
+  Model.User.findOne({ username })
+    .exec()
+    .then((foundedUser: any) => {
+      foundedUser.username = newUsername || foundedUser.username;
+      foundedUser.name = name || foundedUser.name;
+      foundedUser.password = password || foundedUser.password;
+      foundedUser
+        .save()
+        .then((savedUser: any) => res.json({ user: savedUser }));
     })
     .catch((err: any) =>
       res.status(422).send({ error: 'we have an issue', err })

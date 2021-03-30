@@ -162,8 +162,7 @@ exports.getAll = async (req: any, res: any) => {
       .format('YYYY-M-D HH:mm:ss');
 
     Object.assign(query, {
-      // todo change
-      date: {
+      saveDate: {
         $gte: new Date(startDateG),
         $lte: new Date(endDateG),
       },
@@ -175,8 +174,7 @@ exports.getAll = async (req: any, res: any) => {
       .format('YYYY-M-D HH:mm:ss');
 
     Object.assign(query, {
-      // todo change
-      date: {
+      saveDate: {
         $gte: new Date(startDateG),
       },
     });
@@ -277,6 +275,7 @@ exports.updateDb = async (req: any, res: any) => {
       return new Bill({
         allocationId: bill.ref,
         purchaseId: bill.bargah, //spsId
+        saveDate: bill.RegisterDate,
 
         salesmanCode: bill.code,
 

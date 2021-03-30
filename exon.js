@@ -64,6 +64,8 @@ const info = {
   // تاریخ حواله
   havaleDate: '99/12/04',
 
+  RegisterDate: '99/12/04',
+
   // فی خرید
   Price_Sale: null,
   // مدت خرید

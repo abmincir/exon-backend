@@ -5,6 +5,7 @@ const BillSchema = new Schema(
   {
     allocationId: String, //spsId
     purchaseId: String,
+    saveDate: String,
 
     merchantWeight: String,
     spsWeight: String,
@@ -75,6 +76,7 @@ exports.Bill = mongoose.model('Bill', BillSchema);
 const UserSchema = new Schema(
   {
     username: { type: String, unique: true, required: true },
+    name: { type: String },
     password: { type: String },
   },
   { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }
