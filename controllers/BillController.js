@@ -82,33 +82,84 @@ exports.edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
 });
 exports.getAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { startDate, endDate, billNumber } = req.body;
-    if (!startDate || !endDate) {
-        startDate = moment().locale('fa').format('YYYY/MM/DD');
-        endDate = moment().locale('fa').add(1, 'day').format('YYYY/MM/DD');
+    let { startDateBill, endDateBill, startDateSave, endDateSave, billNumber, purchaseNumber, status, } = req.body;
+    status = status || status === '0' ? +status : -2;
+    console.log('\n-----\nSearching -> ', {
+        startDateBill,
+        endDateBill,
+        startDateSave,
+        endDateSave,
+        billNumber,
+        purchaseNumber,
+        status,
+    });
+    let query = {};
+    if (status !== -2) {
+        Object.assign(query, { status });
     }
-    const startDateG = moment
-        .from(startDate, 'fa', 'YYYY/MM/DD')
-        .locale('en')
-        .format('YYYY-M-D HH:mm:ss');
-    const endDateG = moment
-        .from(endDate, 'fa', 'YYYY/MM/DD')
-        .locale('en')
-        .format('YYYY-M-D HH:mm:ss');
-    console.log('Start Date Is -> ', startDate, startDateG, new Date(startDateG));
-    console.log('-----------------');
-    console.log('End Date Is -> ', endDate, endDateG, new Date(endDateG));
-    console.log(billNumber);
-    let query = billNumber && billNumber.length
-        ? {
-            'bill.number': billNumber,
-        }
-        : {
+    console.log(query);
+    if (billNumber) {
+        Object.assign(query, { 'bill.number': billNumber });
+    }
+    if (purchaseNumber) {
+        Object.assign(query, { purchaseId: purchaseNumber });
+    }
+    if (startDateBill && endDateBill) {
+        const startDateG = moment
+            .from(startDateBill, 'fa', 'YYYY/MM/DD')
+            .locale('en')
+            .format('YYYY-M-D HH:mm:ss');
+        const endDateG = moment
+            .from(endDateBill, 'fa', 'YYYY/MM/DD')
+            .locale('en')
+            .format('YYYY-M-D HH:mm:ss');
+        Object.assign(query, {
             date: {
                 $gte: new Date(startDateG),
                 $lte: new Date(endDateG),
             },
-        };
+        });
+    }
+    else if (startDateBill) {
+        const startDateG = moment
+            .from(startDateBill, 'fa', 'YYYY/MM/DD')
+            .locale('en')
+            .format('YYYY-M-D HH:mm:ss');
+        Object.assign(query, {
+            date: {
+                $gte: new Date(startDateG),
+            },
+        });
+    }
+    if (startDateSave && endDateSave) {
+        const startDateG = moment
+            .from(startDateSave, 'fa', 'YYYY/MM/DD')
+            .locale('en')
+            .format('YYYY-M-D HH:mm:ss');
+        const endDateG = moment
+            .from(endDateSave, 'fa', 'YYYY/MM/DD')
+            .locale('en')
+            .format('YYYY-M-D HH:mm:ss');
+        Object.assign(query, {
+            // todo change
+            date: {
+                $gte: new Date(startDateG),
+                $lte: new Date(endDateG),
+            },
+        });
+    }
+    else if (startDateSave) {
+        const startDateG = moment
+            .from(startDateSave, 'fa', 'YYYY/MM/DD')
+            .locale('en')
+            .format('YYYY-M-D HH:mm:ss');
+        Object.assign(query, {
+            // todo change
+            date: {
+                $gte: new Date(startDateG),
+            },
+        });
+    }
     Bill.find(query)
         // .limit(60)
         .sort({ date: 1 })
@@ -219,6 +270,27 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 },
                 date: mongoDate,
             });
+        });
+        Promise.all(Bill.insertMany(bills))
+            .then((dep) => {
+            // this will be called when all inserts finish
+            console.log('%%%%%%%%%%%%%%%%%%%', bills.length, dep.length);
+            let query = {
+                date: {
+                    $gte: new Date(startDateMongo),
+                    $lte: new Date(endDateMongo),
+                },
+            };
+            Bill.find(query)
+                // .limit(60)
+                .sort({ date: 1 })
+                .exec()
+                .then((foundedBill) => res.json({ bill: foundedBill }))
+                .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
+            // res.sendStatus(201);
+        })
+            .catch((err) => {
+            console.log(err);
         });
         Bill.insertMany(bills)
             .then((savedBills) => {
