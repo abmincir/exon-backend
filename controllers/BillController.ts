@@ -291,7 +291,7 @@ exports.updateDb = async (req: any, res: any) => {
           .locale('en')
           .format('YYYY-M-D HH:mm:ss')
       );
-      return new Bill({
+      const b = new Bill({
         allocationId: bill.ref,
         purchaseId: bill.bargah, //spsId
         saveDate: bill.RegisterDate,
@@ -345,34 +345,57 @@ exports.updateDb = async (req: any, res: any) => {
         date: mongoDate,
         created: mongoCreatedDate,
       });
+
+      b.save()
+        .then()
+        .catch((e) => {
+          console.error('not saved', e);
+        });
+
+      return b;
     });
 
-    Bill.insertMany(bills, { ordered: false, silent: true })
-      .then((savedBills: any) => {
-        console.log(bills.length, savedBills.length);
-      })
-      .catch((error: any) => {
-        if (error) {
-          console.error(error);
-        }
-      })
-      .finally(() => {
-        let query = {
-          created: {
-            $gte: new Date(startDateMongo),
-            $lte: new Date(endDateMongo),
-          },
-        };
+    let query = {
+      created: {
+        $gte: new Date(startDateMongo),
+        $lte: new Date(endDateMongo),
+      },
+    };
 
-        Bill.find(query)
-          // .limit(60)
-          .sort({ date: 1 })
-          .exec()
-          .then((foundedBill: any) => res.json({ bill: foundedBill }))
-          .catch((err: any) =>
-            res.status(422).send({ error: 'we have an issue', err })
-          );
-      });
+    Bill.find(query)
+      // .limit(60)
+      .sort({ date: 1 })
+      .exec()
+      .then((foundedBill: any) => res.json({ bill: foundedBill }))
+      .catch((err: any) =>
+        res.status(422).send({ error: 'we have an issue', err })
+      );
+    // Bill.insertMany(bills, { ordered: false, silent: true })
+    //   .then((savedBills: any) => {
+    //     console.log(bills.length, savedBills.length);
+    //   })
+    //   .catch((error: any) => {
+    //     if (error) {
+    //       console.error(error);
+    //     }
+    //   })
+    //   .finally(() => {
+    //     let query = {
+    //       created: {
+    //         $gte: new Date(startDateMongo),
+    //         $lte: new Date(endDateMongo),
+    //       },
+    //     };
+
+    //     Bill.find(query)
+    //       // .limit(60)
+    //       .sort({ date: 1 })
+    //       .exec()
+    //       .then((foundedBill: any) => res.json({ bill: foundedBill }))
+    //       .catch((err: any) =>
+    //         res.status(422).send({ error: 'we have an issue', err })
+    //       );
+    //   });
   } catch (error: any) {
     console.error(error);
   }
