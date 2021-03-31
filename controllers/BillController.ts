@@ -355,8 +355,9 @@ exports.updateDb = async (req: any, res: any) => {
         'bill.id': bill.Barno + '@' + bill.barnoCode,
       })
         .exec()
-        .then((fB: any) => {
-          if (!fB) {
+        .then((fB: any[]) => {
+          console.log('not saved found');
+          if (fB.length === 0) {
             b.save()
               .then()
               .catch((e: any) => {
@@ -368,12 +369,7 @@ exports.updateDb = async (req: any, res: any) => {
       return b;
     });
 
-    let query = {
-      created: {
-        $gte: new Date(startDateMongo),
-        $lte: new Date(endDateMongo),
-      },
-    };
+    let query = {};
 
     Bill.find(query)
       // .limit(60)
