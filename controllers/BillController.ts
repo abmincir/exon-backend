@@ -222,6 +222,11 @@ exports.dummy = (req: any, res: any) => {
 exports.updateDb = async (req: any, res: any) => {
   let { startDate, endDate } = req.body;
 
+  console.log({
+    startDate,
+    endDate,
+  });
+
   if (!startDate || !endDate) {
     startDate = moment().locale('fa').format('YYYY/MM/DD');
     endDate = moment().locale('fa').add(1, 'day').format('YYYY/MM/DD');

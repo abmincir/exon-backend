@@ -181,152 +181,174 @@ exports.dummy = (req, res) => {
 };
 exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { startDate, endDate } = req.body;
+    console.log({
+        startDate,
+        endDate,
+    });
     if (!startDate || !endDate) {
         startDate = moment().locale('fa').format('YYYY/MM/DD');
         endDate = moment().locale('fa').add(1, 'day').format('YYYY/MM/DD');
     }
-    const startDateSql = startDate.substring(2);
-    const endDateSql = endDate.substring(2);
-    const startDateMongo = moment
-        .from(startDate, 'fa', 'YYYY/MM/DD')
-        .locale('en')
-        .format('YYYY-M-D HH:mm:ss');
-    const endDateMongo = moment
-        .from(endDate, 'fa', 'YYYY/MM/DD')
-        .locale('en')
-        .format('YYYY-M-D HH:mm:ss');
-    console.log('+++++++++++++++++');
-    console.log('Start Date Is -> ', {
+    console.log({
         startDate,
-        startDateSql,
-        startDateMongo,
-        dateObj: new Date(startDateMongo),
-    });
-    console.log('-----------------');
-    console.log('End Date Is -> ', {
         endDate,
-        endDateSql,
-        endDateMongo,
-        dateObj: new Date(endDateMongo),
     });
-    console.log('+++++++++++++++++');
-    try {
-        // const result = await SQLService.MockData({
-        const result = yield SQLService.FetchData({
-            startDate: startDateSql,
-            endDate: endDateSql,
-        });
-        const bills = [...result].map((bill) => {
-            const calculatedDate = (bill.barDate[0] === '9' ||
-                bill.barDate[0] === '8' ||
-                bill.barDate[0] === '7'
-                ? '13'
-                : '14') + bill.barDate;
-            const mongoDate = new Date(moment
-                .from(calculatedDate, 'fa', 'YYYY/MM/DD')
-                .locale('en')
-                .format('YYYY-M-D HH:mm:ss'));
-            const calcCreatedDate = (bill.RegisterDate[0] === '9' ||
-                bill.RegisterDate[0] === '8' ||
-                bill.RegisterDate[0] === '7'
-                ? '13'
-                : '14') + bill.RegisterDate;
-            const mongoCreatedDate = new Date(moment
-                .from(calcCreatedDate, 'fa', 'YYYY/MM/DD')
-                .locale('en')
-                .format('YYYY-M-D HH:mm:ss'));
-            return new Bill({
-                allocationId: bill.ref,
-                purchaseId: bill.bargah,
-                saveDate: bill.RegisterDate,
-                salesmanCode: bill.code,
-                driver: {
-                    carNumber: bill.Carno,
-                },
-                draft: {
-                    number: bill.barnoCode,
-                    weight: bill.havaleWeight,
-                    code: bill.havalehcode,
-                    date: bill.havaleDate,
-                },
-                customer: {
-                    name: bill.custname,
-                    code: bill.custcode,
-                },
-                origin: {
-                    name: bill.hamlname,
-                    code: bill.hamlcode,
-                },
-                receiver: {
-                    name: bill.recivename,
-                    postCode: bill.post_code,
-                    telephone: bill.tel,
-                    telAddress: bill.telAdress,
-                    nationalId: bill.meli,
-                },
-                product: {
-                    name: bill.Dscp,
-                    unit: bill.Vahed,
-                    pricePerSale: bill.price,
-                },
-                bill: {
-                    id: bill.Barno + '@' + bill.barnoCode,
-                    row: bill.serial,
-                    number: bill.Barno.split('-')[0],
-                    serial: bill.Barno.split('-')[1],
-                    weight: bill.weight,
-                    date: bill.barDate,
-                },
-                date: mongoDate,
-                created: mongoCreatedDate,
-            });
-        });
-        Promise.all(Bill.insertMany(bills))
-            .then((dep) => {
-            // this will be called when all inserts finish
-            console.log('%%%%%%%%%%%%%%%%%%%', bills.length, dep.length);
-            let query = {
-                date: {
-                    $gte: new Date(startDateMongo),
-                    $lte: new Date(endDateMongo),
-                },
-            };
-            Bill.find(query)
-                // .limit(60)
-                .sort({ date: 1 })
-                .exec()
-                .then((foundedBill) => res.json({ bill: foundedBill }))
-                .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
-            // res.sendStatus(201);
-        })
-            .catch((err) => {
-            console.log(err);
-        });
-        Bill.insertMany(bills)
-            .then((savedBills) => {
-            console.log(bills.length, savedBills.length);
-        })
-            .catch((error) => {
-            if (error) {
-                console.error(error);
-            }
-        })
-            .finally(() => {
-            let query = {
-                date: {
-                    $gte: new Date(startDateMongo),
-                    $lte: new Date(endDateMongo),
-                },
-            };
-            Bill.find(query)
-                // .limit(60)
-                .sort({ date: 1 })
-                .exec()
-                .then((foundedBill) => res.json({ bill: foundedBill }))
-                .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
-        });
-    }
-    catch (error) {
-        console.error(error);
-    }
+    // const startDateSql = startDate.substring(2);
+    // const endDateSql = endDate.substring(2);
+    // const startDateMongo = moment
+    //   .from(startDate, 'fa', 'YYYY/MM/DD')
+    //   .locale('en')
+    //   .format('YYYY-M-D HH:mm:ss');
+    // const endDateMongo = moment
+    //   .from(endDate, 'fa', 'YYYY/MM/DD')
+    //   .locale('en')
+    //   .format('YYYY-M-D HH:mm:ss');
+    // console.log('+++++++++++++++++');
+    // console.log('Start Date Is -> ', {
+    //   startDate,
+    //   startDateSql,
+    //   startDateMongo,
+    //   dateObj: new Date(startDateMongo),
+    // });
+    // console.log('-----------------');
+    // console.log('End Date Is -> ', {
+    //   endDate,
+    //   endDateSql,
+    //   endDateMongo,
+    //   dateObj: new Date(endDateMongo),
+    // });
+    // console.log('+++++++++++++++++');
+    // try {
+    //   // const result = await SQLService.MockData({
+    //   const result = await SQLService.FetchData({
+    //     startDate: startDateSql,
+    //     endDate: endDateSql,
+    //   });
+    //   const bills = [...result].map((bill) => {
+    //     const calculatedDate =
+    //       (bill.barDate[0] === '9' ||
+    //       bill.barDate[0] === '8' ||
+    //       bill.barDate[0] === '7'
+    //         ? '13'
+    //         : '14') + bill.barDate;
+    //     const mongoDate = new Date(
+    //       moment
+    //         .from(calculatedDate, 'fa', 'YYYY/MM/DD')
+    //         .locale('en')
+    //         .format('YYYY-M-D HH:mm:ss')
+    //     );
+    //     const calcCreatedDate =
+    //       (bill.RegisterDate[0] === '9' ||
+    //       bill.RegisterDate[0] === '8' ||
+    //       bill.RegisterDate[0] === '7'
+    //         ? '13'
+    //         : '14') + bill.RegisterDate;
+    //     const mongoCreatedDate = new Date(
+    //       moment
+    //         .from(calcCreatedDate, 'fa', 'YYYY/MM/DD')
+    //         .locale('en')
+    //         .format('YYYY-M-D HH:mm:ss')
+    //     );
+    //     const b = new Bill({
+    //       allocationId: bill.ref,
+    //       purchaseId: bill.bargah, //spsId
+    //       saveDate: bill.RegisterDate,
+    //       salesmanCode: bill.code,
+    //       driver: {
+    //         carNumber: bill.Carno,
+    //       },
+    //       draft: {
+    //         number: bill.barnoCode,
+    //         weight: bill.havaleWeight,
+    //         code: bill.havalehcode,
+    //         date: bill.havaleDate,
+    //       },
+    //       customer: {
+    //         name: bill.custname,
+    //         code: bill.custcode,
+    //       },
+    //       origin: {
+    //         name: bill.hamlname,
+    //         code: bill.hamlcode,
+    //       },
+    //       receiver: {
+    //         name: bill.recivename,
+    //         postCode: bill.post_code,
+    //         telephone: bill.tel,
+    //         telAddress: bill.telAdress,
+    //         nationalId: bill.meli,
+    //       },
+    //       product: {
+    //         name: bill.Dscp,
+    //         unit: bill.Vahed,
+    //         pricePerSale: bill.price,
+    //       },
+    //       bill: {
+    //         id: bill.Barno + '@' + bill.barnoCode,
+    //         row: bill.serial,
+    //         number: bill.Barno.split('-')[0],
+    //         serial: bill.Barno.split('-')[1],
+    //         weight: bill.weight,
+    //         date: bill.barDate,
+    //       },
+    //       date: mongoDate,
+    //       created: mongoCreatedDate,
+    //     });
+    //     Bill.find({
+    //       'bill.id': bill.Barno + '@' + bill.barnoCode,
+    //     })
+    //       .exec()
+    //       .then((fB: any) => {
+    //         if (!fB) {
+    //           b.save()
+    //             .then()
+    //             .catch((e: any) => {
+    //               console.error('not saved', e);
+    //             });
+    //         }
+    //       });
+    //     return b;
+    //   });
+    //   let query = {
+    //     created: {
+    //       $gte: new Date(startDateMongo),
+    //       $lte: new Date(endDateMongo),
+    //     },
+    //   };
+    //   Bill.find(query)
+    //     // .limit(60)
+    //     .sort({ date: 1 })
+    //     .exec()
+    //     .then((foundedBill: any) => res.json({ bill: foundedBill }))
+    //     .catch((err: any) =>
+    //       res.status(422).send({ error: 'we have an issue', err })
+    //     );
+    //   // Bill.insertMany(bills, { ordered: false, silent: true })
+    //   //   .then((savedBills: any) => {
+    //   //     console.log(bills.length, savedBills.length);
+    //   //   })
+    //   //   .catch((error: any) => {
+    //   //     if (error) {
+    //   //       console.error(error);
+    //   //     }
+    //   //   })
+    //   //   .finally(() => {
+    //   //     let query = {
+    //   //       created: {
+    //   //         $gte: new Date(startDateMongo),
+    //   //         $lte: new Date(endDateMongo),
+    //   //       },
+    //   //     };
+    //   //     Bill.find(query)
+    //   //       // .limit(60)
+    //   //       .sort({ date: 1 })
+    //   //       .exec()
+    //   //       .then((foundedBill: any) => res.json({ bill: foundedBill }))
+    //   //       .catch((err: any) =>
+    //   //         res.status(422).send({ error: 'we have an issue', err })
+    //   //       );
+    //   //   });
+    // } catch (error: any) {
+    //   console.error(error);
+    // }
 });
