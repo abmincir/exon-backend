@@ -346,10 +346,18 @@ exports.updateDb = async (req: any, res: any) => {
         created: mongoCreatedDate,
       });
 
-      b.save()
-        .then()
-        .catch((e) => {
-          console.error('not saved', e);
+      Bill.find({
+        'bill.id': bill.Barno + '@' + bill.barnoCode,
+      })
+        .exec()
+        .then((fB: any) => {
+          if (!fB) {
+            b.save()
+              .then()
+              .catch((e) => {
+                console.error('not saved', e);
+              });
+          }
         });
 
       return b;
