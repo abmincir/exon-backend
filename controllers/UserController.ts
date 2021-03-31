@@ -42,6 +42,14 @@ exports.createUser = (req: any, res: any) => {
   });
 };
 
+exports.deleteUser = async (req: any, res: any) => {
+  const { _id } = req.body;
+  await Model.User.findByIdAndDelete(_id).catch((err: any) =>
+    res.status(422).send({ error: 'we have an issue', err })
+  );
+  res.status(200).send('Success');
+};
+
 exports.changePassword = (req: any, res: any) => {
   const { username, password, newPassword } = req.body;
   Model.User.findOne({ username })
