@@ -140,8 +140,7 @@ exports.getAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             .locale('en')
             .format('YYYY-M-D HH:mm:ss');
         Object.assign(query, {
-            // todo change
-            date: {
+            created: {
                 $gte: new Date(startDateG),
                 $lte: new Date(endDateG),
             },
@@ -153,8 +152,7 @@ exports.getAll = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             .locale('en')
             .format('YYYY-M-D HH:mm:ss');
         Object.assign(query, {
-            // todo change
-            date: {
+            created: {
                 $gte: new Date(startDateG),
             },
         });
@@ -226,9 +224,19 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 .from(calculatedDate, 'fa', 'YYYY/MM/DD')
                 .locale('en')
                 .format('YYYY-M-D HH:mm:ss'));
+            const calcCreatedDate = (bill.RegisterDate[0] === '9' ||
+                bill.RegisterDate[0] === '8' ||
+                bill.RegisterDate[0] === '7'
+                ? '13'
+                : '14') + bill.RegisterDate;
+            const mongoCreatedDate = new Date(moment
+                .from(calcCreatedDate, 'fa', 'YYYY/MM/DD')
+                .locale('en')
+                .format('YYYY-M-D HH:mm:ss'));
             return new Bill({
                 allocationId: bill.ref,
                 purchaseId: bill.bargah,
+                saveDate: bill.RegisterDate,
                 salesmanCode: bill.code,
                 driver: {
                     carNumber: bill.Carno,
@@ -268,6 +276,7 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                     date: bill.barDate,
                 },
                 date: mongoDate,
+                created: mongoCreatedDate,
             });
         });
         Promise.all(Bill.insertMany(bills))
