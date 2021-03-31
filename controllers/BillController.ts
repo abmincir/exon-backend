@@ -347,7 +347,7 @@ exports.updateDb = async (req: any, res: any) => {
       });
     });
 
-    Bill.insertMany(bills, { ordered: false })
+    Bill.insertMany(bills, { ordered: false, silent: true })
       .then((savedBills: any) => {
         console.log(bills.length, savedBills.length);
       })
