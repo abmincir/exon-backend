@@ -347,33 +347,7 @@ exports.updateDb = async (req: any, res: any) => {
       });
     });
 
-    Promise.all(Bill.insertMany(bills))
-      .then((dep) => {
-        // this will be called when all inserts finish
-        console.log('%%%%%%%%%%%%%%%%%%%', bills.length, dep.length);
-
-        let query = {
-          date: {
-            $gte: new Date(startDateMongo),
-            $lte: new Date(endDateMongo),
-          },
-        };
-
-        Bill.find(query)
-          // .limit(60)
-          .sort({ date: 1 })
-          .exec()
-          .then((foundedBill: any) => res.json({ bill: foundedBill }))
-          .catch((err: any) =>
-            res.status(422).send({ error: 'we have an issue', err })
-          );
-        // res.sendStatus(201);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    Bill.insertMany(bills)
+    Bill.insertMany(bills, { ordered: false })
       .then((savedBills: any) => {
         console.log(bills.length, savedBills.length);
       })
@@ -384,7 +358,7 @@ exports.updateDb = async (req: any, res: any) => {
       })
       .finally(() => {
         let query = {
-          date: {
+          created: {
             $gte: new Date(startDateMongo),
             $lte: new Date(endDateMongo),
           },

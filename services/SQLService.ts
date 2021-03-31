@@ -54,7 +54,7 @@ exports.FetchData = (input: { startDate: string; endDate: string }) => {
             rej(error);
           }
 
-          console.log(result, result.recordset.length());
+          console.log(result, result.recordset.length);
 
           res(result.recordset);
         })
