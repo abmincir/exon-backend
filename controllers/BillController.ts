@@ -354,7 +354,7 @@ exports.updateDb = async (req: any, res: any) => {
           if (!fB) {
             b.save()
               .then()
-              .catch((e) => {
+              .catch((e: any) => {
                 console.error('not saved', e);
               });
           }
