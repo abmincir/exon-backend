@@ -262,9 +262,6 @@ exports.updateDb = async (req: any, res: any) => {
     endDate = moment().locale('fa').add(1, 'day').format('YYYY/MM/DD');
   }
 
-  const startDateSql = startDate.substring(2);
-  const endDateSql = endDate.substring(2);
-
   const startDateMongo = moment
     .from(startDate, 'fa', 'YYYY/MM/DD')
     .locale('en')
@@ -279,14 +276,12 @@ exports.updateDb = async (req: any, res: any) => {
 
   console.log('Start Date Is -> ', {
     startDate,
-    startDateSql,
     startDateMongo,
     dateObj: new Date(startDateMongo),
   });
   console.log('-----------------');
   console.log('End Date Is -> ', {
     endDate,
-    endDateSql,
     endDateMongo,
     dateObj: new Date(endDateMongo),
   });
@@ -296,8 +291,8 @@ exports.updateDb = async (req: any, res: any) => {
   try {
     // const result = await SQLService.MockData({
     const result: any[] = await SQLService.FetchData({
-      startDate: startDateSql,
-      endDate: endDateSql,
+      startDate,
+      endDate,
     });
 
     let savedBills = 0;
