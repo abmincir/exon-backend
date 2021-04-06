@@ -21,6 +21,7 @@ exports.estelam = async (req: any, res: any) => {
       try {
         doc.status = 2;
 
+        doc.lastMessage = 'بارنامه مورد نظر موجود نیست';
         await doc.save();
 
         return res.status(422).send({
@@ -42,10 +43,26 @@ exports.estelam = async (req: any, res: any) => {
 
         await doc.save();
 
-        return res.status(422).send({
-          error: 'we have an issue',
-          err: 'عدم تطابق وزن',
-        });
+        try {
+          await SPSWS.edit(_id, doc, weight);
+
+          doc.lastMessage = 'عدم تطابق وزن - وزن اصلاح شد';
+          await doc.save();
+
+          return res.send({
+            result,
+            edit: true,
+            message: 'عدم تطابق وزن - وزن اصلاح شد',
+          });
+        } catch (error: any) {
+          doc.lastMessage = 'عدم تطابق وزن - خطا در ثبت وزن';
+          await doc.save();
+
+          return res.status(422).send({
+            error: 'we have an issue',
+            err: 'عدم تطابق وزن - خطا در ثبت وزن',
+          });
+        }
       } catch (err: any) {
         return res.status(422).send({ error: 'we have an issue', err });
       }
@@ -59,10 +76,22 @@ exports.estelam = async (req: any, res: any) => {
       doc.spsDraft = foundedBill.draftNumber;
       doc.driver.name = foundedBill.driverName;
       doc.status = 1;
+      doc.lastMessage = 'استعلام موفق - وزن اصلاح شد';
 
       await doc.save();
 
-      return res.send({ result });
+      try {
+        await SPSWS.edit(_id, doc, weight);
+        return res.send({ result, edit: true });
+      } catch (error: any) {
+        doc.lastMessage = 'استعلام موفق - خطا در ثبت وزن';
+        await doc.save();
+
+        return res.status(422).send({
+          error: 'we have an issue',
+          err: 'استعلام موفق - خطا در ثبت وزن',
+        });
+      }
     } catch (err: any) {
       return res.status(422).send({ error: 'we have an issue', err });
     }
@@ -86,9 +115,10 @@ exports.edit = async (req: any, res: any) => {
     .then((result: any) => {
       return res.send({ result });
     })
-    .catch((err: any) =>
-      res.status(422).send({ error: 'we have an issue', err })
-    );
+    .catch((err: any) => {
+      console.log(err);
+      res.status(422).send({ error: 'we have an issue', err });
+    });
 };
 
 exports.getAll = async (req: any, res: any) => {
@@ -270,11 +300,12 @@ exports.updateDb = async (req: any, res: any) => {
       endDate: endDateSql,
     });
 
-    const bills = [...result].map((bill) => {
+    [...result].map((bill) => {
       const calculatedDate =
         (bill.barDate[0] === '9' ||
         bill.barDate[0] === '8' ||
-        bill.barDate[0] === '7'
+        bill.barDate[0] === '7' ||
+        bill.barDate[0] === '6'
           ? '13'
           : '14') + bill.barDate;
       const mongoDate = new Date(
@@ -296,6 +327,7 @@ exports.updateDb = async (req: any, res: any) => {
           .locale('en')
           .format('YYYY-M-D HH:mm:ss')
       );
+
       const b = new Bill({
         allocationId: bill.ref,
         purchaseId: bill.bargah, //spsId
@@ -357,16 +389,15 @@ exports.updateDb = async (req: any, res: any) => {
         .exec()
         .then((fB: any[]) => {
           console.log('not saved found');
+
           if (fB.length === 0) {
             b.save()
               .then()
               .catch((e: any) => {
-                console.error('not saved', e);
+                console.error('not saved -> error: ', e);
               });
           }
         });
-
-      return b;
     });
 
     let query = {};
@@ -379,6 +410,7 @@ exports.updateDb = async (req: any, res: any) => {
       .catch((err: any) =>
         res.status(422).send({ error: 'we have an issue', err })
       );
+
     // Bill.insertMany(bills, { ordered: false, silent: true })
     //   .then((savedBills: any) => {
     //     console.log(bills.length, savedBills.length);

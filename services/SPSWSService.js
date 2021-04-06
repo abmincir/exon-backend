@@ -212,6 +212,9 @@ exports.edit = (_id, bill, weight) => __awaiter(void 0, void 0, void 0, function
                 const diffgram = 'diffgr:diffgram';
                 const result = jsonResult[envelope][body][0].EditBarnameResponse[0]
                     .EditBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
+                console.log('-------------');
+                console.log(result);
+                console.log('-------------');
                 const errors = [];
                 result.map((bill, index) => __awaiter(this, void 0, void 0, function* () {
                     if (index < result.length - 1) {

@@ -232,6 +232,10 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
             jsonResult[envelope][body][0].EditBarnameResponse[0]
               .EditBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
 
+          console.log('------------- EDIT BARNAME CALLED -------------');
+          console.log(result);
+          console.log('------------- EDIT BARNAME CALLED -------------');
+
           const errors: any = [];
 
           result.map(async (bill: any, index: number) => {
@@ -243,10 +247,14 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
                 });
               } else {
                 try {
-                  console.log('Editing', _id);
+                  console.log('Editing ', _id);
+
                   const changedBill = await BillModel.findById(_id);
                   changedBill.merchantWeight = weight;
-                  changedBill.save().then(() => console.log(changedBill));
+
+                  changedBill
+                    .save()
+                    .then(() => console.log('Edited And Saved'));
                 } catch (err: any) {
                   console.error(err);
                   rej({ error: 'Not Found After Edit', err });
