@@ -23,6 +23,7 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             const doc = yield Bill.findById(_id);
             try {
                 doc.status = 2;
+                doc.lastMessage = 'بارنامه مورد نظر موجود نیست';
                 yield doc.save();
                 return res.status(422).send({
                     error: 'we have an issue',
@@ -40,10 +41,24 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 doc.spsWeight = foundedBill.weight;
                 doc.status = 0;
                 yield doc.save();
-                return res.status(422).send({
-                    error: 'we have an issue',
-                    err: 'عدم تطابق وزن',
-                });
+                try {
+                    yield SPSWS.edit(_id, doc, weight);
+                    doc.lastMessage = 'عدم تطابق وزن - وزن اصلاح شد';
+                    yield doc.save();
+                    return res.send({
+                        result,
+                        edit: true,
+                        message: 'عدم تطابق وزن - وزن اصلاح شد',
+                    });
+                }
+                catch (error) {
+                    doc.lastMessage = 'عدم تطابق وزن - خطا در ثبت وزن';
+                    yield doc.save();
+                    return res.status(422).send({
+                        error: 'we have an issue',
+                        err: 'عدم تطابق وزن - خطا در ثبت وزن',
+                    });
+                }
             }
             catch (err) {
                 return res.status(422).send({ error: 'we have an issue', err });
@@ -56,8 +71,20 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             doc.spsDraft = foundedBill.draftNumber;
             doc.driver.name = foundedBill.driverName;
             doc.status = 1;
+            doc.lastMessage = 'استعلام موفق - وزن اصلاح شد';
             yield doc.save();
-            return res.send({ result });
+            try {
+                yield SPSWS.edit(_id, doc, weight);
+                return res.send({ result, edit: true });
+            }
+            catch (error) {
+                doc.lastMessage = 'استعلام موفق - خطا در ثبت وزن';
+                yield doc.save();
+                return res.status(422).send({
+                    error: 'we have an issue',
+                    err: 'استعلام موفق - خطا در ثبت وزن',
+                });
+            }
         }
         catch (err) {
             return res.status(422).send({ error: 'we have an issue', err });
@@ -218,15 +245,20 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     });
     console.log('+++++++++++++++++');
     try {
-        const result = yield SQLService.MockData({
-            // const result = await SQLService.FetchData({
+        // const result = await SQLService.MockData({
+        const result = yield SQLService.FetchData({
             startDate: startDateSql,
             endDate: endDateSql,
         });
-        const bills = [...result].map((bill) => {
+        let savedBills = 0;
+        let saveErrors = 0;
+        let alreadySavedBills = 0;
+        for (let i = 0; i < result.length; i++) {
+            let bill = result[i];
             const calculatedDate = (bill.barDate[0] === '9' ||
                 bill.barDate[0] === '8' ||
-                bill.barDate[0] === '7'
+                bill.barDate[0] === '7' ||
+                bill.barDate[0] === '6'
                 ? '13'
                 : '14') + bill.barDate;
             const mongoDate = new Date(moment
@@ -287,29 +319,68 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 date: mongoDate,
                 created: mongoCreatedDate,
             });
-            Bill.find({
-                'bill.id': bill.Barno + '@' + bill.barnoCode,
-            })
-                .exec()
-                .then((fB) => {
-                console.log('not saved found');
+            try {
+                const fB = yield Bill.find({
+                    'bill.id': bill.Barno + '@' + bill.barnoCode,
+                }).exec();
                 if (fB.length === 0) {
-                    b.save()
-                        .then()
-                        .catch((e) => {
-                        console.error('not saved', e);
-                    });
+                    try {
+                        yield b.save();
+                        savedBills += 1;
+                    }
+                    catch (saveError) {
+                        saveErrors += 1;
+                        console.error('not saved -> error: ', saveError);
+                    }
                 }
-            });
-            return b;
-        });
+                else {
+                    console.log('not saved found');
+                    alreadySavedBills += 1;
+                }
+            }
+            catch (findError) {
+                console.log('Had Error Finding The Bill');
+            }
+        }
         let query = {};
-        Bill.find(query)
-            // .limit(60)
-            .sort({ date: 1 })
-            .exec()
-            .then((foundedBill) => res.json({ bill: foundedBill }))
-            .catch((err) => res.status(422).send({ error: 'we have an issue', err }));
+        if (startDate && endDate) {
+            const startDateG = moment
+                .from(startDate, 'fa', 'YYYY/MM/DD')
+                .locale('en')
+                .format('YYYY-M-D HH:mm:ss');
+            const endDateG = moment
+                .from(endDate, 'fa', 'YYYY/MM/DD')
+                .locale('en')
+                .format('YYYY-M-D HH:mm:ss');
+            Object.assign(query, {
+                created: {
+                    $gte: new Date(startDateG),
+                    $lte: new Date(endDateG),
+                },
+            });
+        }
+        else if (startDate) {
+            const startDateG = moment
+                .from(startDate, 'fa', 'YYYY/MM/DD')
+                .locale('en')
+                .format('YYYY-M-D HH:mm:ss');
+            Object.assign(query, {
+                created: {
+                    $gte: new Date(startDateG),
+                },
+            });
+        }
+        const foundedBill = yield Bill.find(query).sort({ date: 1 }).exec();
+        console.log('----------- Update Db Result -----------');
+        console.log({
+            savedBills,
+            alreadySavedBills,
+            saveErrors,
+            misNumber: result.length,
+            queryNumber: foundedBill.length,
+        });
+        console.log('----------- Update Db Result -----------');
+        return res.json({ bill: foundedBill });
         // Bill.insertMany(bills, { ordered: false, silent: true })
         //   .then((savedBills: any) => {
         //     console.log(bills.length, savedBills.length);
@@ -336,7 +407,8 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         //       );
         //   });
     }
-    catch (error) {
-        console.error(error);
+    catch (err) {
+        console.error(err);
+        res.status(422).send({ error: 'we have an issue', err });
     }
 });

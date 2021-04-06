@@ -57,6 +57,7 @@ const BillSchema = new Schema({
     date: { type: Date, required: true },
     created: { type: Date, required: true },
     status: { type: Number, default: -1 },
+    lastMessage: { type: String, default: 'بررسی نشده' },
 }, { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } });
 exports.Bill = mongoose.model('Bill', BillSchema);
 const UserSchema = new Schema({

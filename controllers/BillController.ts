@@ -398,15 +398,15 @@ exports.updateDb = async (req: any, res: any) => {
           try {
             await b.save();
             savedBills += 1;
-          } catch (error: any) {
+          } catch (saveError: any) {
             saveErrors += 1;
-            console.error('not saved -> error: ', error);
+            console.error('not saved -> error: ', saveError);
           }
         } else {
           console.log('not saved found');
           alreadySavedBills += 1;
         }
-      } catch (error: any) {
+      } catch (findError: any) {
         console.log('Had Error Finding The Bill');
       }
     }
@@ -483,8 +483,8 @@ exports.updateDb = async (req: any, res: any) => {
     //         res.status(422).send({ error: 'we have an issue', err })
     //       );
     //   });
-  } catch (error: any) {
-    console.error(error);
-    res.status(422).send({ error: 'we have an issue', error });
+  } catch (err: any) {
+    console.error(err);
+    res.status(422).send({ error: 'we have an issue', err });
   }
 };

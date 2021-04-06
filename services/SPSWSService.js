@@ -212,9 +212,9 @@ exports.edit = (_id, bill, weight) => __awaiter(void 0, void 0, void 0, function
                 const diffgram = 'diffgr:diffgram';
                 const result = jsonResult[envelope][body][0].EditBarnameResponse[0]
                     .EditBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
-                console.log('-------------');
+                console.log('------------- EDIT BARNAME CALLED -------------');
                 console.log(result);
-                console.log('-------------');
+                console.log('------------- EDIT BARNAME CALLED -------------');
                 const errors = [];
                 result.map((bill, index) => __awaiter(this, void 0, void 0, function* () {
                     if (index < result.length - 1) {
@@ -226,10 +226,12 @@ exports.edit = (_id, bill, weight) => __awaiter(void 0, void 0, void 0, function
                         }
                         else {
                             try {
-                                console.log('Editing', _id);
+                                console.log('Editing ', _id);
                                 const changedBill = yield BillModel.findById(_id);
                                 changedBill.merchantWeight = weight;
-                                changedBill.save().then(() => console.log(changedBill));
+                                changedBill
+                                    .save()
+                                    .then(() => console.log('Edited And Saved'));
                             }
                             catch (err) {
                                 console.error(err);
