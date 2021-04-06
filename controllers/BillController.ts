@@ -295,12 +295,18 @@ exports.updateDb = async (req: any, res: any) => {
 
   try {
     // const result = await SQLService.MockData({
-    const result = await SQLService.FetchData({
+    const result: any[] = await SQLService.FetchData({
       startDate: startDateSql,
       endDate: endDateSql,
     });
 
-    [...result].map((bill) => {
+    let savedBills = 0;
+    let saveErrors = 0;
+    let alreadySavedBills = 0;
+
+    for (let i = 0; i < result.length; i++) {
+      let bill = result[i];
+
       const calculatedDate =
         (bill.barDate[0] === '9' ||
         bill.barDate[0] === '8' ||
@@ -383,33 +389,73 @@ exports.updateDb = async (req: any, res: any) => {
         created: mongoCreatedDate,
       });
 
-      Bill.find({
-        'bill.id': bill.Barno + '@' + bill.barnoCode,
-      })
-        .exec()
-        .then((fB: any[]) => {
-          console.log('not saved found');
+      try {
+        const fB = await Bill.find({
+          'bill.id': bill.Barno + '@' + bill.barnoCode,
+        }).exec();
 
-          if (fB.length === 0) {
-            b.save()
-              .then()
-              .catch((e: any) => {
-                console.error('not saved -> error: ', e);
-              });
+        if (fB.length === 0) {
+          try {
+            await b.save();
+            savedBills += 1;
+          } catch (error: any) {
+            saveErrors += 1;
+            console.error('not saved -> error: ', error);
           }
-        });
-    });
+        } else {
+          console.log('not saved found');
+          alreadySavedBills += 1;
+        }
+      } catch (error: any) {
+        console.log('Had Error Finding The Bill');
+      }
+    }
 
     let query = {};
 
-    Bill.find(query)
-      // .limit(60)
-      .sort({ date: 1 })
-      .exec()
-      .then((foundedBill: any) => res.json({ bill: foundedBill }))
-      .catch((err: any) =>
-        res.status(422).send({ error: 'we have an issue', err })
-      );
+    if (startDate && endDate) {
+      const startDateG = moment
+        .from(startDate, 'fa', 'YYYY/MM/DD')
+        .locale('en')
+        .format('YYYY-M-D HH:mm:ss');
+
+      const endDateG = moment
+        .from(endDate, 'fa', 'YYYY/MM/DD')
+        .locale('en')
+        .format('YYYY-M-D HH:mm:ss');
+
+      Object.assign(query, {
+        created: {
+          $gte: new Date(startDateG),
+          $lte: new Date(endDateG),
+        },
+      });
+    } else if (startDate) {
+      const startDateG = moment
+        .from(startDate, 'fa', 'YYYY/MM/DD')
+        .locale('en')
+        .format('YYYY-M-D HH:mm:ss');
+
+      Object.assign(query, {
+        created: {
+          $gte: new Date(startDateG),
+        },
+      });
+    }
+
+    const foundedBill = await Bill.find(query).sort({ date: 1 }).exec();
+
+    console.log('----------- Update Db Result -----------');
+    console.log({
+      savedBills,
+      alreadySavedBills,
+      saveErrors,
+      misNumber: result.length,
+      queryNumber: foundedBill.length,
+    });
+    console.log('----------- Update Db Result -----------');
+
+    return res.json({ bill: foundedBill });
 
     // Bill.insertMany(bills, { ordered: false, silent: true })
     //   .then((savedBills: any) => {
@@ -439,5 +485,6 @@ exports.updateDb = async (req: any, res: any) => {
     //   });
   } catch (error: any) {
     console.error(error);
+    res.status(422).send({ error: 'we have an issue', error });
   }
 };
