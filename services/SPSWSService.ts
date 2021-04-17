@@ -208,11 +208,6 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
   `;
 
   return new Promise(async (res, rej) => {
-    console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
-    if (!!!bill.assignmentId) {
-      rej({ error: 'عدم وجود شماره تخصیص', err: 'عدم وجود شماره تخصیص' });
-    }
-
     try {
       const result = await axios.post(
         'https://spsws.bki.ir/spsws.asmx?op=EditBarname',
@@ -293,7 +288,7 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
 
 exports.insert = async (_id: string, bill: any) => {
   const xml = `
-<x:Envelope
+<x:Envelopein
     xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:tem="http://tempuri.org/">
     <x:Header/>
@@ -309,10 +304,15 @@ exports.insert = async (_id: string, bill: any) => {
             <tem:takhsisId>${bill.assignmentId}</tem:takhsisId>
         </tem:insertBarname>
     </x:Body>
-</x:Envelope>>
+</x:Envelopein>>
   `;
 
   return new Promise(async (res, rej) => {
+    console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
+    if (!!!bill.assignmentId) {
+      rej({ error: 'عدم وجود شماره تخصیص', err: 'عدم وجود شماره تخصیص' });
+    }
+
     try {
       const result = await axios.post(
         'http://spsws.bki.ir/spsws.asmx?op=insertBarname',
@@ -334,8 +334,8 @@ exports.insert = async (_id: string, bill: any) => {
           const diffgram: any = 'diffgr:diffgram';
 
           const result =
-            jsonResult[envelope][body][0].InsertBarnameResponse[0]
-              .InsertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
+            jsonResult[envelope][body][0].insertBarnameResponse[0]
+              .insertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
 
           console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
           console.log(result);

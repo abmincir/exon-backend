@@ -196,10 +196,6 @@ exports.edit = (_id, bill, weight) => __awaiter(void 0, void 0, void 0, function
   </x:Envelope>
   `;
     return new Promise((res, rej) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
-        if (!!!bill.assignmentId) {
-            rej({ error: 'عدم وجود شماره تخصیص', err: 'عدم وجود شماره تخصیص' });
-        }
         try {
             const result = yield axios.post('https://spsws.bki.ir/spsws.asmx?op=EditBarname', xml, {
                 headers: {
@@ -270,7 +266,7 @@ exports.edit = (_id, bill, weight) => __awaiter(void 0, void 0, void 0, function
 });
 exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
     const xml = `
-<x:Envelope
+<x:Envelopein
     xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:tem="http://tempuri.org/">
     <x:Header/>
@@ -286,9 +282,13 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
             <tem:takhsisId>${bill.assignmentId}</tem:takhsisId>
         </tem:insertBarname>
     </x:Body>
-</x:Envelope>>
+</x:Envelopein>>
   `;
     return new Promise((res, rej) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
+        if (!!!bill.assignmentId) {
+            rej({ error: 'عدم وجود شماره تخصیص', err: 'عدم وجود شماره تخصیص' });
+        }
         try {
             const result = yield axios.post('http://spsws.bki.ir/spsws.asmx?op=insertBarname', xml, {
                 headers: {
@@ -303,8 +303,8 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
                 const envelope = 'soap:Envelope';
                 const body = 'soap:Body';
                 const diffgram = 'diffgr:diffgram';
-                const result = jsonResult[envelope][body][0].InsertBarnameResponse[0]
-                    .InsertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
+                const result = jsonResult[envelope][body][0].insertBarnameResponse[0]
+                    .insertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
                 console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
                 console.log(result);
                 console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
