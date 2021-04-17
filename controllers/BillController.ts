@@ -28,8 +28,8 @@ exports.estelam = async (req: any, res: any) => {
           await SPSWS.insert(_id, doc);
 
           doc.lastMessage = 'بارنامه مورد نظر موجود نیست - بارنامه اضافه شد';
-          // doc.spsWeight = weight;
-          // doc.status = 1;
+          doc.spsWeight = weight;
+          doc.status = 1;
           await doc.save();
 
           return res.send({
@@ -38,8 +38,7 @@ exports.estelam = async (req: any, res: any) => {
             message: 'بارنامه مورد نظر موجود نیست - بارنامه اضافه شد',
           });
         } catch (error: any) {
-          doc.lastMessage =
-            ' - بارنامه مورد نظر موجود نیست - خطا در ثبت بارنامه' + error;
+          doc.lastMessage = ' - خطا در ثبت بارنامه - ' + error;
           await doc.save();
 
           return res.status(422).send({

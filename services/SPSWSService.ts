@@ -355,12 +355,9 @@ exports.insert = async (_id: string, bill: any) => {
           const result =
             jsonResult[envelope][body][0].insertBarnameResponse[0]
               .insertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
-          const result2 =
-            jsonResult[envelope][body][0].insertBarnameResponse[0]
-              .insertBarnameResult[0][diffgram][0]['$'];
 
           console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
-          console.log(result, result2);
+          console.log(result);
           console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
 
           const errors: any = [];
@@ -395,7 +392,7 @@ exports.insert = async (_id: string, bill: any) => {
           const error = result.find((error: any) => error.errorCode === '0');
 
           if (error) {
-            rej({ error: error[0].errorMsg[0], err: error[0].errorMsg[0] });
+            rej({ error: error[0].ErrorMsg[0], err: error[0].ErrorMsg[0] });
           } else {
             res('success');
           }
