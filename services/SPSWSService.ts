@@ -288,7 +288,7 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
 
 exports.insert = async (_id: string, bill: any) => {
   const xml = `
-<x:Envelopein
+<x:Envelope
     xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:tem="http://tempuri.org/">
     <x:Header/>
@@ -304,8 +304,17 @@ exports.insert = async (_id: string, bill: any) => {
             <tem:takhsisId>${bill.assignmentId}</tem:takhsisId>
         </tem:insertBarname>
     </x:Body>
-</x:Envelopein>>
+</x:Envelope>
   `;
+
+  console.log({
+    billNumber: bill.bill.number,
+    billSerial: bill.bill.serial,
+    saveDate: bill.saveDate,
+    weight: bill.bill.weight,
+    purchaseId: bill.purchaseId,
+    assignmentId: bill.assignmentId,
+  });
 
   return new Promise(async (res, rej) => {
     console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
@@ -315,7 +324,7 @@ exports.insert = async (_id: string, bill: any) => {
 
     try {
       const result = await axios.post(
-        'http://spsws.bki.ir/spsws.asmx?op=insertBarname',
+        'https://spsws.bki.ir/spsws.asmx?op=insertBarname',
         xml,
         {
           headers: {

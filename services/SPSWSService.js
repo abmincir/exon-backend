@@ -266,7 +266,7 @@ exports.edit = (_id, bill, weight) => __awaiter(void 0, void 0, void 0, function
 });
 exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
     const xml = `
-<x:Envelopein
+<x:Envelope
     xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:tem="http://tempuri.org/">
     <x:Header/>
@@ -282,15 +282,23 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
             <tem:takhsisId>${bill.assignmentId}</tem:takhsisId>
         </tem:insertBarname>
     </x:Body>
-</x:Envelopein>>
+</x:Envelope>
   `;
+    console.log({
+        billNumber: bill.bill.number,
+        billSerial: bill.bill.serial,
+        saveDate: bill.saveDate,
+        weight: bill.bill.weight,
+        purchaseId: bill.purchaseId,
+        assignmentId: bill.assignmentId,
+    });
     return new Promise((res, rej) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
         if (!!!bill.assignmentId) {
             rej({ error: 'عدم وجود شماره تخصیص', err: 'عدم وجود شماره تخصیص' });
         }
         try {
-            const result = yield axios.post('http://spsws.bki.ir/spsws.asmx?op=insertBarname', xml, {
+            const result = yield axios.post('https://spsws.bki.ir/spsws.asmx?op=insertBarname', xml, {
                 headers: {
                     'Content-Type': 'text/xml; charset=utf-8',
                     SOAPAction: 'http://tempuri.org/insertBarname',
