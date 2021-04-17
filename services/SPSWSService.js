@@ -265,6 +265,22 @@ exports.edit = (_id, bill, weight) => __awaiter(void 0, void 0, void 0, function
     }));
 });
 exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
+    const calcCreatedDate = (bill.saveDate[0] === '9' ||
+        bill.saveDate[0] === '8' ||
+        bill.saveDate[0] === '7'
+        ? '13'
+        : '14') + bill.saveDate;
+    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+    console.log({
+        billNumber: bill.bill.number,
+        billSerial: bill.bill.serial,
+        saveDate: bill.saveDate,
+        issueDateValid: calcCreatedDate,
+        weight: bill.bill.weight,
+        purchaseId: bill.purchaseId,
+        assignmentId: bill.assignmentId,
+    });
+    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
     const xml = `
 <x:Envelope
     xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
@@ -276,7 +292,7 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
             <tem:pass>exon@321</tem:pass>
             <tem:BarNumber>${bill.bill.number}</tem:BarNumber>
             <tem:BarSerial>${bill.bill.serial}</tem:BarSerial>
-            <tem:ISSUDATE>${bill.saveDate}</tem:ISSUDATE>
+            <tem:ISSUDATE>${calcCreatedDate}</tem:ISSUDATE>
             <tem:MerchantDeclaredWeight>${bill.bill.weight}</tem:MerchantDeclaredWeight>
             <tem:KharidId>${bill.purchaseId}</tem:KharidId>
             <tem:takhsisId>${bill.assignmentId}</tem:takhsisId>
@@ -284,16 +300,6 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
     </x:Body>
 </x:Envelope>
   `;
-    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
-    console.log({
-        billNumber: bill.bill.number,
-        billSerial: bill.bill.serial,
-        saveDate: bill.saveDate,
-        weight: bill.bill.weight,
-        purchaseId: bill.purchaseId,
-        assignmentId: bill.assignmentId,
-    });
-    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
     return new Promise((res, rej) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
         if (!!!bill.assignmentId) {
