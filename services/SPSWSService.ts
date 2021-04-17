@@ -288,17 +288,18 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
 
 exports.insert = async (_id: string, bill: any) => {
   const calcCreatedDate =
-    (bill.saveDate[0] === '9' ||
-    bill.saveDate[0] === '8' ||
-    bill.saveDate[0] === '7'
+    (bill.bill.date[0] === '9' ||
+    bill.bill.date[0] === '8' ||
+    bill.bill.date[0] === '7'
       ? '13'
-      : '14') + bill.saveDate;
+      : '14') + bill.bill.date;
 
   console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
   console.log({
     billNumber: bill.bill.number,
     billSerial: bill.bill.serial,
     saveDate: bill.saveDate,
+    barDate: bill.bill.date,
     issueDateValid: calcCreatedDate,
     weight: bill.bill.weight,
     purchaseId: bill.purchaseId,
