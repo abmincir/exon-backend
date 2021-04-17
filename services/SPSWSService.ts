@@ -307,6 +307,7 @@ exports.insert = async (_id: string, bill: any) => {
 </x:Envelope>
   `;
 
+  console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
   console.log({
     billNumber: bill.bill.number,
     billSerial: bill.bill.serial,
@@ -315,6 +316,7 @@ exports.insert = async (_id: string, bill: any) => {
     purchaseId: bill.purchaseId,
     assignmentId: bill.assignmentId,
   });
+  console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
 
   return new Promise(async (res, rej) => {
     console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
@@ -344,7 +346,8 @@ exports.insert = async (_id: string, bill: any) => {
 
           const result =
             jsonResult[envelope][body][0].insertBarnameResponse[0]
-              .insertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
+              .insertBarnameResult[0];
+          // [diffgram][0].NewDataSet[0].Table1
 
           console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
           console.log(result);
@@ -361,8 +364,6 @@ exports.insert = async (_id: string, bill: any) => {
                 });
               } else {
                 try {
-                  console.log('Editing ', _id);
-
                   const changedBill = await BillModel.findById(_id);
                   changedBill.merchantWeight = bill.bill.weight;
 
