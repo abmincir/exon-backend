@@ -24,10 +24,29 @@ exports.estelam = async (req: any, res: any) => {
         doc.lastMessage = 'بارنامه مورد نظر موجود نیست';
         await doc.save();
 
-        return res.status(422).send({
-          error: 'we have an issue',
-          err: 'بارنامه مورد نظر موجود نیست',
-        });
+        try {
+          await SPSWS.insert(_id, doc);
+
+          doc.lastMessage = 'بارنامه مورد نظر موجود نیست - بارنامه اضافه شد';
+          doc.spsWeight = weight;
+          doc.status = 1;
+          await doc.save();
+
+          return res.send({
+            result,
+            edit: true,
+            message: 'بارنامه مورد نظر موجود نیست - بارنامه اضافه شد',
+          });
+        } catch (error: any) {
+          doc.lastMessage = 'بارنامه مورد نظر موجود نیست - خطا در ثبت بارنامه';
+          await doc.save();
+
+          return res.status(422).send({
+            error: 'we have an issue',
+            err: 'عدم تطابق وزن - خطا در ثبت وزن',
+            insertError: error,
+          });
+        }
       } catch (err: any) {
         return res.status(422).send({ error: 'we have an issue', err });
       }
@@ -46,6 +65,8 @@ exports.estelam = async (req: any, res: any) => {
           await SPSWS.edit(_id, doc, weight);
 
           doc.lastMessage = 'عدم تطابق وزن - وزن اصلاح شد';
+          doc.spsWeight = weight;
+          doc.status = 1;
           await doc.save();
 
           return res.send({
@@ -73,23 +94,39 @@ exports.estelam = async (req: any, res: any) => {
       doc.spsWeight = foundedBill.weight;
       doc.spsDraft = foundedBill.draftNumber;
       doc.driver.name = foundedBill.driverName;
+
+      // duplicated code
+      if (foundedBill.weight !== weight) {
+        doc.status = 0;
+        doc.lastMessage = 'استعلام موفق - مغایرت وزن';
+        await doc.save();
+
+        try {
+          await SPSWS.edit(_id, doc, weight);
+
+          doc.status = 1;
+          doc.lastMessage = 'استعلام موفق - تغیر وزن موفق';
+          doc.spsWeight = weight;
+          await doc.save();
+
+          return res.send({ result, edit: true });
+        } catch (error: any) {
+          doc.lastMessage = 'استعلام موفق - خطا در تغیر وزن';
+          await doc.save();
+
+          return res.status(422).send({
+            error: 'we have an issue',
+            err: 'استعلام موفق - خطا در تغیر وزن',
+          });
+        }
+      }
+
       doc.status = 1;
-      doc.lastMessage = 'استعلام موفق - وزن اصلاح شد';
+      doc.lastMessage = 'استعلام موفق - وزن یکسان';
 
       await doc.save();
 
-      try {
-        await SPSWS.edit(_id, doc, weight);
-        return res.send({ result, edit: true });
-      } catch (error: any) {
-        doc.lastMessage = 'استعلام موفق - خطا در ثبت وزن';
-        await doc.save();
-
-        return res.status(422).send({
-          error: 'we have an issue',
-          err: 'استعلام موفق - خطا در ثبت وزن',
-        });
-      }
+      return res.send({ result, edit: true });
     } catch (err: any) {
       return res.status(422).send({ error: 'we have an issue', err });
     }
@@ -452,33 +489,6 @@ exports.updateDb = async (req: any, res: any) => {
     console.log('----------- Update Db Result -----------');
 
     return res.json({ bill: foundedBill });
-
-    // Bill.insertMany(bills, { ordered: false, silent: true })
-    //   .then((savedBills: any) => {
-    //     console.log(bills.length, savedBills.length);
-    //   })
-    //   .catch((error: any) => {
-    //     if (error) {
-    //       console.error(error);
-    //     }
-    //   })
-    //   .finally(() => {
-    //     let query = {
-    //       created: {
-    //         $gte: new Date(startDateMongo),
-    //         $lte: new Date(endDateMongo),
-    //       },
-    //     };
-
-    //     Bill.find(query)
-    //       // .limit(60)
-    //       .sort({ date: 1 })
-    //       .exec()
-    //       .then((foundedBill: any) => res.json({ bill: foundedBill }))
-    //       .catch((err: any) =>
-    //         res.status(422).send({ error: 'we have an issue', err })
-    //       );
-    //   });
   } catch (err: any) {
     console.error(err);
     res.status(422).send({ error: 'we have an issue', err });

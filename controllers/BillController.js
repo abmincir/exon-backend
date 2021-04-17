@@ -25,10 +25,27 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 doc.status = 2;
                 doc.lastMessage = 'بارنامه مورد نظر موجود نیست';
                 yield doc.save();
-                return res.status(422).send({
-                    error: 'we have an issue',
-                    err: 'بارنامه مورد نظر موجود نیست',
-                });
+                try {
+                    yield SPSWS.insert(_id, doc);
+                    doc.lastMessage = 'بارنامه مورد نظر موجود نیست - بارنامه اضافه شد';
+                    doc.spsWeight = weight;
+                    doc.status = 1;
+                    yield doc.save();
+                    return res.send({
+                        result,
+                        edit: true,
+                        message: 'بارنامه مورد نظر موجود نیست - بارنامه اضافه شد',
+                    });
+                }
+                catch (error) {
+                    doc.lastMessage = 'بارنامه مورد نظر موجود نیست - خطا در ثبت بارنامه';
+                    yield doc.save();
+                    return res.status(422).send({
+                        error: 'we have an issue',
+                        err: 'عدم تطابق وزن - خطا در ثبت وزن',
+                        insertError: error,
+                    });
+                }
             }
             catch (err) {
                 return res.status(422).send({ error: 'we have an issue', err });
@@ -43,6 +60,8 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 try {
                     yield SPSWS.edit(_id, doc, weight);
                     doc.lastMessage = 'عدم تطابق وزن - وزن اصلاح شد';
+                    doc.spsWeight = weight;
+                    doc.status = 1;
                     yield doc.save();
                     return res.send({
                         result,
@@ -68,21 +87,32 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             doc.spsWeight = foundedBill.weight;
             doc.spsDraft = foundedBill.draftNumber;
             doc.driver.name = foundedBill.driverName;
-            doc.status = 1;
-            doc.lastMessage = 'استعلام موفق - وزن اصلاح شد';
-            yield doc.save();
-            try {
-                yield SPSWS.edit(_id, doc, weight);
-                return res.send({ result, edit: true });
-            }
-            catch (error) {
-                doc.lastMessage = 'استعلام موفق - خطا در ثبت وزن';
+            // duplicated code
+            if (foundedBill.weight !== weight) {
+                doc.status = 0;
+                doc.lastMessage = 'استعلام موفق - مغایرت وزن';
                 yield doc.save();
-                return res.status(422).send({
-                    error: 'we have an issue',
-                    err: 'استعلام موفق - خطا در ثبت وزن',
-                });
+                try {
+                    yield SPSWS.edit(_id, doc, weight);
+                    doc.status = 1;
+                    doc.lastMessage = 'استعلام موفق - تغیر وزن موفق';
+                    doc.spsWeight = weight;
+                    yield doc.save();
+                    return res.send({ result, edit: true });
+                }
+                catch (error) {
+                    doc.lastMessage = 'استعلام موفق - خطا در تغیر وزن';
+                    yield doc.save();
+                    return res.status(422).send({
+                        error: 'we have an issue',
+                        err: 'استعلام موفق - خطا در تغیر وزن',
+                    });
+                }
             }
+            doc.status = 1;
+            doc.lastMessage = 'استعلام موفق - وزن یکسان';
+            yield doc.save();
+            return res.send({ result, edit: true });
         }
         catch (err) {
             return res.status(422).send({ error: 'we have an issue', err });
@@ -377,31 +407,6 @@ exports.updateDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
         console.log('----------- Update Db Result -----------');
         return res.json({ bill: foundedBill });
-        // Bill.insertMany(bills, { ordered: false, silent: true })
-        //   .then((savedBills: any) => {
-        //     console.log(bills.length, savedBills.length);
-        //   })
-        //   .catch((error: any) => {
-        //     if (error) {
-        //       console.error(error);
-        //     }
-        //   })
-        //   .finally(() => {
-        //     let query = {
-        //       created: {
-        //         $gte: new Date(startDateMongo),
-        //         $lte: new Date(endDateMongo),
-        //       },
-        //     };
-        //     Bill.find(query)
-        //       // .limit(60)
-        //       .sort({ date: 1 })
-        //       .exec()
-        //       .then((foundedBill: any) => res.json({ bill: foundedBill }))
-        //       .catch((err: any) =>
-        //         res.status(422).send({ error: 'we have an issue', err })
-        //       );
-        //   });
     }
     catch (err) {
         console.error(err);
