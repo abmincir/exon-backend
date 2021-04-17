@@ -208,6 +208,10 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
   `;
 
   return new Promise(async (res, rej) => {
+    if (!bill.assignmentId) {
+      rej({ error: 'عدم وجود شماره تخصیص', err: 'عدم وجود شماره تخصیص' });
+    }
+
     try {
       const result = await axios.post(
         'https://spsws.bki.ir/spsws.asmx?op=EditBarname',
