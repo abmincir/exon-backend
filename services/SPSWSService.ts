@@ -346,11 +346,13 @@ exports.insert = async (_id: string, bill: any) => {
 
           const result =
             jsonResult[envelope][body][0].insertBarnameResponse[0]
-              .insertBarnameResult[0];
-          // [diffgram][0].NewDataSet[0].Table1
+              .insertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
+          const result2 =
+            jsonResult[envelope][body][0].insertBarnameResponse[0]
+              .insertBarnameResult[0][diffgram][0]['$'];
 
           console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
-          console.log(result);
+          console.log(result, result2);
           console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
 
           const errors: any = [];
