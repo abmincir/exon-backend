@@ -196,7 +196,8 @@ exports.edit = (_id, bill, weight) => __awaiter(void 0, void 0, void 0, function
   </x:Envelope>
   `;
     return new Promise((res, rej) => __awaiter(void 0, void 0, void 0, function* () {
-        if (!bill.assignmentId) {
+        console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
+        if (!!!bill.assignmentId) {
             rej({ error: 'عدم وجود شماره تخصیص', err: 'عدم وجود شماره تخصیص' });
         }
         try {

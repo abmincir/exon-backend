@@ -208,7 +208,8 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
   `;
 
   return new Promise(async (res, rej) => {
-    if (!bill.assignmentId) {
+    console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
+    if (!!!bill.assignmentId) {
       rej({ error: 'عدم وجود شماره تخصیص', err: 'عدم وجود شماره تخصیص' });
     }
 
