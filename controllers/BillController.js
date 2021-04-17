@@ -38,7 +38,8 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     });
                 }
                 catch (error) {
-                    doc.lastMessage = 'بارنامه مورد نظر موجود نیست - خطا در ثبت بارنامه';
+                    doc.lastMessage =
+                        ' - بارنامه مورد نظر موجود نیست - خطا در ثبت بارنامه' + error;
                     yield doc.save();
                     return res.status(422).send({
                         error: 'we have an issue',
