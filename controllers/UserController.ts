@@ -44,10 +44,13 @@ exports.createUser = (req: any, res: any) => {
 
 exports.deleteUser = async (req: any, res: any) => {
   const { _id } = req.body;
-  await Model.User.findByIdAndDelete(_id).catch((err: any) =>
-    res.status(422).send({ error: 'we have an issue', err })
-  );
-  res.status(200).send('Success');
+
+  try {
+    await Model.User.findByIdAndDelete(_id);
+    return res.status(200).send('Success');
+  } catch (err: any) {
+    return res.status(422).send({ error: 'we have an issue', err });
+  }
 };
 
 exports.changePassword = (req: any, res: any) => {
@@ -69,19 +72,19 @@ exports.changePassword = (req: any, res: any) => {
     );
 };
 
-exports.changeUser = (req: any, res: any) => {
-  const { username, newUsername, name, password } = req.body;
-  Model.User.findOne({ username })
-    .exec()
-    .then((foundedUser: any) => {
-      foundedUser.username = newUsername || foundedUser.username;
-      foundedUser.name = name || foundedUser.name;
-      foundedUser.password = password || foundedUser.password;
-      foundedUser
-        .save()
-        .then((savedUser: any) => res.json({ user: savedUser }));
-    })
-    .catch((err: any) =>
-      res.status(422).send({ error: 'we have an issue', err })
-    );
+exports.changeUser = async (req: any, res: any) => {
+  const { _id, username, name, password } = req.body;
+
+  try {
+    const foundedUser = await Model.User.findById(_id).exec();
+
+    foundedUser.username = username ?? foundedUser.username;
+    foundedUser.name = name ?? foundedUser.name;
+    foundedUser.password = password ?? foundedUser.password;
+
+    const savedUser = await foundedUser.save();
+    return res.json({ user: savedUser });
+  } catch (err: any) {
+    return res.status(422).send({ error: 'we have an issue', err });
+  }
 };
