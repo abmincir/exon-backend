@@ -25,7 +25,8 @@ exports.estelam = async (req: any, res: any) => {
         await doc.save();
 
         try {
-          await SPSWS.insert(_id, doc);
+          const insertResult = await SPSWS.insert(_id, doc);
+          console.log('*****************', insertResult, '***********');
 
           doc.lastMessage = 'بارنامه مورد نظر موجود نیست - بارنامه اضافه شد';
           doc.spsWeight = weight;

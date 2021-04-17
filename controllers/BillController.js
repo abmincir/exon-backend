@@ -26,7 +26,8 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 doc.lastMessage = 'بارنامه مورد نظر موجود نیست';
                 yield doc.save();
                 try {
-                    yield SPSWS.insert(_id, doc);
+                    const insertResult = yield SPSWS.insert(_id, doc);
+                    console.log('*****************', insertResult, '***********');
                     doc.lastMessage = 'بارنامه مورد نظر موجود نیست - بارنامه اضافه شد';
                     doc.spsWeight = weight;
                     doc.status = 1;

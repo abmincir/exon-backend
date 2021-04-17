@@ -363,51 +363,33 @@ exports.insert = async (_id: string, bill: any) => {
           console.log(result);
           console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
 
-          const errors: any = [];
-
-          result.map(async (bill: any, index: number) => {
-            if (index < result.length - 1) {
-              if (bill && bill.ErrorCode && bill.ErrorCode[0] !== '0') {
-                errors.push({
-                  errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '-0',
-                  errorMessage:
-                    bill && bill.ErrorMsg
-                      ? bill.ErrorMsg[0]
-                      : 'خطا در دریافت اطلاعات',
-                });
-              } else {
-                // todo save some data to bill
-                // try {
-                //   const changedBill = await BillModel.findById(_id);
-                //   changedBill.merchantWeight = bill.bill.weight;
-                //   await changedBill.save();
-                //   console.log('Edited And Saved');
-                // } catch (err: any) {
-                //   console.error(err);
-                //   return rej({ error: 'Not Found After Edit', err });
-                // }
-              }
-            } else {
-              errors.push({
-                errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '-0',
-                errorMessage:
-                  bill && bill.ErrorMsg
-                    ? bill.ErrorMsg[0]
-                    : 'خطا در دریافت اطلاعات',
-              });
-            }
-          });
-
-          const error = result.find((error: any) => error.errorCode === '0');
-
-          if (error) {
+          if (result.length < 1) {
             return rej({
-              error: error.errorMessage,
-              err: error.errorMessage,
+              error: 'خطا در دریافت اطلاعات',
+              err: 'خطا در دریافت اطلاعات',
             });
-          } else {
-            return res('success');
           }
+
+          if (
+            result[0] &&
+            result[0].ErrorCode &&
+            result[0].ErrorCode[0] !== '0'
+          ) {
+            return rej({
+              error:
+                result[0] && result[0].ErrorMsg
+                  ? result[0].ErrorMsg[0]
+                  : 'خطا در دریافت اطلاعات',
+              err:
+                result[0] && result[0].ErrorMsg
+                  ? result[0].ErrorMsg[0]
+                  : 'خطا در دریافت اطلاعات',
+            });
+          }
+
+          // todo save some data to bill
+
+          return res('success');
         })
         .catch(function (err: any) {
           console.error(err);
