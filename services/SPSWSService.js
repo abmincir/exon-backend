@@ -284,6 +284,7 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
     </x:Body>
 </x:Envelope>
   `;
+    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
     console.log({
         billNumber: bill.bill.number,
         billSerial: bill.bill.serial,
@@ -292,6 +293,7 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
         purchaseId: bill.purchaseId,
         assignmentId: bill.assignmentId,
     });
+    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
     return new Promise((res, rej) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
         if (!!!bill.assignmentId) {
@@ -312,7 +314,8 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
                 const body = 'soap:Body';
                 const diffgram = 'diffgr:diffgram';
                 const result = jsonResult[envelope][body][0].insertBarnameResponse[0]
-                    .insertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
+                    .insertBarnameResult[0];
+                // [diffgram][0].NewDataSet[0].Table1
                 console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
                 console.log(result);
                 console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
@@ -327,7 +330,6 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
                         }
                         else {
                             try {
-                                console.log('Editing ', _id);
                                 const changedBill = yield BillModel.findById(_id);
                                 changedBill.merchantWeight = bill.bill.weight;
                                 yield changedBill.save();
