@@ -303,7 +303,10 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
     return new Promise((res, rej) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
         if (!!!bill.assignmentId) {
-            rej({ error: 'عدم وجود شماره تخصیص', err: 'عدم وجود شماره تخصیص' });
+            return rej({
+                error: 'عدم وجود شماره تخصیص',
+                err: 'عدم وجود شماره تخصیص',
+            });
         }
         try {
             const result = yield axios.post('https://spsws.bki.ir/spsws.asmx?op=insertBarname', xml, {
@@ -327,47 +330,54 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
                 const errors = [];
                 result.map((bill, index) => __awaiter(this, void 0, void 0, function* () {
                     if (index < result.length - 1) {
-                        if (bill && bill.errorcode && bill.errorcode[0] !== '0') {
+                        if (bill && bill.ErrorCode && bill.ErrorCode[0] !== '0') {
                             errors.push({
-                                errorCode: bill && bill.errorcode ? bill.errorcode[0] : '',
-                                errorMessage: bill && bill.errormsg ? bill.errormsg[0] : '',
+                                errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '-0',
+                                errorMessage: bill && bill.ErrorMsg
+                                    ? bill.ErrorMsg[0]
+                                    : 'خطا در دریافت اطلاعات',
                             });
                         }
                         else {
-                            try {
-                                const changedBill = yield BillModel.findById(_id);
-                                changedBill.merchantWeight = bill.bill.weight;
-                                yield changedBill.save();
-                                console.log('Edited And Saved');
-                            }
-                            catch (err) {
-                                console.error(err);
-                                rej({ error: 'Not Found After Edit', err });
-                            }
+                            // todo save some data to bill
+                            // try {
+                            //   const changedBill = await BillModel.findById(_id);
+                            //   changedBill.merchantWeight = bill.bill.weight;
+                            //   await changedBill.save();
+                            //   console.log('Edited And Saved');
+                            // } catch (err: any) {
+                            //   console.error(err);
+                            //   return rej({ error: 'Not Found After Edit', err });
+                            // }
                         }
                     }
                     else {
                         errors.push({
-                            errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '',
-                            errorMessage: bill && bill.ErrorMsg ? bill.ErrorMsg[0] : '',
+                            errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '-0',
+                            errorMessage: bill && bill.ErrorMsg
+                                ? bill.ErrorMsg[0]
+                                : 'خطا در دریافت اطلاعات',
                         });
                     }
                 }));
                 const error = result.find((error) => error.errorCode === '0');
                 if (error) {
-                    rej({ error: error[0].ErrorMsg[0], err: error[0].ErrorMsg[0] });
+                    return rej({
+                        error: error.errorMessage,
+                        err: error.errorMessage,
+                    });
                 }
                 else {
-                    res('success');
+                    return res('success');
                 }
             })
                 .catch(function (err) {
                 console.error(err);
-                rej(err);
+                return rej(err);
             });
         }
         catch (error) {
-            rej(error);
+            return rej(error);
         }
     }));
 });

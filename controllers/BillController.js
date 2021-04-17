@@ -42,7 +42,7 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     yield doc.save();
                     return res.status(422).send({
                         error: 'we have an issue',
-                        err: 'عدم تطابق وزن - خطا در ثبت وزن',
+                        err: ' - خطا در ثبت بارنامه - ' + error,
                         insertError: error,
                     });
                 }

@@ -43,7 +43,7 @@ exports.estelam = async (req: any, res: any) => {
 
           return res.status(422).send({
             error: 'we have an issue',
-            err: 'عدم تطابق وزن - خطا در ثبت وزن',
+            err: ' - خطا در ثبت بارنامه - ' + error,
             insertError: error,
           });
         }

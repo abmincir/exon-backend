@@ -329,7 +329,10 @@ exports.insert = async (_id: string, bill: any) => {
   return new Promise(async (res, rej) => {
     console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
     if (!!!bill.assignmentId) {
-      rej({ error: 'عدم وجود شماره تخصیص', err: 'عدم وجود شماره تخصیص' });
+      return rej({
+        error: 'عدم وجود شماره تخصیص',
+        err: 'عدم وجود شماره تخصیص',
+      });
     }
 
     try {
@@ -364,27 +367,33 @@ exports.insert = async (_id: string, bill: any) => {
 
           result.map(async (bill: any, index: number) => {
             if (index < result.length - 1) {
-              if (bill && bill.errorcode && bill.errorcode[0] !== '0') {
+              if (bill && bill.ErrorCode && bill.ErrorCode[0] !== '0') {
                 errors.push({
-                  errorCode: bill && bill.errorcode ? bill.errorcode[0] : '',
-                  errorMessage: bill && bill.errormsg ? bill.errormsg[0] : '',
+                  errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '-0',
+                  errorMessage:
+                    bill && bill.ErrorMsg
+                      ? bill.ErrorMsg[0]
+                      : 'خطا در دریافت اطلاعات',
                 });
               } else {
-                try {
-                  const changedBill = await BillModel.findById(_id);
-                  changedBill.merchantWeight = bill.bill.weight;
-
-                  await changedBill.save();
-                  console.log('Edited And Saved');
-                } catch (err: any) {
-                  console.error(err);
-                  rej({ error: 'Not Found After Edit', err });
-                }
+                // todo save some data to bill
+                // try {
+                //   const changedBill = await BillModel.findById(_id);
+                //   changedBill.merchantWeight = bill.bill.weight;
+                //   await changedBill.save();
+                //   console.log('Edited And Saved');
+                // } catch (err: any) {
+                //   console.error(err);
+                //   return rej({ error: 'Not Found After Edit', err });
+                // }
               }
             } else {
               errors.push({
-                errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '',
-                errorMessage: bill && bill.ErrorMsg ? bill.ErrorMsg[0] : '',
+                errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '-0',
+                errorMessage:
+                  bill && bill.ErrorMsg
+                    ? bill.ErrorMsg[0]
+                    : 'خطا در دریافت اطلاعات',
               });
             }
           });
@@ -392,17 +401,20 @@ exports.insert = async (_id: string, bill: any) => {
           const error = result.find((error: any) => error.errorCode === '0');
 
           if (error) {
-            rej({ error: error[0].ErrorMsg[0], err: error[0].ErrorMsg[0] });
+            return rej({
+              error: error.errorMessage,
+              err: error.errorMessage,
+            });
           } else {
-            res('success');
+            return res('success');
           }
         })
         .catch(function (err: any) {
           console.error(err);
-          rej(err);
+          return rej(err);
         });
     } catch (error: any) {
-      rej(error);
+      return rej(error);
     }
   });
 };
