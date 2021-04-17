@@ -348,7 +348,7 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
                 }));
                 const error = result.find((error) => error.errorCode === '0');
                 if (error) {
-                    rej(error);
+                    rej({ error: error[0].errorMsg[0], err: error[0].errorMsg[0] });
                 }
                 else {
                     res('success');

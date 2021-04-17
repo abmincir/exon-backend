@@ -384,7 +384,7 @@ exports.insert = async (_id: string, bill: any) => {
           const error = result.find((error: any) => error.errorCode === '0');
 
           if (error) {
-            rej(error);
+            rej({ error: error[0].errorMsg[0], err: error[0].errorMsg[0] });
           } else {
             res('success');
           }
