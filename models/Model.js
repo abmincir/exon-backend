@@ -9,6 +9,7 @@ const BillSchema = new Schema({
     spsWeight: String,
     spsDraft: String,
     cottageNumber: String,
+    assignmentId: String,
     salesmanCode: String,
     driver: {
         name: String,

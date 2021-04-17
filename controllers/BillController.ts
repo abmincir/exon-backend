@@ -37,7 +37,6 @@ exports.estelam = async (req: any, res: any) => {
       try {
         const doc = await Bill.findById(_id);
 
-        doc.cottageNumber = foundedBill.cottageNumber;
         doc.spsWeight = foundedBill.weight;
         doc.status = 0;
 
@@ -71,7 +70,6 @@ exports.estelam = async (req: any, res: any) => {
     try {
       const doc = await Bill.findById(_id);
 
-      doc.cottageNumber = foundedBill.cottageNumber;
       doc.spsWeight = foundedBill.weight;
       doc.spsDraft = foundedBill.draftNumber;
       doc.driver.name = foundedBill.driverName;
@@ -333,6 +331,9 @@ exports.updateDb = async (req: any, res: any) => {
         allocationId: bill.ref,
         purchaseId: bill.bargah, //spsId
         saveDate: bill.RegisterDate,
+
+        cottageNumber: bill.cottage_id,
+        assignmentId: bill.ref,
 
         salesmanCode: bill.code,
 
