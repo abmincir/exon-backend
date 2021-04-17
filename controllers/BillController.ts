@@ -144,8 +144,9 @@ exports.estelam = async (req: any, res: any) => {
       return res
         .status(422)
         .send({ error: 'we have an issue', err: 'خطا در اتصال به بازارگاه' });
-    } catch (error: any) {}
-    return res.status(422).send({ error: 'we have an issue', err });
+    } catch (error: any) {
+      return res.status(422).send({ error: 'we have an issue', err });
+    }
   }
 };
 

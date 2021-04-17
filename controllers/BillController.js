@@ -130,8 +130,9 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 .status(422)
                 .send({ error: 'we have an issue', err: 'خطا در اتصال به بازارگاه' });
         }
-        catch (error) { }
-        return res.status(422).send({ error: 'we have an issue', err });
+        catch (error) {
+            return res.status(422).send({ error: 'we have an issue', err });
+        }
     }
 });
 exports.edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
