@@ -121,6 +121,16 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (err) {
         console.error(err);
+        try {
+            const doc = yield Bill.findById(_id);
+            doc.status = 2;
+            doc.lastMessage = 'خطا در اتصال به بازارگاه';
+            yield doc.save();
+            return res
+                .status(422)
+                .send({ error: 'we have an issue', err: 'خطا در اتصال به بازارگاه' });
+        }
+        catch (error) { }
         return res.status(422).send({ error: 'we have an issue', err });
     }
 });

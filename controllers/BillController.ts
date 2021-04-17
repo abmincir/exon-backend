@@ -133,6 +133,18 @@ exports.estelam = async (req: any, res: any) => {
     }
   } catch (err: any) {
     console.error(err);
+
+    try {
+      const doc = await Bill.findById(_id);
+      doc.status = 2;
+      doc.lastMessage = 'خطا در اتصال به بازارگاه';
+
+      await doc.save();
+
+      return res
+        .status(422)
+        .send({ error: 'we have an issue', err: 'خطا در اتصال به بازارگاه' });
+    } catch (error: any) {}
     return res.status(422).send({ error: 'we have an issue', err });
   }
 };
