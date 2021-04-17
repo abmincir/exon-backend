@@ -361,7 +361,7 @@ exports.insert = async (_id: string, bill: any) => {
               .insertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
 
           console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
-          console.log(result, result[0].ErrorCode[0], result[0].ErrorMsg[0]);
+          console.log(result, result[0]?.ErrorCode[0], result[0]?.ErrorMsg[0]);
           console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
 
           if (result.length < 1) {

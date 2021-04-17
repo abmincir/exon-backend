@@ -320,13 +320,14 @@ exports.insert = (_id, bill) => __awaiter(void 0, void 0, void 0, function* () {
             parser
                 .parseStringPromise(result.data)
                 .then(function (jsonResult) {
+                var _a, _b;
                 const envelope = 'soap:Envelope';
                 const body = 'soap:Body';
                 const diffgram = 'diffgr:diffgram';
                 const result = jsonResult[envelope][body][0].insertBarnameResponse[0]
                     .insertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
                 console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
-                console.log(result, result[0].ErrorCode[0], result[0].ErrorMsg[0]);
+                console.log(result, (_a = result[0]) === null || _a === void 0 ? void 0 : _a.ErrorCode[0], (_b = result[0]) === null || _b === void 0 ? void 0 : _b.ErrorMsg[0]);
                 console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
                 if (result.length < 1) {
                     return rej({
