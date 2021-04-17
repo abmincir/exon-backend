@@ -39,13 +39,13 @@ exports.estelam = async (req: any, res: any) => {
             message: 'بارنامه مورد نظر موجود نیست - بارنامه اضافه شد',
           });
         } catch (error: any) {
-          doc.lastMessage = ' - خطا در ثبت بارنامه - ' + error;
+          doc.lastMessage = ' - خطا در ثبت بارنامه - ' + error.err;
           await doc.save();
 
           return res.status(422).send({
             error: 'we have an issue',
-            err: ' - خطا در ثبت بارنامه - ' + error,
-            insertError: error,
+            err: ' - خطا در ثبت بارنامه - ' + error.err,
+            insertError: error.err,
           });
         }
       } catch (err: any) {

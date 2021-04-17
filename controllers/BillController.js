@@ -39,12 +39,12 @@ exports.estelam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     });
                 }
                 catch (error) {
-                    doc.lastMessage = ' - خطا در ثبت بارنامه - ' + error;
+                    doc.lastMessage = ' - خطا در ثبت بارنامه - ' + error.err;
                     yield doc.save();
                     return res.status(422).send({
                         error: 'we have an issue',
-                        err: ' - خطا در ثبت بارنامه - ' + error,
-                        insertError: error,
+                        err: ' - خطا در ثبت بارنامه - ' + error.err,
+                        insertError: error.err,
                     });
                 }
             }
