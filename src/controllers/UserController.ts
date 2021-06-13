@@ -45,12 +45,15 @@ exports.createUser = (req: any, res: any) => {
 exports.deleteUser = async (req: any, res: any) => {
   const { _id } = req.body;
 
-  try {
-    await Model.User.findByIdAndDelete(_id);
-    return res.status(200).send('Success');
-  } catch (err: any) {
-    return res.status(422).send({ error: 'we have an issue', err });
-  }
+  Model.User.findByIdAndDelete(_id, function (err: any, docs: any) {
+    if (err) {
+      console.log(err);
+      return res.status(422).send({ error: 'we have an issue', err });
+    } else {
+      console.log('Deleted : ', docs);
+      return res.status(200).send('Success');
+    }
+  });
 };
 
 exports.changePassword = (req: any, res: any) => {

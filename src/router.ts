@@ -6,7 +6,7 @@ const jsonParser = bodyParser.json();
 
 module.exports = (app: any) => {
   app.get('/user', jsonParser, UserController.getUser);
-  app.get('/user/delete', jsonParser, UserController.deleteUser);
+  app.post('/user/delete', jsonParser, UserController.deleteUser);
   app.get('/user/all', jsonParser, UserController.getAllUsers);
   app.post('/user/auth', jsonParser, UserController.auth);
   app.post('/user/create', jsonParser, UserController.createUser);
