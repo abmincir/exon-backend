@@ -294,7 +294,7 @@ exports.insert = async (_id: string, bill: any) => {
       ? '13'
       : '14') + bill.bill.date;
 
-  console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+  console.log('\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
   console.log({
     billNumber: bill.bill.number,
     billSerial: bill.bill.serial,
@@ -305,7 +305,7 @@ exports.insert = async (_id: string, bill: any) => {
     purchaseId: bill.purchaseId,
     assignmentId: bill.assignmentId,
   });
-  console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+  console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n');
 
   const xml = `
 <x:Envelope
@@ -361,7 +361,7 @@ exports.insert = async (_id: string, bill: any) => {
               .insertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
 
           console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
-          console.log(result, result[0]?.ErrorCode[0], result[0]?.ErrorMsg[0]);
+          console.log(result);
           console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
 
           if (result.length < 1) {
@@ -371,26 +371,18 @@ exports.insert = async (_id: string, bill: any) => {
             });
           }
 
-          if (
-            result[0] &&
-            result[0].ErrorCode &&
-            result[0].ErrorCode[0] !== '0'
-          ) {
+          if (result?.[0]?.ErrorCode?.[0]) {
             return rej({
-              error:
-                result[0] && result[0].ErrorMsg
-                  ? result[0].ErrorMsg[0]
-                  : 'خطا در دریافت اطلاعات',
-              err:
-                result[0] && result[0].ErrorMsg
-                  ? result[0].ErrorMsg[0]
-                  : 'خطا در دریافت اطلاعات',
+              error: result?.[0]?.ErrorMsg[0]
+                ? result[0].ErrorMsg[0]
+                : 'خطا در دریافت اطلاعات',
+              err: result?.[0]?.ErrorMsg[0]
+                ? result[0].ErrorMsg[0]
+                : 'خطا در دریافت اطلاعات',
             });
           }
 
-          // todo save some data to bill
-
-          return res('success');
+          return res(true);
         })
         .catch(function (err: any) {
           console.error(err);

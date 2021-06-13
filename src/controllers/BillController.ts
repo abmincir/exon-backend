@@ -16,7 +16,7 @@ exports.estelam = async (req: any, res: any) => {
       (bill: any) => bill.billNumber === billNumber
     );
 
-    if (foundedBill === null || foundedBill === undefined) {
+    if (!foundedBill) {
       const doc = await Bill.findById(_id);
       try {
         doc.status = 2;
@@ -25,8 +25,7 @@ exports.estelam = async (req: any, res: any) => {
         await doc.save();
 
         try {
-          const insertResult = await SPSWS.insert(_id, doc);
-          console.log('*****************', insertResult, '***********');
+          await SPSWS.insert(_id, doc);
 
           doc.lastMessage = 'بارنامه مورد نظر موجود نیست - بارنامه اضافه شد';
           doc.spsWeight = weight;
@@ -95,33 +94,6 @@ exports.estelam = async (req: any, res: any) => {
       doc.spsWeight = foundedBill.weight;
       doc.spsDraft = foundedBill.draftNumber;
       doc.driver.name = foundedBill.driverName;
-
-      // duplicated code
-      if (foundedBill.weight !== weight) {
-        doc.status = 0;
-        doc.lastMessage = 'استعلام موفق - مغایرت وزن';
-        await doc.save();
-
-        try {
-          await SPSWS.edit(_id, doc, weight);
-
-          doc.status = 1;
-          doc.lastMessage = 'استعلام موفق - تغیر وزن موفق';
-          doc.spsWeight = weight;
-          await doc.save();
-
-          return res.send({ result, edit: true });
-        } catch (error: any) {
-          doc.lastMessage = 'استعلام موفق - خطا در تغیر وزن';
-          await doc.save();
-
-          return res.status(422).send({
-            error: 'we have an issue',
-            err: 'استعلام موفق - خطا در تغیر وزن',
-          });
-        }
-      }
-
       doc.status = 1;
       doc.lastMessage = 'استعلام موفق - وزن یکسان';
 
