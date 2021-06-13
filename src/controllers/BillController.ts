@@ -151,6 +151,7 @@ exports.getAll = async (req: any, res: any) => {
     billNumber,
     purchaseNumber,
     status,
+    productName,
   } = req.body;
 
   status = status || status === '0' ? +status : -2;
@@ -163,6 +164,7 @@ exports.getAll = async (req: any, res: any) => {
     billNumber,
     purchaseNumber,
     status,
+    productName,
   });
 
   let query = {};
@@ -171,9 +173,14 @@ exports.getAll = async (req: any, res: any) => {
     Object.assign(query, { status });
   }
 
+  if (productName) {
+    Object.assign(query, { 'product.name': productName });
+  }
+
   if (billNumber) {
     Object.assign(query, { 'bill.number': billNumber });
   }
+
   if (purchaseNumber) {
     Object.assign(query, { purchaseId: purchaseNumber });
   }
@@ -476,7 +483,7 @@ exports.updateDb = async (req: any, res: any) => {
 
     return res.json({ bill: foundedBill });
   } catch (err: any) {
-    console.error(err);
+    console.error(' --------- SQL ERROR ', err);
     res.status(422).send({ error: 'we have an issue', err });
   }
 };
