@@ -1,0 +1,31 @@
+<service>
+	<id>misautomationbackendservice.exe</id>
+	<name>MIS Automation Backend Service</name>
+	<description>Backend Process Managing MongoDb And Handeling Requests</description>
+	<executable>C:\Program Files\nodejs\node.exe</executable>
+	<argument>--harmony</argument>
+	<argument>C:\Users\Administrator.ADEXON\Desktop\exon-backend\node_modules\node-windows\lib\wrapper.js</argument>
+	<argument>--file</argument>
+	<argument>C:\Users\Administrator.ADEXON\Desktop\exon-backend\dist</argument>
+	<argument>--scriptoptions=</argument>
+	<argument>--log</argument>
+	<argument>MIS Automation Backend Service wrapper</argument>
+	<argument>--grow</argument>
+	<argument>0.25</argument>
+	<argument>--wait</argument>
+	<argument>1</argument>
+	<argument>--maxrestarts</argument>
+	<argument>3</argument>
+	<argument>--abortonerror</argument>
+	<argument>n</argument>
+	<argument>--stopparentfirst</argument>
+	<argument>undefined</argument>
+	<logmode>rotate</logmode>
+	<stoptimeout>30sec</stoptimeout>
+	<serviceaccount>
+		<domain>SRV-APPS</domain>
+		<user>LocalSystem</user>
+		<password></password>
+	</serviceaccount>
+	<workingdirectory>C:\Users\Administrator.ADEXON\Desktop\exon-backend</workingdirectory>
+</service>

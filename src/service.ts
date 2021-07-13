@@ -4,7 +4,10 @@ import { Service } from 'node-windows';
 const svc = new Service({
   name: 'MIS Automation Backend Service',
   description: 'Backend Process Managing MongoDb And Handeling Requests',
-  script: './app.js',
+
+  // Path To The Main Script
+  script:
+    'C:\\Users\\Administrator.ADEXON\\Desktop\\exon-backend\\dist\\app.js',
 });
 
 // Listen for the "install" event, which indicates the
@@ -16,3 +19,12 @@ svc.on('install', () => {
 });
 
 svc.install();
+
+// // Listen for the "uninstall" event so we know when it's done.
+// svc.on('uninstall', function () {
+//   console.log('Uninstall complete.');
+//   console.log('The service exists: ', svc.exists);
+// });
+
+// // Uninstall the service.
+// svc.uninstall();
