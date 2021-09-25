@@ -1,6 +1,8 @@
 import bodyParser = require('body-parser');
 const BillController = require('./controllers/BillController');
 const UserController = require('./controllers/UserController');
+const DatabaseController = require('./controllers/DatabaseController');
+const AccountController = require('./controllers/AccountController');
 
 const jsonParser = bodyParser.json();
 
@@ -22,4 +24,14 @@ module.exports = (app: any) => {
 
   app.post('/sql', jsonParser, BillController.fetch);
   app.post('/test', jsonParser, BillController.dummy);
+
+  app.post('/accounts/create', jsonParser, AccountController.create);
+  app.get('/accounts/all', jsonParser, AccountController.getAll);
+  app.post('/accounts/change-user', jsonParser, AccountController.update)
+  app.post('/accounts/delete', jsonParser, AccountController.delete)
+
+  app.post('/databases/create');
+  app.get('/databases/all', jsonParser, DatabaseController.getAll);
+  app.post('/databases/change-database', jsonParser, DatabaseController.update);
+  app.post('/databases/delete', jsonParser, DatabaseController.delete);
 };

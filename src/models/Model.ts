@@ -86,3 +86,24 @@ const UserSchema = new Schema(
 );
 
 exports.User = mongoose.model('User', UserSchema);
+
+const AccountSchema = new Schema(
+  {
+    username: { type: String, unique: true, required: true },
+    password: { type: String, require: true },
+  },
+  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }
+);
+exports.Account = mongoose.model('Account', AccountSchema);
+
+const DatabaseSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    username: { type: String, required: true },
+    password: { type: String },
+    address: { type: String, required: true },
+    proc: { type: String, require: true },
+  },
+  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }
+);
+exports.Database = mongoose.model('Database', DatabaseSchema);
