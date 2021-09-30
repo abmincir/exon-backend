@@ -258,7 +258,7 @@ exports.getAll = async (req: any, res: any) => {
 exports.fetch = (req: any, res: any) => {
   const { startDate, endDate } = req.body;
 
-  SQLService.FetchData({ startDate, endDate }).then(
+  SQLService.FetchTadbirData({ startDate, endDate }).then(
     (result: any) => {
       console.log(result);
       res.send(result);
