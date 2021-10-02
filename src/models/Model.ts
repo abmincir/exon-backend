@@ -6,6 +6,13 @@ const BillSchema = new Schema(
     allocationId: String, //spsId
     purchaseId: String,
     saveDate: String,
+    dbName: String, // Origin Sql Database Name That Is Unique
+
+    // The User Doing The Action
+    username: String,
+
+    // The Bazargah Account Doing The Action
+    account: String,
 
     merchantWeight: String,
     spsWeight: String,
@@ -98,7 +105,7 @@ exports.Account = mongoose.model('Account', AccountSchema);
 
 const DatabaseSchema = new Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, unique: true },
     username: { type: String, required: true },
     password: { type: String },
     address: { type: String, required: true },

@@ -5,7 +5,7 @@ const url = 'https://spsws.bki.ir/spsws.asmx?WSDL';
 const userName = '10103740920';
 const pass = 'exon@321';
 
-exports.estelam = async (purchaseId: string) => {
+exports.estelam = async (purchaseId: string, username: string, password: string) => {
   const xml = `
   <x:Envelope
     xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
@@ -13,8 +13,8 @@ exports.estelam = async (purchaseId: string) => {
     <x:Header/>
     <x:Body>
         <tem:EstelameBarname>
-            <tem:userName>10103740920</tem:userName>
-            <tem:pass>exon@321</tem:pass>
+            <tem:userName>${username}</tem:userName>
+            <tem:pass>${password}</tem:pass>
             <tem:fromDate></tem:fromDate>
             <tem:toDate></tem:toDate>
             <tem:kharidId>${purchaseId}</tem:kharidId>
@@ -36,7 +36,7 @@ exports.estelam = async (purchaseId: string) => {
             'Content-Type': 'text/xml; charset=utf-8',
             SOAPAction: 'http://tempuri.org/EstelameBarname',
           },
-        }
+        },
       );
 
       var parser = new xml2js.Parser(/* options */);
@@ -60,8 +60,7 @@ exports.estelam = async (purchaseId: string) => {
           result.map((bill: any, index: number) => {
             if (index < result.length - 1) {
               bills.push({
-                cottageNumber:
-                  bill && bill.kutajnumber ? bill.kutajnumber[0] : '',
+                cottageNumber: bill && bill.kutajnumber ? bill.kutajnumber[0] : '',
                 weight: bill && bill.weightk ? bill.weightk[0] : '',
                 draftNumber: bill && bill.hamlid ? bill.hamlid[0] : '',
                 billNumber: bill && bill.barnamen ? bill.barnamen[0] : '',
@@ -122,7 +121,7 @@ exports.estelamByDate = async (startDate: string, endDate: string) => {
             'Content-Type': 'text/xml; charset=utf-8',
             SOAPAction: 'http://tempuri.org/EstelameBarname',
           },
-        }
+        },
       );
 
       var parser = new xml2js.Parser(/* options */);
@@ -144,8 +143,7 @@ exports.estelamByDate = async (startDate: string, endDate: string) => {
           result.map((bill: any, index: number) => {
             if (index < result.length - 1) {
               bills.push({
-                cottageNumber:
-                  bill && bill.kutajnumber ? bill.kutajnumber[0] : '',
+                cottageNumber: bill && bill.kutajnumber ? bill.kutajnumber[0] : '',
                 weight: bill && bill.weightk ? bill.weightk[0] : '',
                 draftNumber: bill && bill.hamlid ? bill.hamlid[0] : '',
                 billNumber: bill && bill.barnamen ? bill.barnamen[0] : '',
@@ -175,7 +173,13 @@ exports.estelamByDate = async (startDate: string, endDate: string) => {
   });
 };
 
-exports.edit = async (_id: string, bill: any, weight: string) => {
+exports.edit = async (
+  _id: string,
+  bill: any,
+  weight: string,
+  username: string,
+  password: string,
+) => {
   const { spsDraft } = bill;
   const { name, carNumber } = bill.driver;
   const billNumber = bill.bill.number;
@@ -190,8 +194,8 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
     <x:Header/>
     <x:Body>
       <tem:EditBarname>
-          <tem:userName>10103740920</tem:userName>
-          <tem:pass>exon@321</tem:pass>
+          <tem:userName>${username}</tem:userName>
+          <tem:pass>${password}</tem:pass>
           <tem:HamlId>${spsDraft}</tem:HamlId>
           <tem:value>${weight}</tem:value>
           <tem:DriverName>${name}</tem:DriverName>
@@ -217,7 +221,7 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
             'Content-Type': 'text/xml; charset=utf-8',
             SOAPAction: 'http://tempuri.org/EditBarname',
           },
-        }
+        },
       );
 
       var parser = new xml2js.Parser(/* options */);
@@ -229,8 +233,9 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
           const diffgram: any = 'diffgr:diffgram';
 
           const result =
-            jsonResult[envelope][body][0].EditBarnameResponse[0]
-              .EditBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
+            jsonResult[envelope][body][0].EditBarnameResponse[0].EditBarnameResult[0][
+              diffgram
+            ][0].NewDataSet[0].Table1;
 
           console.log('------------- EDIT BARNAME CALLED -------------');
           console.log(result);
@@ -252,9 +257,7 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
                   const changedBill = await BillModel.findById(_id);
                   changedBill.merchantWeight = weight;
 
-                  changedBill
-                    .save()
-                    .then(() => console.log('Edited And Saved'));
+                  changedBill.save().then(() => console.log('Edited And Saved'));
                 } catch (err: any) {
                   console.error(err);
                   rej({ error: 'Not Found After Edit', err });
@@ -286,16 +289,16 @@ exports.edit = async (_id: string, bill: any, weight: string) => {
   });
 };
 
-exports.insert = async (_id: string, bill: any) => {
+exports.insert = async (_id: string, bill: any, username: string, password: string) => {
   const calcCreatedDate =
-    (bill.bill.date[0] === '9' ||
-    bill.bill.date[0] === '8' ||
-    bill.bill.date[0] === '7'
+    (bill.bill.date[0] === '9' || bill.bill.date[0] === '8' || bill.bill.date[0] === '7'
       ? '13'
       : '14') + bill.bill.date;
 
   console.log('\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
   console.log({
+    username,
+    password,
     billNumber: bill.bill.number,
     billSerial: bill.bill.serial,
     saveDate: bill.saveDate,
@@ -314,6 +317,8 @@ exports.insert = async (_id: string, bill: any) => {
     <x:Header/>
     <x:Body>
         <tem:insertBarname>
+            <tem:userName>${username}</tem:userName>
+            <tem:pass>${password}</tem:pass>
             <tem:userName>10103740920</tem:userName>
             <tem:pass>exon@321</tem:pass>
             <tem:BarNumber>${bill.bill.number}</tem:BarNumber>
@@ -345,7 +350,7 @@ exports.insert = async (_id: string, bill: any) => {
             'Content-Type': 'text/xml; charset=utf-8',
             SOAPAction: 'http://tempuri.org/insertBarname',
           },
-        }
+        },
       );
 
       var parser = new xml2js.Parser(/* options */);
@@ -357,8 +362,9 @@ exports.insert = async (_id: string, bill: any) => {
           const diffgram: any = 'diffgr:diffgram';
 
           const result =
-            jsonResult[envelope][body][0].insertBarnameResponse[0]
-              .insertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
+            jsonResult[envelope][body][0].insertBarnameResponse[0].insertBarnameResult[0][
+              diffgram
+            ][0].NewDataSet[0].Table1;
 
           console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
           console.log(result);

@@ -1,16 +1,32 @@
-const { Bill } = require('../models/Model');
+const { Bill, Account: Acc, User } = require('../models/Model');
 const moment = require('jalali-moment');
 const SPSWS = require('../services/SPSWSService');
 const SQLService = require('../services/SQLService');
 
 exports.estelam = async (req: any, res: any) => {
-  const { _id, purchaseId, billNumber, weight } = req.body;
+  const { _id, purchaseId, billNumber, weight, accountId, username } = req.body;
+
+  const foundedAcc = await Acc.findOne({ _id: accountId }).exec();
+
+  if (!foundedAcc || !foundedAcc._id) {
+    return res.status(400).send({ error: `account ${accountId} does not exists` });
+  }
+
+  const foundedUser = await User.findOne({ username }).exec();
+
+  if (!foundedUser || !foundedUser._id) {
+    return res.status(400).send({ error: `account ${username} does not exists` });
+  }
 
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'application/json');
 
   try {
-    const result = await SPSWS.estelam(purchaseId);
+    const result = await SPSWS.estelam(
+      purchaseId,
+      foundedAcc.username,
+      foundedAcc.password,
+    );
 
     const foundedBill = result.find((bill: any) => bill.billNumber === billNumber);
 
@@ -18,12 +34,14 @@ exports.estelam = async (req: any, res: any) => {
       const doc = await Bill.findById(_id);
       try {
         doc.status = 2;
+        doc.account = foundedUser.account;
+        doc.username = foundedUser.username;
 
         doc.lastMessage = 'بارنامه مورد نظر موجود نیست';
         await doc.save();
 
         try {
-          await SPSWS.insert(_id, doc);
+          await SPSWS.insert(_id, doc, foundedAcc.username, foundedAcc.password);
 
           doc.lastMessage = 'بارنامه مورد نظر موجود نیست - بارنامه اضافه شد';
           doc.spsWeight = weight;
@@ -55,12 +73,14 @@ exports.estelam = async (req: any, res: any) => {
         const doc = await Bill.findById(_id);
 
         doc.spsWeight = foundedBill.weight;
+        doc.account = foundedUser.account;
+        doc.username = foundedUser.username;
         doc.status = 0;
 
         await doc.save();
 
         try {
-          await SPSWS.edit(_id, doc, weight);
+          await SPSWS.edit(_id, doc, weight, foundedAcc.username, foundedAcc.password);
 
           doc.lastMessage = 'عدم تطابق وزن - وزن اصلاح شد';
           doc.spsWeight = weight;
@@ -93,6 +113,8 @@ exports.estelam = async (req: any, res: any) => {
       doc.spsDraft = foundedBill.draftNumber;
       doc.driver.name = foundedBill.driverName;
       doc.status = 1;
+      doc.account = foundedUser.account;
+      doc.username = foundedUser.username;
       doc.lastMessage = 'استعلام موفق - وزن یکسان';
 
       await doc.save();
@@ -107,6 +129,8 @@ exports.estelam = async (req: any, res: any) => {
     try {
       const doc = await Bill.findById(_id);
       doc.status = 2;
+      doc.account = foundedUser.account;
+      doc.username = foundedUser.username;
       doc.lastMessage = 'خطا در اتصال به بازارگاه';
 
       await doc.save();
@@ -121,7 +145,13 @@ exports.estelam = async (req: any, res: any) => {
 };
 
 exports.edit = async (req: any, res: any) => {
-  const { _id, weight } = req.body;
+  const { _id, weight, accountId } = req.body;
+
+  const foundedAcc = await Acc.findOne({ _id: accountId }).exec();
+
+  if (!foundedAcc || !foundedAcc._id) {
+    return res.status(400).send({ error: `account ${accountId} does not exists` });
+  }
 
   let bill;
   try {
@@ -130,7 +160,7 @@ exports.edit = async (req: any, res: any) => {
     return res.status(422).send({ error: 'we have an issue', err });
   }
 
-  SPSWS.edit(_id, bill, weight)
+  SPSWS.edit(_id, bill, weight, foundedAcc.username, foundedAcc.password)
     .then((result: any) => {
       return res.send({ result });
     })
@@ -150,7 +180,15 @@ exports.getAll = async (req: any, res: any) => {
     purchaseNumber,
     status,
     productName,
+    sort,
+    dbId,
   } = req.body;
+
+  const foundedDb = await DB.findById(dbId).exec();
+
+  if (!foundedDb || !foundedDb._id) {
+    return res.status(400).send({ error: `db ${dbId} does not exists` });
+  }
 
   status = status || status === '0' ? +status : -2;
 
@@ -166,6 +204,8 @@ exports.getAll = async (req: any, res: any) => {
   });
 
   let query = {};
+
+  Object.assign(query, { dbName: foundedDb.name });
 
   if (status !== -2) {
     Object.assign(query, { status });
@@ -243,9 +283,33 @@ exports.getAll = async (req: any, res: any) => {
     });
   }
 
+  const {
+    purchaseId,
+    spsWeight,
+    date,
+    billWeight,
+    billDate,
+    billSerial,
+    billNumber: billNumberSort,
+    productName: productNameSort,
+    customerName,
+    billStatus,
+  } = sort;
+
   Bill.find(query)
     .limit(1000)
-    .sort({ date: 1 })
+    .sort({
+      purchaseId,
+      spsWeight,
+      date,
+      'bill.weight': billWeight,
+      'bill.date': billDate,
+      'bill.serial': billSerial,
+      'bill.number': billNumberSort,
+      'product.name': productNameSort,
+      'customer.name': customerName,
+      status: billStatus,
+    })
     .exec()
     .then((foundedBill: any) => res.json({ bill: foundedBill }))
     .catch((err: any) => res.status(422).send({ error: 'we have an issue', err }));
@@ -335,6 +399,12 @@ exports.updateDb = async (req: any, res: any) => {
       dbId,
     });
 
+    const foundedDb = await DB.findById(dbId).exec();
+
+    if (!foundedDb || !foundedDb._id) {
+      return res.status(400).send({ error: `db ${dbId} does not exists` });
+    }
+
     let savedBills = 0;
     let saveErrors = 0;
     let alreadySavedBills = 0;
@@ -373,6 +443,7 @@ exports.updateDb = async (req: any, res: any) => {
         allocationId: bill.ref,
         purchaseId: bill.bargah, //spsId
         saveDate: bill.RegisterDate,
+        dbName: foundedDb.name, // Origin Sql Database Name That Is Unique
 
         cottageNumber: bill.cottage_id,
         assignmentId: bill.ref,
