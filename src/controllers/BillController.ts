@@ -12,9 +12,7 @@ exports.estelam = async (req: any, res: any) => {
   try {
     const result = await SPSWS.estelam(purchaseId);
 
-    const foundedBill = result.find(
-      (bill: any) => bill.billNumber === billNumber
-    );
+    const foundedBill = result.find((bill: any) => bill.billNumber === billNumber);
 
     if (!foundedBill) {
       const doc = await Bill.findById(_id);
@@ -250,9 +248,7 @@ exports.getAll = async (req: any, res: any) => {
     .sort({ date: 1 })
     .exec()
     .then((foundedBill: any) => res.json({ bill: foundedBill }))
-    .catch((err: any) =>
-      res.status(422).send({ error: 'we have an issue', err })
-    );
+    .catch((err: any) => res.status(422).send({ error: 'we have an issue', err }));
 };
 
 exports.fetch = (req: any, res: any) => {
@@ -263,7 +259,7 @@ exports.fetch = (req: any, res: any) => {
       console.log(result);
       res.send(result);
     },
-    (error: any) => console.error(error)
+    (error: any) => console.error(error),
   );
 };
 
@@ -273,22 +269,33 @@ exports.dummy = (req: any, res: any) => {
       console.log(result);
       res.send(result);
     },
-    (error: any) => console.error(error)
+    (error: any) => console.error(error),
   );
 };
 
 exports.updateDb = async (req: any, res: any) => {
-  let { startDate, endDate } = req.body;
+  let { startDate, endDate, dbId } = req.body;
 
   console.log({
     startDate,
     endDate,
+    dbId,
   });
 
   if (!startDate || !endDate) {
     startDate = moment().locale('fa').format('YYYY/MM/DD');
     endDate = moment().locale('fa').add(1, 'day').format('YYYY/MM/DD');
   }
+
+  const startDateMiladi = moment
+    .from(startDate, 'fa', 'YYYY/MM/DD')
+    .locale('en')
+    .format('YYYY-MM-DD');
+
+  const endDateMiladi = moment
+    .from(endDate, 'fa', 'YYYY/MM/DD')
+    .locale('en')
+    .format('YYYY-MM-DD');
 
   const startDateMongo = moment
     .from(startDate, 'fa', 'YYYY/MM/DD')
@@ -305,12 +312,14 @@ exports.updateDb = async (req: any, res: any) => {
   console.log('Start Date Is -> ', {
     startDate,
     startDateMongo,
+    startDateMiladi,
     dateObj: new Date(startDateMongo),
   });
   console.log('-----------------');
   console.log('End Date Is -> ', {
     endDate,
     endDateMongo,
+    endDateMiladi,
     dateObj: new Date(endDateMongo),
   });
 
@@ -321,6 +330,9 @@ exports.updateDb = async (req: any, res: any) => {
     const result: any[] = await SQLService.FetchData({
       startDate,
       endDate,
+      startDateMiladi,
+      endDateMiladi,
+      dbId,
     });
 
     let savedBills = 0;
@@ -341,7 +353,7 @@ exports.updateDb = async (req: any, res: any) => {
         moment
           .from(calculatedDate, 'fa', 'YYYY/MM/DD')
           .locale('en')
-          .format('YYYY-M-D HH:mm:ss')
+          .format('YYYY-M-D HH:mm:ss'),
       );
 
       const calcCreatedDate =
@@ -354,7 +366,7 @@ exports.updateDb = async (req: any, res: any) => {
         moment
           .from(calcCreatedDate, 'fa', 'YYYY/MM/DD')
           .locale('en')
-          .format('YYYY-M-D HH:mm:ss')
+          .format('YYYY-M-D HH:mm:ss'),
       );
 
       const b = new Bill({
