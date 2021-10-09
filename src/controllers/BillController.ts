@@ -1,4 +1,9 @@
-const { Bill, Account: Acc, User } = require('../models/Model');
+const {
+  Bill,
+  Database: DBModel,
+  Account: Acc,
+  User,
+} = require('../models/Model');
 const moment = require('jalali-moment');
 const SPSWS = require('../services/SPSWSService');
 const SQLService = require('../services/SQLService');
@@ -9,13 +14,17 @@ exports.estelam = async (req: any, res: any) => {
   const foundedAcc = await Acc.findOne({ _id: accountId }).exec();
 
   if (!foundedAcc || !foundedAcc._id) {
-    return res.status(400).send({ error: `account ${accountId} does not exists` });
+    return res
+      .status(400)
+      .send({ error: `account ${accountId} does not exists` });
   }
 
   const foundedUser = await User.findOne({ username }).exec();
 
   if (!foundedUser || !foundedUser._id) {
-    return res.status(400).send({ error: `account ${username} does not exists` });
+    return res
+      .status(400)
+      .send({ error: `account ${username} does not exists` });
   }
 
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -25,10 +34,12 @@ exports.estelam = async (req: any, res: any) => {
     const result = await SPSWS.estelam(
       purchaseId,
       foundedAcc.username,
-      foundedAcc.password,
+      foundedAcc.password
     );
 
-    const foundedBill = result.find((bill: any) => bill.billNumber === billNumber);
+    const foundedBill = result.find(
+      (bill: any) => bill.billNumber === billNumber
+    );
 
     if (!foundedBill) {
       const doc = await Bill.findById(_id);
@@ -41,7 +52,12 @@ exports.estelam = async (req: any, res: any) => {
         await doc.save();
 
         try {
-          await SPSWS.insert(_id, doc, foundedAcc.username, foundedAcc.password);
+          await SPSWS.insert(
+            _id,
+            doc,
+            foundedAcc.username,
+            foundedAcc.password
+          );
 
           doc.lastMessage = 'بارنامه مورد نظر موجود نیست - بارنامه اضافه شد';
           doc.spsWeight = weight;
@@ -80,7 +96,13 @@ exports.estelam = async (req: any, res: any) => {
         await doc.save();
 
         try {
-          await SPSWS.edit(_id, doc, weight, foundedAcc.username, foundedAcc.password);
+          await SPSWS.edit(
+            _id,
+            doc,
+            weight,
+            foundedAcc.username,
+            foundedAcc.password
+          );
 
           doc.lastMessage = 'عدم تطابق وزن - وزن اصلاح شد';
           doc.spsWeight = weight;
@@ -150,7 +172,9 @@ exports.edit = async (req: any, res: any) => {
   const foundedAcc = await Acc.findOne({ _id: accountId }).exec();
 
   if (!foundedAcc || !foundedAcc._id) {
-    return res.status(400).send({ error: `account ${accountId} does not exists` });
+    return res
+      .status(400)
+      .send({ error: `account ${accountId} does not exists` });
   }
 
   let bill;
@@ -184,7 +208,7 @@ exports.getAll = async (req: any, res: any) => {
     dbId,
   } = req.body;
 
-  const foundedDb = await DB.findById(dbId).exec();
+  const foundedDb = await DBModel.findById(dbId).exec();
 
   if (!foundedDb || !foundedDb._id) {
     return res.status(400).send({ error: `db ${dbId} does not exists` });
@@ -312,7 +336,9 @@ exports.getAll = async (req: any, res: any) => {
     })
     .exec()
     .then((foundedBill: any) => res.json({ bill: foundedBill }))
-    .catch((err: any) => res.status(422).send({ error: 'we have an issue', err }));
+    .catch((err: any) =>
+      res.status(422).send({ error: 'we have an issue', err })
+    );
 };
 
 exports.fetch = (req: any, res: any) => {
@@ -323,7 +349,7 @@ exports.fetch = (req: any, res: any) => {
       console.log(result);
       res.send(result);
     },
-    (error: any) => console.error(error),
+    (error: any) => console.error(error)
   );
 };
 
@@ -333,7 +359,7 @@ exports.dummy = (req: any, res: any) => {
       console.log(result);
       res.send(result);
     },
-    (error: any) => console.error(error),
+    (error: any) => console.error(error)
   );
 };
 
@@ -399,7 +425,7 @@ exports.updateDb = async (req: any, res: any) => {
       dbId,
     });
 
-    const foundedDb = await DB.findById(dbId).exec();
+    const foundedDb = await DBModel.findById(dbId).exec();
 
     if (!foundedDb || !foundedDb._id) {
       return res.status(400).send({ error: `db ${dbId} does not exists` });
@@ -423,7 +449,7 @@ exports.updateDb = async (req: any, res: any) => {
         moment
           .from(calculatedDate, 'fa', 'YYYY/MM/DD')
           .locale('en')
-          .format('YYYY-M-D HH:mm:ss'),
+          .format('YYYY-M-D HH:mm:ss')
       );
 
       const calcCreatedDate =
@@ -436,7 +462,7 @@ exports.updateDb = async (req: any, res: any) => {
         moment
           .from(calcCreatedDate, 'fa', 'YYYY/MM/DD')
           .locale('en')
-          .format('YYYY-M-D HH:mm:ss'),
+          .format('YYYY-M-D HH:mm:ss')
       );
 
       const b = new Bill({
@@ -552,7 +578,7 @@ exports.updateDb = async (req: any, res: any) => {
       });
     }
 
-    const foundedBill = await Bill.find(query).sort({ date: 1 }).exec();
+    const foundedBill = await Bill.find(query).sort().exec();
 
     console.log('----------- Update Db Result -----------');
     console.log({

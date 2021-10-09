@@ -95,12 +95,12 @@ exports.FetchData = async (input: {
       request.input(
         isShamsi ? 'StartDate' : 'Start',
         sql.VarChar(64),
-        isShamsi ? startDate : startDateMiladi,
+        isShamsi ? startDate : startDateMiladi
       );
       request.input(
         isShamsi ? 'EndDate' : 'End',
         sql.VarChar(64),
-        isShamsi ? endDate : endDateMiladi,
+        isShamsi ? endDate : endDateMiladi
       );
 
       // query to the database and get the records

@@ -4,7 +4,9 @@ exports.getAll = async (req: any, res: any) => {
   Database.find({})
     .exec()
     .then((foundedDbs: any) => res.json({ dbs: foundedDbs }))
-    .catch((err: any) => res.status(422).send({ error: 'we have an issue', err }));
+    .catch((err: any) =>
+      res.status(422).send({ error: 'we have an issue', err })
+    );
 };
 
 exports.create = async (req: any, res: any) => {
@@ -23,7 +25,7 @@ exports.create = async (req: any, res: any) => {
       }
 
       return res.json({ db });
-    },
+    }
   );
 };
 

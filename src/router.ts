@@ -27,10 +27,10 @@ module.exports = (app: any) => {
 
   app.post('/accounts/create', jsonParser, AccountController.create);
   app.get('/accounts/all', jsonParser, AccountController.getAll);
-  app.post('/accounts/change-user', jsonParser, AccountController.update)
-  app.post('/accounts/delete', jsonParser, AccountController.delete)
+  app.post('/accounts/change-user', jsonParser, AccountController.update);
+  app.post('/accounts/delete', jsonParser, AccountController.delete);
 
-  app.post('/databases/create');
+  app.post('/databases/create', jsonParser, DatabaseController.create);
   app.get('/databases/all', jsonParser, DatabaseController.getAll);
   app.post('/databases/change-database', jsonParser, DatabaseController.update);
   app.post('/databases/delete', jsonParser, DatabaseController.delete);
