@@ -7,27 +7,29 @@ exports.getAll = async (req: any, res: any) => {
     .catch((err: any) =>
       res.status(422).send({ error: 'we have an issue', err })
     );
-}
+};
 
 exports.create = async (req: any, res: any) => {
-  const { username, password } = req.body;
+  const { username, title, password } = req.body;
 
   const foundAccount = await Account.findOne({ username }).exec();
   if (foundAccount && foundAccount._id) {
-    return res.status(400).send({ error: `username ${username} already exists` });
+    return res
+      .status(400)
+      .send({ error: `username ${username} already exists` });
   }
 
-  Account.create({ username, password }, (err: any, account: any) => {
+  Account.create({ username, title, password }, (err: any, account: any) => {
     if (err) {
       return res.status(422).send({ error: 'create account has error', err });
     }
 
     return res.json({ account });
-  })
-}
+  });
+};
 
 exports.update = async (req: any, res: any) => {
-  const { _id, username, password } = req.body;
+  const { _id, username, title, password } = req.body;
 
   const foundedAccount = await Account.findById(_id).exec();
   if (!foundedAccount || !foundedAccount._id) {
@@ -35,12 +37,13 @@ exports.update = async (req: any, res: any) => {
   }
 
   foundedAccount.username = username;
+  foundedAccount.title = title;
   foundedAccount.password = password;
 
   const updatedAccount = await foundedAccount.save();
 
   return res.json({ account: updatedAccount });
-}
+};
 
 exports.delete = async (req: any, res: any) => {
   const { _id } = req.body;
@@ -52,4 +55,4 @@ exports.delete = async (req: any, res: any) => {
 
     return res.status(201).send('Success');
   });
-}
+};

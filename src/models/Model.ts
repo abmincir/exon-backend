@@ -78,7 +78,7 @@ const BillSchema = new Schema(
     status: { type: Number, default: -1 },
     lastMessage: { type: String, default: 'بررسی نشده' },
   },
-  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } },
+  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }
 );
 
 exports.Bill = mongoose.model('Bill', BillSchema);
@@ -89,7 +89,7 @@ const UserSchema = new Schema(
     name: { type: String },
     password: { type: String },
   },
-  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } },
+  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }
 );
 
 exports.User = mongoose.model('User', UserSchema);
@@ -97,21 +97,23 @@ exports.User = mongoose.model('User', UserSchema);
 const AccountSchema = new Schema(
   {
     username: { type: String, unique: true, required: true },
+    title: { type: String },
     password: { type: String, require: true },
   },
-  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } },
+  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }
 );
 exports.Account = mongoose.model('Account', AccountSchema);
 
 const DatabaseSchema = new Schema(
   {
     name: { type: String, required: true, unique: true },
+    title: { type: String },
     username: { type: String, required: true },
     password: { type: String },
     address: { type: String, required: true },
     proc: { type: String, require: true },
     isShamsi: { type: Boolean, require: true },
   },
-  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } },
+  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }
 );
 exports.Database = mongoose.model('Database', DatabaseSchema);

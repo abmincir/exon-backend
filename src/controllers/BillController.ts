@@ -18,13 +18,21 @@ exports.estelam = async (req: any, res: any) => {
       .status(400)
       .send({ error: `account ${accountId} does not exists` });
   }
+  console.log(' ----------------- foundedAcc ---------------');
+  console.log(foundedAcc);
+  console.log(' ----------------- foundedAcc ---------------');
 
-  const foundedUser = await User.findOne({ username }).exec();
+  let foundedUser;
+  if (username) {
+    foundedUser = await User.findOne({ username }).exec();
 
-  if (!foundedUser || !foundedUser._id) {
-    return res
-      .status(400)
-      .send({ error: `account ${username} does not exists` });
+    if (!foundedUser || !foundedUser._id) {
+      return res
+        .status(400)
+        .send({ error: `account ${username} does not exists` });
+    }
+  } else {
+    foundedUser = { username: 'ADMIN' };
   }
 
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -45,7 +53,7 @@ exports.estelam = async (req: any, res: any) => {
       const doc = await Bill.findById(_id);
       try {
         doc.status = 2;
-        doc.account = foundedUser.account;
+        doc.account = foundedAcc.title;
         doc.username = foundedUser.username;
 
         doc.lastMessage = 'بارنامه مورد نظر موجود نیست';
@@ -89,7 +97,7 @@ exports.estelam = async (req: any, res: any) => {
         const doc = await Bill.findById(_id);
 
         doc.spsWeight = foundedBill.weight;
-        doc.account = foundedUser.account;
+        doc.account = foundedAcc.title;
         doc.username = foundedUser.username;
         doc.status = 0;
 
@@ -135,7 +143,7 @@ exports.estelam = async (req: any, res: any) => {
       doc.spsDraft = foundedBill.draftNumber;
       doc.driver.name = foundedBill.driverName;
       doc.status = 1;
-      doc.account = foundedUser.account;
+      doc.account = foundedAcc.title;
       doc.username = foundedUser.username;
       doc.lastMessage = 'استعلام موفق - وزن یکسان';
 
@@ -151,7 +159,7 @@ exports.estelam = async (req: any, res: any) => {
     try {
       const doc = await Bill.findById(_id);
       doc.status = 2;
-      doc.account = foundedUser.account;
+      doc.account = foundedAcc.title;
       doc.username = foundedUser.username;
       doc.lastMessage = 'خطا در اتصال به بازارگاه';
 

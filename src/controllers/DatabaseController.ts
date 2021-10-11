@@ -10,7 +10,7 @@ exports.getAll = async (req: any, res: any) => {
 };
 
 exports.create = async (req: any, res: any) => {
-  const { name, username, password, address, proc, isShamsi } = req.body;
+  const { name, title, username, password, address, proc, isShamsi } = req.body;
 
   const foundDb = await Database.findOne({ name }).exec();
   if (foundDb && foundDb._id) {
@@ -18,7 +18,7 @@ exports.create = async (req: any, res: any) => {
   }
 
   Database.create(
-    { name, username, password, address, proc, isShamsi },
+    { name, title, username, password, address, proc, isShamsi },
     (err: any, db: any) => {
       if (err) {
         return res.status(422).send({ error: 'create db has error', err });
@@ -30,7 +30,7 @@ exports.create = async (req: any, res: any) => {
 };
 
 exports.update = async (req: any, res: any) => {
-  const { name, username, password, address, proc, isShamsi } = req.body;
+  const { name, title, username, password, address, proc, isShamsi } = req.body;
 
   const foundedDatabase = await Database.findOne({ name }).exec();
   if (!foundedDatabase || !foundedDatabase._id) {
@@ -38,6 +38,7 @@ exports.update = async (req: any, res: any) => {
   }
 
   foundedDatabase.name = name;
+  foundedDatabase.title = title;
   foundedDatabase.username = username;
   foundedDatabase.password = password;
   foundedDatabase.address = address;

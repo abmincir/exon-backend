@@ -84,6 +84,9 @@ exports.FetchData = async (input: {
         },
       },
     };
+    console.log('--------- config ------------');
+    console.log(config);
+    console.log('--------- config ------------');
 
     sql.connect(config, (error: Error) => {
       if (error) {
