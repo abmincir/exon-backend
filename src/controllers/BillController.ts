@@ -318,7 +318,7 @@ exports.getAll = async (req: any, res: any) => {
   const {
     purchaseId,
     spsWeight,
-    date,
+    saveDate,
     billWeight,
     billDate,
     billSerial,
@@ -328,20 +328,51 @@ exports.getAll = async (req: any, res: any) => {
     billStatus,
   } = sort;
 
+  let sortObj = {};
+
+  if (purchaseId !== 0) {
+    Object.assign(sortObj, { purchaseId });
+  }
+
+  if (spsWeight !== 0) {
+    Object.assign(sortObj, { spsWeight });
+  }
+
+  if (saveDate !== 0) {
+    Object.assign(sortObj, { date: saveDate });
+  }
+
+  if (billWeight !== 0) {
+    Object.assign(sortObj, { 'bill.weight': billWeight });
+  }
+
+  if (billDate !== 0) {
+    Object.assign(sortObj, { 'bill.date': billDate });
+  }
+
+  if (billSerial !== 0) {
+    Object.assign(sortObj, { 'bill.serial': billSerial });
+  }
+
+  if (billNumberSort !== 0) {
+    Object.assign(sortObj, { 'bill.number': billNumberSort });
+  }
+
+  if (productNameSort !== 0) {
+    Object.assign(sortObj, { 'product.name': productNameSort });
+  }
+
+  if (customerName !== 0) {
+    Object.assign(sortObj, { 'customer.name': customerName });
+  }
+
+  if (billStatus !== 0) {
+    Object.assign(sortObj, { status: billStatus });
+  }
+
   Bill.find(query)
     .limit(1000)
-    .sort({
-      purchaseId,
-      spsWeight,
-      date,
-      'bill.weight': billWeight,
-      'bill.date': billDate,
-      'bill.serial': billSerial,
-      'bill.number': billNumberSort,
-      'product.name': productNameSort,
-      'customer.name': customerName,
-      status: billStatus,
-    })
+    .sort(sortObj)
     .exec()
     .then((foundedBill: any) => res.json({ bill: foundedBill }))
     .catch((err: any) =>
