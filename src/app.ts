@@ -26,6 +26,6 @@ app.use(cors());
 router(app);
 
 // listen for requests
-app.listen(3001, () => {
+app.listen(3000, () => {
   console.log('Server Is Running On Port 3000');
 });

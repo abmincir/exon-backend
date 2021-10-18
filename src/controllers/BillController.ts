@@ -330,45 +330,47 @@ exports.getAll = async (req: any, res: any) => {
 
   let sortObj = {};
 
-  if (purchaseId !== 0) {
+  if (purchaseId && purchaseId !== 0) {
     Object.assign(sortObj, { purchaseId });
   }
 
-  if (spsWeight !== 0) {
+  if (spsWeight && spsWeight !== 0) {
     Object.assign(sortObj, { spsWeight });
   }
 
-  if (saveDate !== 0) {
+  if (saveDate && saveDate !== 0) {
     Object.assign(sortObj, { date: saveDate });
   }
 
-  if (billWeight !== 0) {
+  if (billWeight && billWeight !== 0) {
     Object.assign(sortObj, { 'bill.weight': billWeight });
   }
 
-  if (billDate !== 0) {
+  if (billDate && billDate !== 0) {
     Object.assign(sortObj, { 'bill.date': billDate });
   }
 
-  if (billSerial !== 0) {
+  if (billSerial && billSerial !== 0) {
     Object.assign(sortObj, { 'bill.serial': billSerial });
   }
 
-  if (billNumberSort !== 0) {
+  if (billNumberSort && billNumberSort !== 0) {
     Object.assign(sortObj, { 'bill.number': billNumberSort });
   }
 
-  if (productNameSort !== 0) {
+  if (productNameSort && productNameSort !== 0) {
     Object.assign(sortObj, { 'product.name': productNameSort });
   }
 
-  if (customerName !== 0) {
+  if (customerName && customerName !== 0) {
     Object.assign(sortObj, { 'customer.name': customerName });
   }
 
-  if (billStatus !== 0) {
+  if (billStatus && billStatus !== 0) {
     Object.assign(sortObj, { status: billStatus });
   }
+
+  console.log(sortObj, sort);
 
   Bill.find(query)
     .limit(1000)
