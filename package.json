@@ -30,6 +30,7 @@
     "express": "^4.17.1",
     "fast-xml-parser": "^3.18.0",
     "jalali-moment": "^3.3.10",
+    "moment": "^2.29.4",
     "mongoose": "^5.11.18",
     "mssql": "^6.3.1",
     "node-fetch": "^2.6.1",
