@@ -1,5 +1,6 @@
 import axios from 'axios';
 import moment from 'moment';
+import { DepositStatementInputI, DepositStatementResponseI, LoginResponseI } from '../types/KookService.types';
 
 const TOKEN_EXP_MARGIN_MIN = 10;
 

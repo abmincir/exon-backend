@@ -1,4 +1,4 @@
-interface DepositStatementInputI {
+export interface DepositStatementInputI {
   cif?: string
   action?: 'DEBIT' | 'CREDIT'
   englishDescription?: 'PER' | 'EN'
@@ -11,7 +11,7 @@ interface DepositStatementInputI {
   order?: 'ASC' | 'DESC'
 }
 
-interface DepositStatementResponseI {
+export interface DepositStatementResponseI {
   totalRecord?: number
   statements?: {
     agentBranchCode?: string;
@@ -29,7 +29,7 @@ interface DepositStatementResponseI {
   }[]
 }
 
-interface LoginResponseI {
+export interface LoginResponseI {
   token?: string
   expiration?: string;
 
