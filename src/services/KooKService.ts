@@ -7,7 +7,7 @@ const TOKEN_EXP_MARGIN_MIN = 10;
 let TOKEN = ""
 let TOKEN_EXP = ""
 
-const depositStatement = async ({
+export const depositStatement = async ({
   cif,
   action,
   englishDescription,
@@ -77,8 +77,4 @@ const refreshToken = async () => {
 
   TOKEN = data.token ?? "";
   TOKEN_EXP = data.expiration ?? "";
-}
-
-module.exports = {
-  deposit: depositStatement,
 }
