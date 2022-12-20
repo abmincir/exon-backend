@@ -3,6 +3,7 @@ const BillController = require('./controllers/BillController');
 const UserController = require('./controllers/UserController');
 const DatabaseController = require('./controllers/DatabaseController');
 const AccountController = require('./controllers/AccountController');
+const KooKController = require('./controllers/KooKController');
 
 const jsonParser = bodyParser.json();
 
@@ -34,4 +35,6 @@ module.exports = (app: any) => {
   app.get('/databases/all', jsonParser, DatabaseController.getAll);
   app.post('/databases/change-database', jsonParser, DatabaseController.update);
   app.post('/databases/delete', jsonParser, DatabaseController.delete);
+
+  app.get('/kook/deposit', jsonParser, KooKController.getDeposit);
 };
