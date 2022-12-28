@@ -52,6 +52,10 @@ const refreshToken = async () => {
   const channel = process.env.KOOK_CHANNEL
   const secretKey = process.env.KOOK_SECRET_KEY
 
+  console.log("-------------------------------------")
+  console.log({username, password, channel, secretKey})
+  console.log("-------------------------------------")
+
   if (!TOKEN_EXP) {
     // check if token has been expired
     const diff = moment().diff(TOKEN_EXP, 'minutes')
