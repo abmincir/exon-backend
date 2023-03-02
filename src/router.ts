@@ -20,13 +20,8 @@ module.exports = (app: any) => {
   app.post('/bill/fetch', jsonParser, BillController.getAll);
   app.post('/bill/update-db', jsonParser, BillController.updateDb);
 
-  app.post('/bill/insert-saman', jsonParser, BillController.insertSamanInfo);
-
   app.post('/bill/estelam', jsonParser, BillController.estelam);
   app.post('/bill/edit', jsonParser, BillController.edit);
-
-  app.post('/sql', jsonParser, BillController.fetch);
-  app.post('/test', jsonParser, BillController.dummy);
 
   app.post('/accounts/create', jsonParser, AccountController.create);
   app.get('/accounts/all', jsonParser, AccountController.getAll);
@@ -39,4 +34,5 @@ module.exports = (app: any) => {
   app.post('/databases/delete', jsonParser, DatabaseController.delete);
 
   app.get('/kook/deposit', jsonParser, KooKController.getDeposit);
+  app.post('/kook/insert-saman', jsonParser, KooKController.insertSamanInfo);
 };
