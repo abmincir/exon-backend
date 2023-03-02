@@ -20,6 +20,8 @@ module.exports = (app: any) => {
   app.post('/bill/fetch', jsonParser, BillController.getAll);
   app.post('/bill/update-db', jsonParser, BillController.updateDb);
 
+  app.post('/bill/insert-saman', jsonParser, BillController.insertSamanInfo);
+
   app.post('/bill/estelam', jsonParser, BillController.estelam);
   app.post('/bill/edit', jsonParser, BillController.edit);
 

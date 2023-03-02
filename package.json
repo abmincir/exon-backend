@@ -27,6 +27,7 @@
     "axios": "^0.21.1",
     "circular-json": "^0.5.9",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.17.1",
     "fast-xml-parser": "^3.18.0",
     "jalali-moment": "^3.3.10",

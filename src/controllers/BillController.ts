@@ -394,6 +394,46 @@ exports.fetch = (req: any, res: any) => {
   );
 };
 
+exports.insertSamanInfo = (req: any, res: any) => {
+  const {
+    id,
+    agentBranchCode,
+    agentBranchName,
+    balance,
+    branchCode,
+    branchName,
+    date,
+    description,
+    referenceNumber,
+    registrationNumber,
+    serial,
+    serialNumber,
+    transferAmount,
+  } = req.body;
+
+  SQLService.insertPaySamanBankInfo({
+    id,
+    agentBranchCode,
+    agentBranchName,
+    balance,
+    branchCode,
+    branchName,
+    date,
+    description,
+    referenceNumber,
+    registrationNumber,
+    serial,
+    serialNumber,
+    transferAmount,
+  }).then(
+    (result: any) => {
+      console.log(result);
+      res.send(result);
+    },
+    (error: any) => console.error(error)
+  );
+};
+
 exports.dummy = (req: any, res: any) => {
   SQLService.MockData().then(
     (result: any) => {
@@ -457,7 +497,6 @@ exports.updateDb = async (req: any, res: any) => {
   console.log('+++++++++++++++++');
 
   try {
-    // const result = await SQLService.MockData({
     const result: any[] = await SQLService.FetchData({
       startDate,
       endDate,
@@ -553,12 +592,15 @@ exports.updateDb = async (req: any, res: any) => {
         },
 
         bill: {
-          id: bill.Barno + '@' + bill.barnoCode,
-          row: bill.serial,
-          number: bill.Barno.split('-')[0],
-          serial: bill.Barno.split('-')[1],
-          weight: bill.weight,
-          date: bill.barDate,
+          id:
+            !!bill.Barno && !!bill.barnoCode
+              ? bill.Barno + '@' + bill.barnoCode
+              : 'ناموجود',
+          row: bill.serial ?? 'ناموجود',
+          number: bill.Barno ? bill.Barno.split('-')[0] : 'ناموجود',
+          serial: bill.Barno ? bill.Barno.split('-')[1] : 'ناموجود',
+          weight: bill.weight ?? 'ناموجود',
+          date: bill.barDate ?? 'ناموجود',
         },
 
         date: mongoDate,
@@ -567,7 +609,10 @@ exports.updateDb = async (req: any, res: any) => {
 
       try {
         const fB = await Bill.find({
-          'bill.id': bill.Barno + '@' + bill.barnoCode,
+          'bill.id':
+            !!bill.Barno && !!bill.barnoCode
+              ? bill.Barno + '@' + bill.barnoCode
+              : 'ناموجود',
         }).exec();
 
         if (fB.length === 0) {
@@ -579,7 +624,6 @@ exports.updateDb = async (req: any, res: any) => {
             console.error('not saved -> error: ', saveError);
           }
         } else {
-          console.log('not saved found');
           alreadySavedBills += 1;
         }
       } catch (findError: any) {

@@ -40,19 +40,19 @@ exports.FetchData = async (input: {
   //   },
   // };
 
-  const tadbirConfig = {
-    user: 'TadbirUser',
-    password: '$$$%%%',
-    server: '192.168.1.17',
-    database: 'TEST1400_6_25',
-    options: {
-      encrypt: true,
-      enableArithAbort: true,
-      cryptoCredentialsDetails: {
-        minVersion: 'TLSv1',
-      },
-    },
-  };
+  // const tadbirConfig = {
+  //   user: 'TadbirUser',
+  //   password: '$$$%%%',
+  //   server: '192.168.1.17',
+  //   database: 'TEST1400_6_25',
+  //   options: {
+  //     encrypt: true,
+  //     enableArithAbort: true,
+  //     cryptoCredentialsDetails: {
+  //       minVersion: 'TLSv1',
+  //     },
+  //   },
+  // };
 
   // connect to your database
   return new Promise(async (res, rej) => {
@@ -111,67 +111,261 @@ exports.FetchData = async (input: {
         .execute(proc)
         .then((result: any, error: any) => {
           if (error) {
+            sql.close();
             console.log(error);
             rej(error);
           }
 
           console.log(result, result.recordset.length);
 
+          sql.close();
+
           res(result.recordset);
         })
         .catch((error: any) => {
           console.log(error);
+
+          sql.close();
+
           rej(error);
         });
     });
   });
 };
 
-exports.FetchTadbirData = (input: { startDate: string; endDate: string }) => {
-  const { startDate, endDate } = input;
+// exports.FetchTadbirData = (input: { startDate: string; endDate: string }) => {
+//   const { startDate, endDate } = input;
 
-  // config for your database
-  const config = {
-    user: 'TadbirUser',
-    password: '$$$%%%',
-    server: '192.168.1.17',
-    database: 'TEST1400_6_25',
-    options: {
-      encrypt: true,
-      enableArithAbort: true,
-      cryptoCredentialsDetails: {
-        minVersion: 'TLSv1',
+//   // config for your database
+//   const config = {
+//     user: 'TadbirUser',
+//     password: '$$$%%%',
+//     server: '192.168.1.27',
+//     database: 'TEST1400_6_25',
+//     options: {
+//       encrypt: true,
+//       enableArithAbort: true,
+//       cryptoCredentialsDetails: {
+//         minVersion: 'TLSv1',
+//       },
+//     },
+//   };
+
+//   // connect to your database
+//   return new Promise((res, rej) => {
+//     sql.connect(config, (error: Error) => {
+//       if (error) {
+//         console.log(error);
+//         rej(error);
+//       }
+//       // create Request object
+//       const request = new sql.Request();
+//       request.input('StartDate', sql.VarChar(64), startDate);
+//       request.input('EndDate', sql.VarChar(64), endDate);
+
+//       // query to the database and get the records
+//       return request
+//         .execute('___BRBarnameProc___')
+//         .then((result: any, error: any) => {
+//           if (error) {
+//             console.log(error);
+//             rej(error);
+//           }
+
+//           console.log(result, result.recordset.length);
+
+//           res(result.recordset);
+//         })
+//         .catch((error: any) => {
+//           console.log(error);
+//           rej(error);
+//         });
+//     });
+//   });
+// };
+
+// AMORVARIDFAR
+
+// exports.insertPaySamanBankInfo = (input: {
+//   id: number;
+//   agentBranchCode: string;
+//   agentBranchName: string;
+//   balance: number;
+//   branchCode: string;
+//   branchName: string;
+//   date: string;
+//   description: string;
+//   referenceNumber: string;
+//   registrationNumber: string;
+//   serial: number;
+//   serialNumber: string;
+//   transferAmount: number;
+// }) => {
+
+//   // config for your database
+//   const config = {
+//     user: 'TadbirUser',
+//     password: '$$$%%%',
+//     server: '192.168.1.27',
+//     database: 'AMORVARIDFAR',
+//     options: {
+//       encrypt: true,
+//       enableArithAbort: true,
+//       cryptoCredentialsDetails: {
+//         minVersion: 'TLSv1',
+//       },
+//     },
+//   };
+
+//   // connect to your database
+//   return new Promise((res, rej) => {
+//     sql.connect(config, (error: Error) => {
+//       if (error) {
+//         console.log(error);
+//         rej(error);
+//       }
+//       // create Request object
+//       const request = new sql.Request();
+
+//       // query to the database and get the records
+//       return request
+//         .execute('UD__PaySamanBankInfoInsertQuery__')
+//         .then((result: any, error: any) => {
+//           if (error) {
+//             console.log(error);
+//             rej(error);
+//           }
+
+//           console.log(result);
+
+//           res(result.recordset);
+//         })
+//         .catch((error: any) => {
+//           console.log(error);
+//           rej(error);
+//         });
+//     });
+//   });
+// };
+
+exports.insertPaySamanBankInfo = async (input: {
+  id: number;
+  agentBranchCode: string;
+  agentBranchName: string;
+  balance: number;
+  branchCode: string;
+  branchName: string;
+  date: string;
+  description: string;
+  referenceNumber: string;
+  registrationNumber: string;
+  serial: number;
+  serialNumber: string;
+  transferAmount: number;
+}) => {
+  return new Promise(async (res, rej) => {
+    const {
+      agentBranchCode,
+      agentBranchName,
+      balance,
+      branchCode,
+      branchName,
+      date,
+      description,
+      referenceNumber,
+      registrationNumber,
+      serial,
+      serialNumber,
+      transferAmount,
+    } = input;
+
+    const config = {
+      user: 'TadbirUser',
+      password: '$$$%%%',
+      server: '192.168.1.27',
+      database: 'AMORVARIDFAR',
+      options: {
+        encrypt: true,
+        enableArithAbort: true,
+        cryptoCredentialsDetails: {
+          minVersion: 'TLSv1',
+        },
       },
-    },
-  };
+    };
 
-  // connect to your database
-  return new Promise((res, rej) => {
     sql.connect(config, (error: Error) => {
       if (error) {
         console.log(error);
         rej(error);
       }
+
       // create Request object
       const request = new sql.Request();
-      request.input('StartDate', sql.VarChar(64), startDate);
-      request.input('EndDate', sql.VarChar(64), endDate);
+      request.input('agentBranchCode', sql.NVarChar(255), agentBranchCode);
+      request.input('agentBranchName', sql.NVarChar(255), agentBranchName);
+      request.input('balance', sql.BigInt, balance);
+      request.input('branchCode', sql.NVarChar(255), branchCode);
+      request.input('branchName', sql.NVarChar(255), branchName);
+      request.input('date', sql.NVarChar(255), date);
+      request.input('description', sql.NVarChar(sql.MAX), description);
+      request.input('referenceNumber', sql.NVarChar(255), referenceNumber);
+      request.input(
+        'registrationNumber',
+        sql.NVarChar(255),
+        registrationNumber
+      );
+      request.input('serial', sql.BigInt, serial);
+      request.input('serialNumber', sql.NVarChar(255), serialNumber);
+      request.input('transferAmount', sql.BigInt, transferAmount);
 
       // query to the database and get the records
       return request
-        .execute('___BRBarnameProc___')
+        .query(
+          `INSERT INTO [dbo].[UD__PaySamanBankInfo__]
+          ([agentBranchCode]
+            ,[agentBranchName]
+            ,[balance]
+            ,[branchCode]
+            ,[branchName]
+            ,[date]
+            ,[description]
+            ,[referenceNumber]
+            ,[registrationNumber]
+            ,[serial]
+            ,[serialNumber]
+            ,[transferAmount])
+            VALUES
+            (@agentBranchCode,
+            @agentBranchName,
+            @balance,
+            @branchCode,
+            @branchName,
+            @date,
+            @description,
+            @referenceNumber,
+            @registrationNumber,
+            @serial,
+            @serialNumber,
+            @transferAmount)`
+        )
         .then((result: any, error: any) => {
           if (error) {
             console.log(error);
+            sql.close();
             rej(error);
           }
 
-          console.log(result, result.recordset.length);
+          console.log(result);
 
-          res(result.recordset);
+          sql.close();
+
+          res(result);
         })
         .catch((error: any) => {
           console.log(error);
+
+          sql.close();
+
           rej(error);
         });
     });
