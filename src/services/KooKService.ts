@@ -56,10 +56,12 @@ const refreshToken = async () => {
   const secretKey = process.env.KOOK_SECRET_KEY;
 
   const { data } = await axios.post<LoginResponseI>('https://kook.sb24.ir:9000/login', {
-    channel,
-    username,
-    password,
-    secretKey,
+    loginReq: {
+      channel,
+      username,
+      password,
+      secretKey,
+    },
   });
 
   if (data.error || data.exception || !!data.token === false) {
