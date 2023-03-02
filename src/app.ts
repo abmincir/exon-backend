@@ -4,6 +4,8 @@ const cors = require('cors');
 const router = require('./router');
 const mongoose = require('mongoose');
 
+require('dotenv').config();
+
 // Creating Connection To Mongo Database
 mongoose.Promise = global.Promise;
 mongoose.set('useCreateIndex', true);
