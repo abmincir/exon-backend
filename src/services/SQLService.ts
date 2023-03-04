@@ -1,3 +1,4 @@
+import { StatementI } from '../types/KookService.types';
 const sql = require('mssql');
 const fs = require('fs');
 const { Database: DB } = require('../models/Model');
@@ -52,12 +53,12 @@ exports.FetchData = async (input: {
       request.input(
         isShamsi ? 'StartDate' : 'Start',
         sql.VarChar(64),
-        isShamsi ? startDate : startDateMiladi,
+        isShamsi ? startDate : startDateMiladi
       );
       request.input(
         isShamsi ? 'EndDate' : 'End',
         sql.VarChar(64),
-        isShamsi ? endDate : endDateMiladi,
+        isShamsi ? endDate : endDateMiladi
       );
 
       // query to the database and get the records
@@ -87,21 +88,7 @@ exports.FetchData = async (input: {
   });
 };
 
-exports.insertPaySamanBankInfo = async (input: {
-  id: number;
-  agentBranchCode: string;
-  agentBranchName: string;
-  balance: number;
-  branchCode: string;
-  branchName: string;
-  date: string;
-  description: string;
-  referenceNumber: string;
-  registrationNumber: string;
-  serial: number;
-  serialNumber: string;
-  transferAmount: number;
-}) => {
+exports.insertPaySamanBankInfo = async (input: StatementI) => {
   return new Promise(async (res, rej) => {
     const {
       agentBranchCode,
@@ -148,7 +135,11 @@ exports.insertPaySamanBankInfo = async (input: {
       request.input('date', sql.NVarChar(255), date);
       request.input('description', sql.NVarChar(sql.MAX), description);
       request.input('referenceNumber', sql.NVarChar(255), referenceNumber);
-      request.input('registrationNumber', sql.NVarChar(255), registrationNumber);
+      request.input(
+        'registrationNumber',
+        sql.NVarChar(255),
+        registrationNumber
+      );
       request.input('serial', sql.BigInt, serial);
       request.input('serialNumber', sql.NVarChar(255), serialNumber);
       request.input('transferAmount', sql.BigInt, transferAmount);
@@ -181,7 +172,7 @@ exports.insertPaySamanBankInfo = async (input: {
             @registrationNumber,
             @serial,
             @serialNumber,
-            @transferAmount)`,
+            @transferAmount)`
         )
         .then((result: any, error: any) => {
           if (error) {
