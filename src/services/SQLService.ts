@@ -88,7 +88,7 @@ exports.FetchData = async (input: {
   });
 };
 
-exports.insertPaySamanBankInfo = async (input: StatementI) => {
+export const insertPaySamanBankInfo = async (input: StatementI) => {
   return new Promise(async (res, rej) => {
     const {
       agentBranchCode,

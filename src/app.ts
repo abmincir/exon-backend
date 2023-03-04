@@ -1,3 +1,4 @@
+import { SamanSchedule } from './services/ScheduleService';
 import express from 'express';
 
 const cors = require('cors');
@@ -26,6 +27,11 @@ app.use(cors());
 
 // adding routes
 router(app);
+
+// Schedule Taks
+SamanSchedule().then(() => {
+  console.log('Starting Schedule Tasks');
+});
 
 // listen for requests
 app.listen(3000, () => {

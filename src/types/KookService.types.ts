@@ -28,7 +28,7 @@ export interface StatementI {
 
 export interface DepositStatementResponseI {
   totalRecord?: number;
-  statements?: StatementI[];
+  statements: StatementI[];
 }
 
 export interface LoginResponseI {

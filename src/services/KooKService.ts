@@ -1,15 +1,15 @@
 import axios from 'axios';
-import moment from 'moment';
+const moment = require('moment');
 
 import {
-  DepositStatementInputI,
   DepositStatementResponseI,
   LoginResponseI,
+  StatementI,
 } from '../types/KookService.types';
 
 let TOKEN = '';
 
-export const depositStatement = async () => {
+export const depositStatement = async (): Promise<StatementI[]> => {
   await refreshToken();
 
   const { data, status } = await axios.post<DepositStatementResponseI>(
