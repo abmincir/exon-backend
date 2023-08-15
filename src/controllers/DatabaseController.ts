@@ -1,63 +1,77 @@
-const { Database } = require('../models/Model');
+import { Request, Response } from 'express'
 
-exports.getAll = async (req: any, res: any) => {
-  Database.find({})
-    .exec()
-    .then((foundedDbs: any) => res.json({ dbs: foundedDbs }))
-    .catch((err: any) =>
-      res.status(422).send({ error: 'we have an issue', err })
-    );
-};
+import { sendError, sendSuccess } from '../helpers/request.helper'
 
-exports.create = async (req: any, res: any) => {
-  const { name, title, username, password, address, proc, isShamsi } = req.body;
+import { Database, IDatabase } from '../models/database.model'
 
-  const foundDb = await Database.findOne({ name }).exec();
-  if (foundDb && foundDb._id) {
-    return res.status(400).send({ error: `db ${name} already exists` });
+export const getAllDatabases = async (_req: Request, res: Response) => {
+  try {
+    const foundedDbs: IDatabase[] = await Database.find().exec()
+    sendSuccess(res, { dbs: foundedDbs })
+  } catch (err) {
+    sendError(res, 'Error fetching databases', 500, err)
   }
+}
 
-  Database.create(
-    { name, title, username, password, address, proc, isShamsi },
-    (err: any, db: any) => {
-      if (err) {
-        return res.status(422).send({ error: 'create db has error', err });
-      }
+export const createDatabase = async (req: Request, res: Response) => {
+  const { name, title, username, password, address, proc, isShamsi } = req.body
 
-      return res.json({ db });
-    }
-  );
-};
-
-exports.update = async (req: any, res: any) => {
-  const { name, title, username, password, address, proc, isShamsi } = req.body;
-
-  const foundedDatabase = await Database.findOne({ name }).exec();
-  if (!foundedDatabase || !foundedDatabase._id) {
-    return res.status(400).send({ error: `db ${name} does not exists` });
-  }
-
-  foundedDatabase.name = name;
-  foundedDatabase.title = title;
-  foundedDatabase.username = username;
-  foundedDatabase.password = password;
-  foundedDatabase.address = address;
-  foundedDatabase.proc = proc;
-  foundedDatabase.isShamsi = isShamsi;
-
-  const updatedDatabase = await foundedDatabase.save();
-
-  return res.json({ db: updatedDatabase });
-};
-
-exports.delete = async (req: any, res: any) => {
-  const { _id } = req.body;
-
-  Database.findByIdAndDelete(_id, (err: any, docs: any) => {
-    if (err) {
-      return res.status(422).send({ error: 'we have an issue', err });
+  try {
+    const foundDb = await Database.findOne({ name }).exec()
+    if (foundDb) {
+      sendError(res, `Database ${name} already exists`, 400)
+      return
     }
 
-    return res.status(201).send('Success');
-  });
-};
+    const newDb: IDatabase = await Database.create({
+      name,
+      title,
+      username,
+      password,
+      address,
+      proc,
+      isShamsi,
+    })
+
+    sendSuccess(res, { db: newDb })
+  } catch (err) {
+    sendError(res, 'Error creating database', 500, err)
+  }
+}
+
+export const updateDatabase = async (req: Request, res: Response) => {
+  const { name, title, username, password, address, proc, isShamsi } = req.body
+
+  try {
+    const foundedDatabase = await Database.findOne({ name }).exec()
+    if (!foundedDatabase) {
+      sendError(res, `Database ${name} does not exist`, 400)
+      return
+    }
+
+    foundedDatabase.name = name
+    foundedDatabase.title = title
+    foundedDatabase.username = username
+    foundedDatabase.password = password
+    foundedDatabase.address = address
+    foundedDatabase.proc = proc
+    foundedDatabase.isShamsi = isShamsi
+
+    const updatedDatabase: IDatabase = await foundedDatabase.save()
+
+    sendSuccess(res, { db: updatedDatabase })
+  } catch (err) {
+    sendError(res, 'Error updating database', 500, err)
+  }
+}
+
+export const deleteDatabase = async (req: Request, res: Response) => {
+  const { _id } = req.body
+
+  try {
+    await Database.findByIdAndDelete(_id).exec()
+    sendSuccess(res, 'Database deleted', 201)
+  } catch (err) {
+    sendError(res, 'Error deleting database', 500, err)
+  }
+}

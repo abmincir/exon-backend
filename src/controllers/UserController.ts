@@ -1,93 +1,111 @@
-const Model = require('../models/Model');
+import { Request, Response } from 'express'
 
-exports.getAllUsers = (req: any, res: any) => {
-  Model.User.find({})
-    .exec()
-    .then((foundedUsers: any) => res.json({ users: foundedUsers }))
-    .catch((err: any) =>
-      res.status(422).send({ error: 'we have an issue', err })
-    );
-};
+import { sendError, sendSuccess } from '../helpers/request.helper'
 
-exports.getUser = (req: any, res: any) => {
-  Model.User.findById(req.body._id)
-    .exec()
-    .then((foundedUser: any) => res.json({ user: foundedUser }))
-    .catch((err: any) =>
-      res.status(422).send({ error: 'we have an issue', err })
-    );
-};
+import { User } from '../models/user.model'
 
-exports.auth = (req: any, res: any) => {
-  const { username, password } = req.body;
-  Model.User.findOne({ username })
-    .exec()
-    .then((foundedUser: any) => {
-      if (foundedUser.password === password) {
-        res.json({ user: foundedUser });
-      } else {
-        res.status(401).send({ error: 'Error In Authentication' });
-      }
-    })
-    .catch((err: any) =>
-      res.status(422).send({ error: 'we have an issue', err })
-    );
-};
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const foundedUsers = await User.find({}).exec()
 
-exports.createUser = (req: any, res: any) => {
-  const { username, name, password } = req.body;
-  Model.User.create({ username, name, password }, (err: any, user: any) => {
-    if (err) return res.status(422).send({ error: 'we have an issue', err });
-    res.json({ user });
-  });
-};
+    sendSuccess(res, { users: foundedUsers })
+  } catch (err) {
+    sendError(res, 'Error fetching users', 500, err)
+  }
+}
 
-exports.deleteUser = async (req: any, res: any) => {
-  const { _id } = req.body;
-
-  Model.User.findByIdAndDelete(_id, function (err: any, docs: any) {
-    if (err) {
-      console.log(err);
-      return res.status(422).send({ error: 'we have an issue', err });
-    } else {
-      console.log('Deleted : ', docs);
-      return res.status(200).send('Success');
-    }
-  });
-};
-
-exports.changePassword = (req: any, res: any) => {
-  const { username, password, newPassword } = req.body;
-  Model.User.findOne({ username })
-    .exec()
-    .then((foundedUser: any) => {
-      if (foundedUser.password === password) {
-        foundedUser.password = newPassword;
-        foundedUser
-          .save()
-          .then((savedUser: any) => res.json({ user: savedUser }));
-      } else {
-        res.status(401).send({ error: 'Error In Authentication' });
-      }
-    })
-    .catch((err: any) =>
-      res.status(422).send({ error: 'we have an issue', err })
-    );
-};
-
-exports.changeUser = async (req: any, res: any) => {
-  const { _id, username, name, password } = req.body;
+export const getUser = async (req: Request, res: Response) => {
+  const { _id } = req.body
 
   try {
-    const foundedUser = await Model.User.findById(_id).exec();
+    const foundedUser = await User.findById(_id).exec()
 
-    foundedUser.username = username ?? foundedUser.username;
-    foundedUser.name = name ?? foundedUser.name;
-    foundedUser.password = password ?? foundedUser.password;
-
-    const savedUser = await foundedUser.save();
-    return res.json({ user: savedUser });
-  } catch (err: any) {
-    return res.status(422).send({ error: 'we have an issue', err });
+    sendSuccess(res, { user: foundedUser })
+  } catch (err) {
+    sendError(res, 'Error fetching user', 500, err)
   }
-};
+}
+
+export const auth = async (req: Request, res: Response) => {
+  const { username, password } = req.body
+
+  try {
+    const foundedUser = await User.findOne({ username }).exec()
+
+    if (foundedUser && foundedUser.password === password) {
+      sendSuccess(res, { user: foundedUser })
+    } else {
+      sendError(res, 'Authentication failed', 401)
+    }
+  } catch (err) {
+    sendError(res, 'Error authenticating user', 500, err)
+  }
+}
+
+export const createUser = async (req: Request, res: Response) => {
+  const { username, name, password } = req.body
+
+  try {
+    const user = await User.create({ username, name, password })
+
+    sendSuccess(res, { user })
+  } catch (err) {
+    sendError(res, 'Error creating user', 500, err)
+  }
+}
+
+export const deleteUser = async (req: Request, res: Response) => {
+  const { _id } = req.body
+
+  try {
+    const deletedUser = await User.findByIdAndDelete(_id).exec()
+    if (deletedUser) {
+      sendSuccess(res, 'User deleted', 200)
+    } else {
+      sendError(res, 'User not found', 404)
+    }
+  } catch (err) {
+    sendError(res, 'Error deleting user', 500, err)
+  }
+}
+
+export const changePassword = async (req: Request, res: Response) => {
+  const { username, password, newPassword } = req.body
+
+  try {
+    const foundedUser = await User.findOne({ username }).exec()
+
+    if (foundedUser && foundedUser.password === password) {
+      foundedUser.password = newPassword
+      const savedUser = await foundedUser.save()
+
+      sendSuccess(res, { user: savedUser })
+    } else {
+      sendError(res, 'Authentication failed', 401)
+    }
+  } catch (err) {
+    sendError(res, 'Error changing password', 500, err)
+  }
+}
+
+export const changeUser = async (req: Request, res: Response) => {
+  const { _id, username, name, password } = req.body
+
+  try {
+    const foundedUser = await User.findById(_id).exec()
+
+    if (!foundedUser) {
+      sendError(res, 'User not found', 404)
+      return
+    }
+
+    foundedUser.username = username ?? foundedUser.username
+    foundedUser.name = name ?? foundedUser.name
+    foundedUser.password = password ?? foundedUser.password
+    const savedUser = await foundedUser.save()
+
+    sendSuccess(res, { user: savedUser })
+  } catch (err) {
+    sendError(res, 'Error updating user', 500, err)
+  }
+}

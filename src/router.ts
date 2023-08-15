@@ -1,38 +1,58 @@
-import bodyParser = require('body-parser');
-const BillController = require('./controllers/BillController');
-const UserController = require('./controllers/UserController');
-const DatabaseController = require('./controllers/DatabaseController');
-const AccountController = require('./controllers/AccountController');
-const KooKController = require('./controllers/KooKController');
+import { Application } from 'express'
 
-const jsonParser = bodyParser.json();
+import {
+  create as createAccountHandler,
+  deleteAccount as deleteAccountHandler,
+  getAll as getAllAccountsHandler,
+  update as updateAccountHandler,
+} from './controllers/AccountController'
 
-module.exports = (app: any) => {
-  app.get('/user', jsonParser, UserController.getUser);
-  app.post('/user/delete', jsonParser, UserController.deleteUser);
-  app.get('/user/all', jsonParser, UserController.getAllUsers);
-  app.post('/user/auth', jsonParser, UserController.auth);
-  app.post('/user/create', jsonParser, UserController.createUser);
-  app.post('/user/changePassword', jsonParser, UserController.changePassword);
-  app.post('/user/changeUser', jsonParser, UserController.changeUser);
+import {
+  auth as authHandler,
+  changePassword as changePasswordHandler,
+  changeUser as changeUserHandler,
+  createUser as createUserHandler,
+  deleteUser as deleteUserHandler,
+  getAllUsers as getAllUsersHandler,
+  getUser as getUserHandler,
+} from './controllers/UserController'
 
-  app.post('/bill/all', jsonParser, BillController.getAll);
-  app.post('/bill/fetch', jsonParser, BillController.getAll);
-  app.post('/bill/update-db', jsonParser, BillController.updateDb);
+import {
+  createDatabase as createDatabaseHandler,
+  deleteDatabase as deleteDatabaseHandler,
+  getAllDatabases as getAllDatabasesHandler,
+  updateDatabase as updateDatabaseHandler,
+} from './controllers/DatabaseController'
 
-  app.post('/bill/estelam', jsonParser, BillController.estelam);
-  app.post('/bill/edit', jsonParser, BillController.edit);
+import {
+  edit as editBillHandler,
+  estelam as estelamBillHandler,
+  getAll as getAllBillsHandler,
+  updateDb as updateBillDbHandler,
+} from './controllers/BillController'
 
-  app.post('/accounts/create', jsonParser, AccountController.create);
-  app.get('/accounts/all', jsonParser, AccountController.getAll);
-  app.post('/accounts/change-user', jsonParser, AccountController.update);
-  app.post('/accounts/delete', jsonParser, AccountController.delete);
+export const router = (app: Application) => {
+  app.get('/user', getUserHandler)
+  app.get('/user/all', getAllUsersHandler)
+  app.post('/user/delete', deleteUserHandler)
+  app.post('/user/auth', authHandler)
+  app.post('/user/create', createUserHandler)
+  app.post('/user/changePassword', changePasswordHandler)
+  app.post('/user/changeUser', changeUserHandler)
 
-  app.post('/databases/create', jsonParser, DatabaseController.create);
-  app.get('/databases/all', jsonParser, DatabaseController.getAll);
-  app.post('/databases/change-database', jsonParser, DatabaseController.update);
-  app.post('/databases/delete', jsonParser, DatabaseController.delete);
+  app.post('/bill/all', getAllBillsHandler)
+  app.post('/bill/fetch', getAllBillsHandler)
+  app.post('/bill/update-db', updateBillDbHandler)
+  app.post('/bill/estelam', estelamBillHandler)
+  app.post('/bill/edit', editBillHandler)
 
-  app.get('/kook/deposit', jsonParser, KooKController.getDeposit);
-  app.post('/kook/insert-saman', jsonParser, KooKController.insertSamanInfo);
-};
+  app.get('/accounts/all', getAllAccountsHandler)
+  app.post('/accounts/create', createAccountHandler)
+  app.post('/accounts/change-user', updateAccountHandler)
+  app.post('/accounts/delete', deleteAccountHandler)
+
+  app.get('/databases/all', getAllDatabasesHandler)
+  app.post('/databases/create', createDatabaseHandler)
+  app.post('/databases/change-database', updateDatabaseHandler)
+  app.post('/databases/delete', deleteDatabaseHandler)
+}

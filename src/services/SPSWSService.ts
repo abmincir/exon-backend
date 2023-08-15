@@ -1,316 +1,156 @@
-const axios = require('axios');
-var xml2js = require('xml2js');
-const BillModel = require('../models/Model').Bill;
-const url = 'https://spsws.bki.ir/spsws.asmx?WSDL';
-const userName = '10103740920';
-const pass = 'exon@321';
+import axios from 'axios';
+import xml2js from 'xml2js';
+import {
+  editXML,
+  estelamByDateXML,
+  estelamXML,
+  extractBillsAndErrors,
+  insertXML,
+} from '../helpers/xml.helper';
+import { Bill } from '../models/bill.model';
 
-exports.estelam = async (
+const BASE_URL = 'https://spsws.bki.ir/spsws.asmx?WSDL';
+const DEFAULT_USERNAME = '10103740920';
+const DEFAULT_PASSWORD = 'exon@321';
+
+async function parseXMLToJSON(data: string): Promise<any> {
+  const parser = new xml2js.Parser();
+  return parser.parseStringPromise(data);
+}
+
+async function postXML(endpoint: string, xml: string): Promise<any> {
+  return axios.post(`${BASE_URL}?op=${endpoint}`, xml, {
+    headers: {
+      'Content-Type': 'text/xml; charset=utf-8',
+      SOAPAction: `http://tempuri.org/${endpoint}`,
+    },
+  });
+}
+
+export const estelam = async (
   purchaseId: string,
-  username: string,
-  password: string
-) => {
-  const xml = `
-  <x:Envelope
-    xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:tem="http://tempuri.org/">
-    <x:Header/>
-    <x:Body>
-        <tem:EstelameBarname>
-            <tem:userName>${username}</tem:userName>
-            <tem:pass>${password}</tem:pass>
-            <tem:fromDate></tem:fromDate>
-            <tem:toDate></tem:toDate>
-            <tem:kharidId>${purchaseId}</tem:kharidId>
-            <tem:TakhsisId></tem:TakhsisId>
-            <tem:KutajNumber></tem:KutajNumber>
-            <tem:IdHaml></tem:IdHaml>
-        </tem:EstelameBarname>
-    </x:Body>
-  </x:Envelope>
-  `;
+  username: string = DEFAULT_USERNAME,
+  password: string = DEFAULT_PASSWORD,
+): Promise<any> => {
+  const xml = estelamXML(username, password, purchaseId);
 
-  return new Promise(async (res, rej) => {
-    try {
-      const result = await axios.post(
-        'https://spsws.bki.ir/spsws.asmx?op=EstelameBarname',
-        xml,
-        {
-          headers: {
-            'Content-Type': 'text/xml; charset=utf-8',
-            SOAPAction: 'http://tempuri.org/EstelameBarname',
-          },
-        }
-      );
+  try {
+    const response = await postXML('EstelameBarname', xml);
+    const jsonResponse = await parseXMLToJSON(response.data);
 
-      var parser = new xml2js.Parser(/* options */);
-      parser
-        .parseStringPromise(result.data)
-        .then(function (jsonResult: any) {
-          const envelope: any = 'soap:Envelope';
-          const body: any = 'soap:Body';
-          const diffgram: any = 'diffgr:diffgram';
+    const { bills, errors } = extractBillsAndErrors(jsonResponse);
 
-          const result = [
-            ...jsonResult[envelope][body][0].EstelameBarnameResponse[0]
-              .EstelameBarnameResult[0][diffgram][0].NewDataSet[0].Table1,
-          ];
-
-          console.log(result);
-
-          const bills: any = [];
-          const errors: any = [];
-
-          result.map((bill: any, index: number) => {
-            if (index < result.length - 1) {
-              bills.push({
-                cottageNumber:
-                  bill && bill.kutajnumber ? bill.kutajnumber[0] : '',
-                weight: bill && bill.weightk ? bill.weightk[0] : '',
-                draftNumber: bill && bill.hamlid ? bill.hamlid[0] : '',
-                billNumber: bill && bill.barnamen ? bill.barnamen[0] : '',
-                driverName: bill && bill.drivern ? bill.drivern[0] : '',
-              });
-            } else {
-              errors.push({
-                errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '',
-                errorMessage: bill && bill.ErrorMsg ? bill.ErrorMsg[0] : '',
-              });
-            }
-          });
-
-          if (errors[0].errorCode !== '0') {
-            rej(errors);
-          } else {
-            res(bills);
-          }
-        })
-        .catch(function (err: any) {
-          console.error(err);
-          rej(err);
-        });
-    } catch (error: any) {
-      rej(error);
+    if (errors[0].errorCode !== '0') {
+      throw errors;
+    } else {
+      return bills;
     }
-  });
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
-exports.estelamByDate = async (startDate: string, endDate: string) => {
-  const xml = `
-  <x:Envelope
-    xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:tem="http://tempuri.org/">
-    <x:Header/>
-    <x:Body>
-        <tem:EstelameBarname>
-            <tem:userName>10103740920</tem:userName>
-            <tem:pass>exon@321</tem:pass>
-            <tem:fromDate></tem:fromDate>
-            <tem:toDate></tem:toDate>
-            <tem:kharidId></tem:kharidId>
-            <tem:TakhsisId></tem:TakhsisId>
-            <tem:KutajNumber></tem:KutajNumber>
-            <tem:IdHaml></tem:IdHaml>
-        </tem:EstelameBarname>
-    </x:Body>
-  </x:Envelope>
-  `;
+export const estelamByDate = async (startDate: string, endDate: string): Promise<any> => {
+  const xml = estelamByDateXML;
 
-  return new Promise(async (res, rej) => {
-    try {
-      const result = await axios.post(
-        'https://spsws.bki.ir/spsws.asmx?op=EstelameBarname',
-        xml,
-        {
-          headers: {
-            'Content-Type': 'text/xml; charset=utf-8',
-            SOAPAction: 'http://tempuri.org/EstelameBarname',
-          },
-        }
-      );
+  try {
+    const response = await postXML('EstelameBarname', xml);
+    const jsonResponse = await parseXMLToJSON(response.data);
 
-      var parser = new xml2js.Parser(/* options */);
-      parser
-        .parseStringPromise(result.data)
-        .then(function (jsonResult: any) {
-          const envelope: any = 'soap:Envelope';
-          const body: any = 'soap:Body';
-          const diffgram: any = 'diffgr:diffgram';
+    const { bills, errors } = extractBillsAndErrors(jsonResponse);
 
-          const result = [
-            ...jsonResult[envelope][body][0].EstelameBarnameResponse[0]
-              .EstelameBarnameResult[0][diffgram][0].NewDataSet[0].Table1,
-          ];
-
-          const bills: any = [];
-          const errors: any = [];
-
-          result.map((bill: any, index: number) => {
-            if (index < result.length - 1) {
-              bills.push({
-                cottageNumber:
-                  bill && bill.kutajnumber ? bill.kutajnumber[0] : '',
-                weight: bill && bill.weightk ? bill.weightk[0] : '',
-                draftNumber: bill && bill.hamlid ? bill.hamlid[0] : '',
-                billNumber: bill && bill.barnamen ? bill.barnamen[0] : '',
-                driverName: bill && bill.drivern ? bill.drivern[0] : '',
-              });
-            } else {
-              errors.push({
-                errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '',
-                errorMessage: bill && bill.ErrorMsg ? bill.ErrorMsg[0] : '',
-              });
-            }
-          });
-
-          if (errors[0].errorCode !== '0') {
-            rej(errors);
-          } else {
-            res(bills);
-          }
-        })
-        .catch(function (err: any) {
-          console.error(err);
-          rej(err);
-        });
-    } catch (error: any) {
-      rej(error);
+    if (errors[0].errorCode !== '0') {
+      throw errors;
+    } else {
+      return bills;
     }
-  });
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
-exports.edit = async (
+export const edit = async (
   _id: string,
   bill: any,
   weight: string,
-  username: string,
-  password: string
-) => {
-  const { spsDraft } = bill;
-  const { name, carNumber } = bill.driver;
+  username: string = DEFAULT_USERNAME,
+  password: string = DEFAULT_PASSWORD,
+): Promise<string | any[]> => {
+  const { spsDraft, driver, receiver } = bill;
+  const { name, carNumber } = driver;
+  const {
+    name: receiverName,
+    telAddress: receiverAddress,
+    telephone: receiverPhone,
+  } = receiver;
   const billNumber = bill.bill.number;
-  const receiverName = bill.receiver.name;
-  const receiverAddress = bill.receiver.telAddress;
-  const receiverPhone = bill.receiver.telephone;
 
-  const xml = `
-  <x:Envelope
-  xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
-  xmlns:tem="http://tempuri.org/">
-    <x:Header/>
-    <x:Body>
-      <tem:EditBarname>
-          <tem:userName>${username}</tem:userName>
-          <tem:pass>${password}</tem:pass>
-          <tem:HamlId>${spsDraft}</tem:HamlId>
-          <tem:value>${weight}</tem:value>
-          <tem:DriverName>${name}</tem:DriverName>
-          <tem:CarNo>${carNumber}</tem:CarNo>
-          <tem:barnameh>${billNumber}</tem:barnameh>
-          <tem:serialNo></tem:serialNo>
-          <tem:RecieverName>${receiverName}</tem:RecieverName>
-          <tem:IssuDate></tem:IssuDate>
-          <tem:reciverAddress>${receiverAddress}</tem:reciverAddress>
-          <tem:recieverPhone>${receiverPhone}</tem:recieverPhone>
-      </tem:EditBarname>
-    </x:Body>
-  </x:Envelope>
-  `;
+  const xml = editXML(
+    username,
+    password,
+    spsDraft,
+    weight,
+    name,
+    carNumber,
+    billNumber,
+    receiverName,
+    receiverAddress,
+    receiverPhone,
+  );
 
-  return new Promise(async (res, rej) => {
-    try {
-      const result = await axios.post(
-        'https://spsws.bki.ir/spsws.asmx?op=EditBarname',
-        xml,
-        {
-          headers: {
-            'Content-Type': 'text/xml; charset=utf-8',
-            SOAPAction: 'http://tempuri.org/EditBarname',
-          },
+  try {
+    const response = await postXML('EditBarname', xml);
+    const jsonResponse = await parseXMLToJSON(response.data);
+
+    const result =
+      jsonResponse['soap:Envelope']['soap:Body'][0].EditBarnameResponse[0]
+        .EditBarnameResult[0]['diffgr:diffgram'][0].NewDataSet[0].Table1;
+
+    const errors = result
+      .slice(0, -1)
+      .filter((bill: any) => bill.errorcode && bill.errorcode[0] !== '0')
+      .map((bill: any) => ({
+        errorCode: bill.errorcode[0],
+        errorMessage: bill.errormsg[0],
+      }));
+
+    if (!errors.length) {
+      try {
+        const changedBill = await Bill.findById(_id);
+
+        if (!changedBill) {
+          throw new Error('Bill Not Found');
         }
-      );
 
-      var parser = new xml2js.Parser(/* options */);
-      parser
-        .parseStringPromise(result.data)
-        .then(function (jsonResult: any) {
-          const envelope: any = 'soap:Envelope';
-          const body: any = 'soap:Body';
-          const diffgram: any = 'diffgr:diffgram';
+        changedBill.merchantWeight = weight;
+        await changedBill.save();
 
-          const result =
-            jsonResult[envelope][body][0].EditBarnameResponse[0]
-              .EditBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
-
-          console.log('------------- EDIT BARNAME CALLED -------------');
-          console.log(result);
-          console.log('------------- EDIT BARNAME CALLED -------------');
-
-          const errors: any = [];
-
-          result.map(async (bill: any, index: number) => {
-            if (index < result.length - 1) {
-              if (bill && bill.errorcode && bill.errorcode[0] !== '0') {
-                errors.push({
-                  errorCode: bill && bill.errorcode ? bill.errorcode[0] : '',
-                  errorMessage: bill && bill.errormsg ? bill.errormsg[0] : '',
-                });
-              } else {
-                try {
-                  console.log('Editing ', _id);
-
-                  const changedBill = await BillModel.findById(_id);
-                  changedBill.merchantWeight = weight;
-
-                  changedBill
-                    .save()
-                    .then(() => console.log('Edited And Saved'));
-                } catch (err: any) {
-                  console.error(err);
-                  rej({ error: 'Not Found After Edit', err });
-                }
-              }
-            } else {
-              errors.push({
-                errorCode: bill && bill.ErrorCode ? bill.ErrorCode[0] : '',
-                errorMessage: bill && bill.ErrorMsg ? bill.ErrorMsg[0] : '',
-              });
-            }
-          });
-
-          const error = result.find((error: any) => error.errorCode === '0');
-
-          if (error) {
-            rej(errors);
-          } else {
-            res('success');
-          }
-        })
-        .catch(function (err: any) {
-          console.error(err);
-          rej(err);
-        });
-    } catch (error: any) {
-      rej(error);
+        return 'success';
+      } catch (err) {
+        console.error(err);
+        throw { error: 'Not Found After Edit', err };
+      }
+    } else {
+      throw errors;
     }
-  });
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
-exports.insert = async (
+export const insert = async (
   _id: string,
   bill: any,
-  username: string,
-  password: string
-) => {
+  username: string = DEFAULT_USERNAME,
+  password: string = DEFAULT_PASSWORD,
+): Promise<boolean | any> => {
   const calcCreatedDate =
-    (bill.bill.date[0] === '9' ||
-    bill.bill.date[0] === '8' ||
-    bill.bill.date[0] === '7'
-      ? '13'
-      : '14') + bill.bill.date;
+    (['9', '8', '7'].includes(bill.bill.date[0]) ? '13' : '14') + bill.bill.date;
 
-  console.log('\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
-  console.log({
+  console.log('\nCalling Insert:', {
     username,
     password,
     billNumber: bill.bill.number,
@@ -322,93 +162,50 @@ exports.insert = async (
     purchaseId: bill.purchaseId,
     assignmentId: bill.assignmentId,
   });
-  console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n');
 
-  const xml = `
-<x:Envelope
-    xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:tem="http://tempuri.org/">
-    <x:Header/>
-    <x:Body>
-        <tem:insertBarname>
-            <tem:userName>${username}</tem:userName>
-            <tem:pass>${password}</tem:pass>
-            <tem:userName>10103740920</tem:userName>
-            <tem:pass>exon@321</tem:pass>
-            <tem:BarNumber>${bill.bill.number}</tem:BarNumber>
-            <tem:BarSerial>${bill.bill.serial}</tem:BarSerial>
-            <tem:ISSUDATE>${calcCreatedDate}</tem:ISSUDATE>
-            <tem:MerchantDeclaredWeight>${bill.bill.weight}</tem:MerchantDeclaredWeight>
-            <tem:KharidId>${bill.purchaseId}</tem:KharidId>
-            <tem:takhsisId>${bill.assignmentId}</tem:takhsisId>
-        </tem:insertBarname>
-    </x:Body>
-</x:Envelope>
-  `;
+  const xml = insertXML(
+    username,
+    password,
+    bill.bill.number,
+    bill.bill.serial,
+    calcCreatedDate,
+    bill.bill.weight,
+    bill.purchaseId,
+    bill.assignmentId,
+  );
 
-  return new Promise(async (res, rej) => {
-    console.log('\n\nTAKHSIS -> ' + bill.assignmentId);
-    if (!!!bill.assignmentId) {
-      return rej({
-        error: 'عدم وجود شماره تخصیص',
-        err: 'عدم وجود شماره تخصیص',
-      });
+  if (!bill.assignmentId) {
+    throw {
+      error: 'عدم وجود شماره تخصیص',
+      err: 'عدم وجود شماره تخصیص',
+    };
+  }
+
+  try {
+    const response = await postXML('insertBarname', xml);
+    const jsonResponse = await parseXMLToJSON(response.data);
+
+    const result =
+      jsonResponse['soap:Envelope']['soap:Body'][0].insertBarnameResponse[0]
+        .insertBarnameResult[0]['diffgr:diffgram'][0].NewDataSet[0].Table1;
+
+    if (!result.length) {
+      throw {
+        error: 'خطا در دریافت اطلاعات',
+        err: 'خطا در دریافت اطلاعات',
+      };
     }
 
-    try {
-      const result = await axios.post(
-        'https://spsws.bki.ir/spsws.asmx?op=insertBarname',
-        xml,
-        {
-          headers: {
-            'Content-Type': 'text/xml; charset=utf-8',
-            SOAPAction: 'http://tempuri.org/insertBarname',
-          },
-        }
-      );
-
-      var parser = new xml2js.Parser(/* options */);
-      parser
-        .parseStringPromise(result.data)
-        .then(function (jsonResult: any) {
-          const envelope: any = 'soap:Envelope';
-          const body: any = 'soap:Body';
-          const diffgram: any = 'diffgr:diffgram';
-
-          const result =
-            jsonResult[envelope][body][0].insertBarnameResponse[0]
-              .insertBarnameResult[0][diffgram][0].NewDataSet[0].Table1;
-
-          console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
-          console.log(result);
-          console.log('+++++++++++++ Insert Bill CALLED +++++++++++++');
-
-          if (result.length < 1) {
-            return rej({
-              error: 'خطا در دریافت اطلاعات',
-              err: 'خطا در دریافت اطلاعات',
-            });
-          }
-
-          if (result?.[0]?.ErrorCode?.[0]) {
-            return rej({
-              error: result?.[0]?.ErrorMsg[0]
-                ? result[0].ErrorMsg[0]
-                : 'خطا در دریافت اطلاعات',
-              err: result?.[0]?.ErrorMsg[0]
-                ? result[0].ErrorMsg[0]
-                : 'خطا در دریافت اطلاعات',
-            });
-          }
-
-          return res(true);
-        })
-        .catch(function (err: any) {
-          console.error(err);
-          return rej(err);
-        });
-    } catch (error: any) {
-      return rej(error);
+    if (result?.[0]?.ErrorCode?.[0]) {
+      throw {
+        error: result?.[0]?.ErrorMsg[0] || 'خطا در دریافت اطلاعات',
+        err: result?.[0]?.ErrorMsg[0] || 'خطا در دریافت اطلاعات',
+      };
     }
-  });
+
+    return true;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };

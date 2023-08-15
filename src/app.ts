@@ -1,39 +1,31 @@
-import { SamanSchedule } from './services/ScheduleService';
-import express from 'express';
+import cors from 'cors'
+import express from 'express'
+import mongoose from 'mongoose'
+import { router } from './router'
 
-const cors = require('cors');
-const router = require('./router');
-const mongoose = require('mongoose');
+import dotenv from 'dotenv'
+dotenv.config()
 
-require('dotenv').config();
+const PORT = process.env.PORT || 3000
+const MONGO_URI = 'mongodb://localhost:27017/ExonDb'
 
-// Creating Connection To Mongo Database
-mongoose.Promise = global.Promise;
-mongoose.set('useCreateIndex', true);
-mongoose.set('useNewUrlParser', true);
-mongoose.set('useFindAndModify', false);
-mongoose.set('useUnifiedTopology', true);
+mongoose.Promise = global.Promise
+mongoose.set('useCreateIndex', true)
+mongoose.set('useNewUrlParser', true)
+mongoose.set('useFindAndModify', false)
+mongoose.set('useUnifiedTopology', true)
 
-// Connecting To Mongodb
-mongoose.connect('mongodb://localhost:27017/ExonDb').catch((error: any) => {
-  console.log('Rejected To Connect To Mongo -> ', error);
-});
+mongoose.connect(MONGO_URI).catch((error: any) => {
+  console.log('Rejected To Connect To Mongo -> ', error)
+})
 
-// initialize app
-const app = express();
+const app = express()
 
-// enabling CORS
-app.use(cors());
+app.use(express.json())
+app.use(cors())
 
-// adding routes
-router(app);
+router(app)
 
-// Schedule Taks
-SamanSchedule().then(() => {
-  console.log('Starting Schedule Tasks');
-});
-
-// listen for requests
-app.listen(3000, () => {
-  console.log('Server Is Running On Port 3000');
-});
+app.listen(PORT, () => {
+  console.log(`Server Is Running On Port ${PORT}`)
+})

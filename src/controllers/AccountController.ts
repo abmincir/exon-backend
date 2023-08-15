@@ -1,58 +1,61 @@
-const { Account } = require('../models/Model');
+import { Request, Response } from 'express'
 
-exports.getAll = async (req: any, res: any) => {
-  Account.find({})
-    .exec()
-    .then((foundedAccounts: any) => res.json({ accounts: foundedAccounts }))
-    .catch((err: any) =>
-      res.status(422).send({ error: 'we have an issue', err })
-    );
-};
+import { sendError, sendSuccess } from '../helpers/request.helper'
 
-exports.create = async (req: any, res: any) => {
-  const { username, title, password } = req.body;
+import { Account, IAccountRequestData } from '../models/acount.model'
 
-  const foundAccount = await Account.findOne({ username }).exec();
-  if (foundAccount && foundAccount._id) {
-    return res
-      .status(400)
-      .send({ error: `username ${username} already exists` });
+export const getAll = async (req: Request, res: Response) => {
+  try {
+    const accounts = await Account.find({}).exec()
+    sendSuccess(res, { accounts })
+  } catch (err) {
+    sendError(res, 'Failed to retrieve accounts', 500, err)
   }
+}
 
-  Account.create({ username, title, password }, (err: any, account: any) => {
-    if (err) {
-      return res.status(422).send({ error: 'create account has error', err });
+export const create = async (req: IAccountRequestData, res: Response) => {
+  const { username, title, password } = req.body
+
+  try {
+    const foundAccount = await Account.findOne({ username }).exec()
+    if (foundAccount) {
+      return sendError(res, `Username ${username} already exists`, 400)
     }
 
-    return res.json({ account });
-  });
-};
-
-exports.update = async (req: any, res: any) => {
-  const { _id, username, title, password } = req.body;
-
-  const foundedAccount = await Account.findById(_id).exec();
-  if (!foundedAccount || !foundedAccount._id) {
-    return res.status(400).send({ error: `user ${_id} does not exists` });
+    const account = await Account.create({ username, title, password })
+    sendSuccess(res, { account })
+  } catch (err) {
+    sendError(res, 'Failed to create account', 500, err)
   }
+}
 
-  foundedAccount.username = username;
-  foundedAccount.title = title;
-  foundedAccount.password = password;
+export const update = async (req: IAccountRequestData, res: Response) => {
+  const { _id, username, title, password } = req.body
 
-  const updatedAccount = await foundedAccount.save();
-
-  return res.json({ account: updatedAccount });
-};
-
-exports.delete = async (req: any, res: any) => {
-  const { _id } = req.body;
-
-  Account.findByIdAndDelete(_id, (err: any, docs: any) => {
-    if (err) {
-      return res.status(422).send({ error: 'we have an issue', err });
+  try {
+    const foundedAccount = await Account.findById(_id).exec()
+    if (!foundedAccount) {
+      return sendError(res, `User ${_id} does not exist`, 404)
     }
 
-    return res.status(201).send('Success');
-  });
-};
+    foundedAccount.username = username
+    foundedAccount.title = title
+    foundedAccount.password = password
+
+    const updatedAccount = await foundedAccount.save()
+    sendSuccess(res, { account: updatedAccount })
+  } catch (err) {
+    sendError(res, 'Failed to update account', 500, err)
+  }
+}
+
+export const deleteAccount = async (req: IAccountRequestData, res: Response) => {
+  const { _id } = req.body
+
+  try {
+    await Account.findByIdAndDelete(_id).exec()
+    sendSuccess(res, 'Success', 200)
+  } catch (err) {
+    sendError(res, 'Failed to delete account', 500, err)
+  }
+}
