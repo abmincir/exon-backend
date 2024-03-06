@@ -1,5 +1,7 @@
 import { Application } from 'express'
 
+import * as AddressController from './controllers/AddressController';
+
 import {
   create as createAccountHandler,
   deleteAccount as deleteAccountHandler,
@@ -55,4 +57,8 @@ export const router = (app: Application) => {
   app.post('/databases/create', createDatabaseHandler)
   app.post('/databases/change-database', updateDatabaseHandler)
   app.post('/databases/delete', deleteDatabaseHandler)
+
+  app.post('/addresses/add', AddressController.addAddresses);
+  app.post('/addresses/delete', AddressController.deleteAddresses);
+  app.get('/addresses/fetch/:goodOwnerCood', AddressController.fetchAddresses);  
 }
