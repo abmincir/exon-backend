@@ -27,4 +27,36 @@ export interface IDraft {
   shenaseh: string;
 }
 
-export interface IDraftDocument extends IDraft, Document { }
+export interface IDraftDocument extends IDraft, Document {}
+
+const DraftSchema = new Schema<IDraftDocument>(
+  {
+    hamlCode: Number,
+    hamlCompanyCode: Number,
+    kotaj: String,
+    custCode: String,
+    qty: String,
+    shipRecno: Number,
+    shipName: String,
+    name: String,
+    address: String,
+    tel: String,
+    postCode: String,
+    addressReceive: String,
+    meli: String,
+    tarekh: String,
+    price: String,
+    priceFactor: String,
+    weight: String,
+    trail: Boolean,
+    send: Number,
+    recno: String,
+    yekta: String,
+    bargah: String,
+    peygiri: String,
+    shenaseh: String,
+  },
+  { timestamps: true }
+);
+
+export const Draft: Model<IDraftDocument> = model<IDraftDocument>('Draft', DraftSchema);
