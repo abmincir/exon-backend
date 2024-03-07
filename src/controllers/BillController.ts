@@ -240,4 +240,46 @@ const updateDraftDbHandler: (req: Request, res: Response) => Promise<Response | 
   }
 };
 
+const getAllDraftsHandler: (req: Request, res: Response) => Promise<Response | void> = async (req, res) => {
+  const {
+    hamlCode,
+    kotaj,
+    shipRecno,
+    recno,
+    meli,
+    tarekh,
+    peygiri,
+    shenaseh,
+    startDate,
+    endDate,
+    sort,
+  } = req.body;
+
+  let query: any = {};
+
+  if (hamlCode) query.hamlCode = hamlCode;
+  if (kotaj) query.kotaj = kotaj;
+  if (shipRecno) query.shipRecno = shipRecno;
+  if (recno) query.recno = recno;
+  if (meli) query.meli = meli;
+  if (tarekh) query.tarekh = tarekh;
+  if (peygiri) query.peygiri = peygiri;
+  if (shenaseh) query.shenaseh = shenaseh;
+
+  const dateQuery = createDateQuery(startDate, endDate);
+  if (dateQuery) query.date = dateQuery; // Assuming Draft model has a 'date' field or adjust as necessary
+
+  const sortObj = createSortObject(sort); // Assuming function exists similar to bills handler
+
+  try {
+    const drafts = await Draft.find(query).limit(1000).sort(sortObj).exec();
+    res.json({ drafts });
+  } catch (err) {
+    handleError(res, 'Failed to fetch drafts', 422, err); // Assuming handleError function exists
+  }
+};
+
+export { getAllDraftsHandler };
+
+
 export { editHandler as edit, estelamHandler as estelam, getAllHandler as getAll, updateDbHandler as updateDb }

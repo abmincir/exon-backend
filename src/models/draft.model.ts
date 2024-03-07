@@ -5,7 +5,7 @@ export interface IDraft {
   hamlCompanyCode: number;
   kotaj: string;
   custCode: string;
-  qty: string;
+  qty: number;
   shipRecno: number;
   shipName: string;
   name: string;
@@ -15,16 +15,18 @@ export interface IDraft {
   addressReceive: string;
   meli: string;
   tarekh: string;
-  price: string;
-  priceFactor: string;
+  price: number;
+  priceFactor: number;
   weight: string;
   trail: boolean;
   send: number;
-  recno: string;
+  recno: number;
   yekta: string;
   bargah: string;
-  peygiri: string;
+  peygiri: number;
   shenaseh: string;
+  status: number;
+  code: number;
 }
 
 export interface IDraftDocument extends IDraft, Document {}
@@ -35,7 +37,7 @@ const DraftSchema = new Schema<IDraftDocument>(
     hamlCompanyCode: Number,
     kotaj: String,
     custCode: String,
-    qty: String,
+    qty: Number,
     shipRecno: Number,
     shipName: String,
     name: String,
@@ -45,16 +47,18 @@ const DraftSchema = new Schema<IDraftDocument>(
     addressReceive: String,
     meli: String,
     tarekh: String,
-    price: String,
-    priceFactor: String,
+    price: Number,
+    priceFactor: Number,
     weight: String,
     trail: Boolean,
     send: Number,
-    recno: String,
+    recno: Number,
     yekta: String,
     bargah: String,
-    peygiri: String,
+    peygiri: Number,
     shenaseh: String,
+    status: Number,
+    code: Number,
   },
   { timestamps: true }
 );
