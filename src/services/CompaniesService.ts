@@ -16,16 +16,11 @@ const DEFAULT_HEADERS = {
  * @param {object} params - The request parameters including companyCode, dates, times, and reportName.
  * @returns {Promise<any>} The response data from the API.
  */
-export const fetchCompanyData = async (params: {
-  companyCode: string,
-  date1: string,
-  time1?: string,
-  date2: string,
-  time2?: string,
-  reportName: string
-}): Promise<any> => {
+export const fetchCompanyData = async (): Promise<any> => {
   try {
-    const response = await axios.post(BASE_URL, params, {
+    const response = await axios.post(BASE_URL, {
+      reportName: "شرکتها"
+    }, {
       headers: DEFAULT_HEADERS,
     });
     return response.data;
