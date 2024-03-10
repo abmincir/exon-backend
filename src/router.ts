@@ -33,6 +33,8 @@ import {
   updateDb as updateBillDbHandler,
 } from './controllers/BillController'
 
+import { getAllCompaniesHandler } from './controllers/CompaniesController';
+
 export const router = (app: Application) => {
   app.get('/user', getUserHandler)
   app.get('/user/all', getAllUsersHandler)
@@ -60,5 +62,7 @@ export const router = (app: Application) => {
 
   app.post('/addresses/add', AddressController.addAddresses);
   app.post('/addresses/delete', AddressController.deleteAddresses);
-  app.get('/addresses/fetch/:goodOwnerCood', AddressController.fetchAddresses);  
+  app.get('/addresses/fetch/:goodOwnerCood', AddressController.fetchAddresses);
+
+  app.post('/companies/all', getAllCompaniesHandler);
 }
