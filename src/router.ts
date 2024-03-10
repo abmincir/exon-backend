@@ -35,6 +35,8 @@ import {
 
 import { getAllCompaniesHandler } from './controllers/CompaniesController';
 
+import { getAllDraftsHandler, updateDraftDbHandler } from './controllers/DraftController';
+
 export const router = (app: Application) => {
   app.get('/user', getUserHandler)
   app.get('/user/all', getAllUsersHandler)
@@ -65,4 +67,8 @@ export const router = (app: Application) => {
   app.get('/addresses/fetch/:goodOwnerCood', AddressController.fetchAddresses);
 
   app.post('/companies/all', getAllCompaniesHandler);
+
+
+  app.post('/draft/all', getAllDraftsHandler)
+  app.post('/draft/update-db', updateDraftDbHandler)
 }

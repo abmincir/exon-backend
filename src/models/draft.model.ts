@@ -1,6 +1,9 @@
 import { Document, Model, Schema, model } from 'mongoose';
 
 export interface IDraft {
+  saveDate: string;
+  dbName: string;
+
   hamlCode: number;
   hamlCompanyCode: number;
   kotaj: string;
@@ -8,8 +11,7 @@ export interface IDraft {
   qty: number;
   shipRecno: number;
   shipName: string;
-  name: string;
-  address: string;
+  name: string; address: string;
   tel: string;
   postCode: string;
   addressReceive: string;
@@ -25,8 +27,12 @@ export interface IDraft {
   bargah: string;
   peygiri: number;
   shenaseh: string;
+
   status: number;
   code: number;
+
+  date: Date;
+  created: Date;
 }
 
 export interface IDraftDocument extends IDraft, Document {}
@@ -57,8 +63,11 @@ const DraftSchema = new Schema<IDraftDocument>(
     bargah: String,
     peygiri: Number,
     shenaseh: String,
-    status: Number,
+    status: { type: Number, default: -1 },
     code: Number,
+
+    date: { type: Date, required: true },
+    created: { type: Date, required: true },
   },
   { timestamps: true }
 );
