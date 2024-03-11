@@ -14,7 +14,7 @@ export const addAddresses = async (addresses: AddressAddRequest[]): Promise<Addr
   console.log("_______________________\n")
   
   try {
-    const response = await axios.post(`${BASE_URL}/Address/add`, [], {
+    const response = await axios.post(`${BASE_URL}/Address/add`, addresses, {
       headers: DEFAULT_HEADERS,
     });
     console.log("\nRESULT:", response)
