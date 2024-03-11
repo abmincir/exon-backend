@@ -9,10 +9,16 @@ import {
 } from './Address.interface';
 
 export const addAddresses = async (addresses: AddressAddRequest[]): Promise<AddressResponse> => {
+  console.log("\n_______________________")
+  console.log({addresses})
+  console.log("_______________________\n")
+  
   try {
-    const response = await axios.post(`${BASE_URL}/Address/add`, addresses, {
+    const response = await axios.post(`${BASE_URL}/Address/add`, [], {
       headers: DEFAULT_HEADERS,
     });
+    console.log("\nRESULT:", response)
+    console.log("\n")
     return response.data;
   } catch (error) {
     console.error('Error adding addresses:', error);

@@ -2,8 +2,8 @@ export const BASE_URL = 'https://pishrodarya.ir/services/AddressService/api';
 export const DEFAULT_HEADERS = {
   'accept': 'text/plain',
   'Content-Type': 'application/json',
-  'AuthUser': '{AuthUser_Value}', // Replace with actual value
-  'AuthenticationX365': 'Put_VALUE_HERE', // This seems to be a constant value; adjust if necessary
+  'AuthUser': 'Iedeh_Pardazan_KarAfarin', // Replace with actual value
+  'AuthenticationX365': '592af739f9fa47839feca8bf9d753e55B7A7F6E827D646B7ABE3ACC2F44F5C69', // This seems to be a constant value; adjust if necessary
 };
 
 export interface AddressCommonRequest {
