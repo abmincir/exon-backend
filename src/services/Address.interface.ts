@@ -3,7 +3,7 @@ export const DEFAULT_HEADERS = {
   'accept': 'text/plain',
   'Content-Type': 'application/json',
   'AuthUser': '{AuthUser_Value}', // Replace with actual value
-  'AuthenticationX': '365', // This seems to be a constant value; adjust if necessary
+  'AuthenticationX365': 'Put_VALUE_HERE', // This seems to be a constant value; adjust if necessary
 };
 
 export interface AddressCommonRequest {
