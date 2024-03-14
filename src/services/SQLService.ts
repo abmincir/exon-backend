@@ -25,7 +25,7 @@ export const FetchData = async (input: {
       server: foundedDb.address,
       database: foundedDb.name,
       options: {
-        encrypt: true,
+        encrypt: false,
         enableArithAbort: true,
         cryptoCredentialsDetails: {
           minVersion: 'TLSv1.3' as SecureVersion,
@@ -49,10 +49,10 @@ export const FetchData = async (input: {
     );
 
     const result: IResult<any> = await request.execute(foundedDb.proc);
-    console.log(result, result.recordset.length);
 
     return result.recordset;
   } catch (error) {
+    console.log("loh")
     console.error(error);
     throw error;
   } finally {

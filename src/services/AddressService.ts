@@ -8,18 +8,12 @@ import {
   DEFAULT_HEADERS,
 } from './Address.interface';
 
-export const addAddresses = async (addresses: AddressAddRequest[]): Promise<AddressResponse> => {
-  console.log("\n_______________________")
-  console.log({addresses})
-  console.log("_______________________\n")
-  
+export const addAddresses = async (addresses: AddressAddRequest[]): Promise<any> => {
   try {
     const response = await axios.post(`${BASE_URL}/Address/add`, addresses, {
       headers: DEFAULT_HEADERS,
     });
-    console.log("\nRESULT:", response)
-    console.log("\n")
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error adding addresses:', error);
     throw error;

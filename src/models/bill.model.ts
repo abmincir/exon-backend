@@ -151,6 +151,11 @@ const BillSchema = new Schema<IBillDocument>(
 
 export const Bill: Model<IBillDocument> = model<IBillDocument>('Bill', BillSchema);
 
+export interface IBillByDateRequestData{
+  startDate:string;
+  endDate:string;
+}
+
 export interface IBillRequestData {
   _id: string;
   purchaseId: string;

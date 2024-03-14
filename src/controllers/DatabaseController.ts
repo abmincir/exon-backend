@@ -17,11 +17,11 @@ export const createDatabase = async (req: Request, res: Response) => {
   const { name, title, username, password, address, proc, isShamsi } = req.body
 
   try {
-    const foundDb = await Database.findOne({ name }).exec()
-    if (foundDb) {
-      sendError(res, `Database ${name} already exists`, 400)
-      return
-    }
+    // const foundDb = await Database.findOne({ name }).exec()
+    // if (foundDb) {
+    //   sendError(res, `Database ${name} already exists`, 400)
+    //   return
+    // }
 
     const newDb: IDatabase = await Database.create({
       name,

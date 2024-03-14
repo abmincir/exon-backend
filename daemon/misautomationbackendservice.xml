@@ -4,9 +4,11 @@
 	<description>Backend Process Managing MongoDb And Handeling Requests</description>
 	<executable>C:\Program Files\nodejs\node.exe</executable>
 	<argument>--harmony</argument>
-	<argument>C:\Users\Administrator.ADEXON\Desktop\exon-backend\node_modules\node-windows\lib\wrapper.js</argument>
+	<!-- <argument>C:\Users\Administrator.ADEXON\Desktop\exon-backend\node_modules\node-windows\lib\wrapper.js</argument> -->
+	<argument>C:\Users\zelda-adm\abm\exon-backend-latest\node_modules\node-windows\lib\wrapper.js</argument>
 	<argument>--file</argument>
-	<argument>C:\Users\Administrator.ADEXON\Desktop\exon-backend\dist</argument>
+	<!-- <argument>C:\Users\Administrator.ADEXON\Desktop\exon-backend\dist</argument> -->
+	<argument>C:\Users\zelda-adm\abm\exon-backend-latest\dist</argument>
 	<argument>--scriptoptions=</argument>
 	<argument>--log</argument>
 	<argument>MIS Automation Backend Service wrapper</argument>
@@ -27,5 +29,6 @@
 		<user>LocalSystem</user>
 		<password></password>
 	</serviceaccount>
-	<workingdirectory>C:\Users\Administrator.ADEXON\Desktop\exon-backend</workingdirectory>
+	<!-- <workingdirectory>C:\Users\Administrator.ADEXON\Desktop\exon-backend</workingdirectory> -->
+	<workingdirectory>C:\Users\zelda-adm\abm\exon-backend-latest</workingdirectory>
 </service>

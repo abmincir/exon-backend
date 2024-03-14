@@ -52,8 +52,8 @@ export const estelamByDateXML = `
     <x:Header/>
     <x:Body>
         <tem:EstelameBarname>
-            <tem:userName>10103740920</tem:userName>
-            <tem:pass>exon@321</tem:pass>
+            <tem:userName>10103012748</tem:userName>
+            <tem:pass>$@10103012748</tem:pass>
             <tem:fromDate></tem:fromDate>
             <tem:toDate></tem:toDate>
             <tem:kharidId></tem:kharidId>
@@ -118,8 +118,8 @@ export const insertXML = (
         <tem:insertBarname>
             <tem:userName>${username}</tem:userName>
             <tem:pass>${password}</tem:pass>
-            <tem:userName>10103740920</tem:userName>
-            <tem:pass>exon@321</tem:pass>
+            <tem:userName>10103012748</tem:userName>
+            <tem:pass>$@10103012748</tem:pass>
             <tem:BarNumber>${billNumber}</tem:BarNumber>
             <tem:BarSerial>${billSerial}</tem:BarSerial>
             <tem:ISSUDATE>${calcCreatedDate}</tem:ISSUDATE>

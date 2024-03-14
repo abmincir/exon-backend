@@ -4,11 +4,11 @@ import { Request, Response } from 'express';
 
 import { handleError } from '../helpers/request.helper'
 import {
-  createDateQuery,
   createDraftInstance,
   createHamlSortObject,
   formatDate,
-} from '../helpers/bill.helper'
+} from '../helpers/draft.helper'
+import {createDateQuery} from '../helpers/bill.helper'
 import { FetchData } from '../services/SQLService';
 import { Database } from '../models/database.model';
 import { Draft } from '../models/draft.model';
@@ -34,16 +34,10 @@ const updateDraftDbHandler: (req: Request, res: Response) => Promise<Response | 
       dbId,
     });
 
-    const foundedDb = await Database.findById(dbId).exec();
-
-    if (!foundedDb) {
-      handleError(res, `db ${dbId} does not exists`, 400);
-      return;
-    }
 
     for (const draftData of result) {
       try {
-        const newDraft = createDraftInstance(draftData, foundedDb.name);
+        const newDraft = createDraftInstance(draftData);
         await newDraft.save();
       } catch (err) {
         console.error('Draft not saved -> error:', err);
@@ -69,36 +63,34 @@ const updateDraftDbHandler: (req: Request, res: Response) => Promise<Response | 
 const getAllDraftsHandler: (req: Request, res: Response) => Promise<Response | void> = async (req, res) => {
   const {
     hamlCode,
-    kotaj,
-    shipRecno,
-    recno,
-    meli,
-    peygiri,
+    code,
+    bargah,
     shenaseh,
     startDate,
     endDate,
     sort,
   } = req.body;
 
+  console.log(req.body)
+
   let query: any = {};
 
-  if (hamlCode) query.hamlCode = hamlCode;
-  if (kotaj) query.kotaj = kotaj;
-  if (shipRecno) query.shipRecno = shipRecno;
-  if (recno) query.recno = recno;
-  if (meli) query.meli = meli;
-  if (peygiri) query.peygiri = peygiri;
-  if (shenaseh) query.shenaseh = shenaseh;
+  if (code) query.code = code
+  if (hamlCode) query.hamlCode = hamlCode
+  if (bargah) query.bargah = bargah
+  if (shenaseh) query.shenaseh = shenaseh
 
   const dateQuery = createDateQuery(startDate, endDate);
-  if (dateQuery) query.date = dateQuery;
+  if (dateQuery) query.date = dateQuery
 
   const sortObj = createHamlSortObject(sort);
-
+  console.log('before try')
   try {
     const drafts = await Draft.find(query).limit(1000).sort(sortObj).exec();
-    res.json({ drafts });
+    console.log(drafts)
+    return res.status(200).json(drafts)
   } catch (err) {
+    console.log(err)
     handleError(res, 'Failed to fetch drafts', 422, err);
   }
 };

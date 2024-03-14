@@ -1,9 +1,7 @@
 import { Document, Model, Schema, model } from 'mongoose';
 
 export interface IDraft {
-  saveDate: string;
-  dbName: string;
-
+  code:number;
   hamlCode: number;
   hamlCompanyCode: number;
   kotaj: string;
@@ -11,7 +9,8 @@ export interface IDraft {
   qty: number;
   shipRecno: number;
   shipName: string;
-  name: string; address: string;
+  name: string;
+  address: string;
   tel: string;
   postCode: string;
   addressReceive: string;
@@ -19,7 +18,7 @@ export interface IDraft {
   tarekh: string;
   price: number;
   priceFactor: number;
-  weight: string;
+  weight: number;
   trail: boolean;
   send: number;
   recno: number;
@@ -27,18 +26,17 @@ export interface IDraft {
   bargah: string;
   peygiri: number;
   shenaseh: string;
+  customerName:string;
 
-  status: number;
-  code: number;
-
-  date: Date;
-  created: Date;
+  status?: string;
+  lastMessage?: string;
 }
 
 export interface IDraftDocument extends IDraft, Document {}
 
 const DraftSchema = new Schema<IDraftDocument>(
   {
+    code: Number,
     hamlCode: Number,
     hamlCompanyCode: Number,
     kotaj: String,
@@ -55,7 +53,7 @@ const DraftSchema = new Schema<IDraftDocument>(
     tarekh: String,
     price: Number,
     priceFactor: Number,
-    weight: String,
+    weight: Number,
     trail: Boolean,
     send: Number,
     recno: Number,
@@ -63,11 +61,10 @@ const DraftSchema = new Schema<IDraftDocument>(
     bargah: String,
     peygiri: Number,
     shenaseh: String,
-    status: { type: Number, default: -1 },
-    code: Number,
+    customerName: String,
 
-    date: { type: Date, required: true },
-    created: { type: Date, required: true },
+    status: { type: String, default: 'unknown' },
+    lastMessage: { type: String, default: 'بررسی نشده' },
   },
   { timestamps: true }
 );

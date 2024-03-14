@@ -16,8 +16,8 @@ export interface IDatabaseDocument extends IDatabase, Document {}
 
 const DatabaseSchema = new Schema<IDatabaseDocument>(
   {
-    name: { type: String, required: true, unique: true },
-    title: { type: String },
+    name: { type: String, required: true },
+    title: { type: String, unique:true },
     username: { type: String, required: true },
     password: { type: String },
     address: { type: String, required: true },

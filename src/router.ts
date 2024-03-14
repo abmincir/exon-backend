@@ -29,11 +29,13 @@ import {
 import {
   edit as editBillHandler,
   estelam as estelamBillHandler,
+  estelamByDateHandler,
   getAll as getAllBillsHandler,
   updateDb as updateBillDbHandler,
+  updateDraftDB as updateDraftDBHandler
 } from './controllers/BillController'
 
-import { getAllCompaniesHandler } from './controllers/CompaniesController';
+import { getAllCompaniesData, getAllCompaniesHandler } from './controllers/CompaniesController';
 
 import { getAllDraftsHandler, updateDraftDbHandler } from './controllers/DraftController';
 
@@ -50,6 +52,7 @@ export const router = (app: Application) => {
   app.post('/bill/fetch', getAllBillsHandler)
   app.post('/bill/update-db', updateBillDbHandler)
   app.post('/bill/estelam', estelamBillHandler)
+  app.post('/bill/estelambydate', estelamByDateHandler)
   app.post('/bill/edit', editBillHandler)
 
   app.get('/accounts/all', getAllAccountsHandler)
@@ -62,13 +65,14 @@ export const router = (app: Application) => {
   app.post('/databases/change-database', updateDatabaseHandler)
   app.post('/databases/delete', deleteDatabaseHandler)
 
+  
   app.post('/addresses/add', AddressController.addAddresses);
   app.post('/addresses/delete', AddressController.deleteAddresses);
+  app.post('/draft/update-db' , updateDraftDBHandler)
   app.get('/addresses/fetch/:goodOwnerCood', AddressController.fetchAddresses);
-
-  app.post('/companies/all', getAllCompaniesHandler);
-
-
   app.post('/draft/all', getAllDraftsHandler)
   app.post('/draft/update-db', updateDraftDbHandler)
+
+  app.post('/companies/all', getAllCompaniesHandler);
+  app.post('/companies/data',getAllCompaniesData); 
 }

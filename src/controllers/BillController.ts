@@ -11,16 +11,28 @@ import {
   handleMatchingWeight,
   handleWeightMismatch,
 } from '../helpers/bill.helper'
-import { handleError, sendSuccess } from '../helpers/request.helper'
+import { handleError, sendError, sendSuccess } from '../helpers/request.helper'
 
 import { Account } from '../models/acount.model'
-import { Bill, IBillRequestData } from '../models/bill.model'
+import { Bill, IBillByDateRequestData, IBillRequestData } from '../models/bill.model'
 import { Database } from '../models/database.model'
 import { User } from '../models/user.model'
 
-
-import { edit as editService, estelam as estelamService } from '../services/SPSWSService'
+import { edit as editService, estelamByDate, estelam as estelamService } from '../services/SPSWSService'
 import { FetchData } from '../services/SQLService'
+import { Draft, IDraft } from '../models/draft.model'
+
+export const estelamByDateHandler :(req:Request<IBillByDateRequestData> , res:any) => Promise<void> = async (req,res)=>{
+  const {startDate,endDate} = req.body
+  try{
+    const result = await estelamByDate(startDate,endDate)
+    sendSuccess(res,result)
+  }
+  catch(err){
+    handleError(res, 'Failed to process request', 550, err)
+  }
+
+}
 
 const estelamHandler: (req: Request<IBillRequestData>, res: Response) => Promise<void> = async (req, res) => {
   const { _id, purchaseId, billNumber, weight, accountId, username } = req.body
@@ -182,16 +194,6 @@ const updateDbHandler: (req: Request, res: Response) => Promise<Response | void>
       },
     }).exec()
 
-    console.log('----------- Update Db Result -----------')
-    console.log({
-      savedBills,
-      alreadySavedBills,
-      saveErrors,
-      misNumber: result.length,
-      queryNumber: bills.length,
-    })
-    console.log('----------- Update Db Result -----------')
-
     res.json({ bill: bills })
   } catch (err) {
     console.error(' --------- SQL ERROR ', err)
@@ -199,4 +201,46 @@ const updateDbHandler: (req: Request, res: Response) => Promise<Response | void>
   }
 }
 
-export { editHandler as edit, estelamHandler as estelam, getAllHandler as getAll, updateDbHandler as updateDb }
+const updateDraftDbHandler: (req: Request, res: Response) => Promise<Response | void> = async (req, res) => {
+  let { startDate, endDate, dbId } = req.body;
+
+  if (!startDate || !endDate) {
+    startDate = moment().locale('fa').format('YYYY/MM/DD');
+    endDate = moment().locale('fa').add(1, 'day').format('YYYY/MM/DD');
+  }
+
+  const { miladi: startDateMiladi, mongo: startDateMongo } = formatDate(startDate)
+  const { miladi: endDateMiladi, mongo: endDateMongo } = formatDate(endDate)
+
+  try {
+    const result: IDraft[] = await FetchData({
+      startDate,
+      endDate,
+      startDateMiladi,
+      endDateMiladi,
+      dbId,
+    });
+
+
+    let savedDrafts = 0;
+    let saveErrors = 0;
+
+    for (const draftData of result) {
+      try {
+        const newDraft = new Draft(draftData);
+        await newDraft.save();
+        savedDrafts++;
+      } catch (err) {
+        console.error('Draft not saved -> error:', err);
+        saveErrors++;
+      }
+    }
+
+    res.json({ message: "Draft DB updated",data:result, savedDrafts, saveErrors });
+  } catch (err) {
+    console.error('Error updating draft DB:', err);
+    handleError(res, 'Failed to update draft DB', 422, err);
+  }
+};
+
+export { editHandler as edit, estelamHandler as estelam, getAllHandler as getAll, updateDbHandler as updateDb, updateDraftDbHandler as updateDraftDB }

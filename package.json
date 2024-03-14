@@ -1,5 +1,5 @@
 {
-  "name": "exon-back-end",
+  "name": "abm-back-end",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -30,7 +30,7 @@
     "fast-xml-parser": "^3.18.0",
     "jalali-moment": "^3.3.10",
     "moment": "^2.29.4",
-    "mongoose": "^5.11.18",
+    "mongoose": "^5.13.22",
     "mssql": "^6.3.1",
     "node-cron": "^3.0.2",
     "node-fetch": "^2.6.1",

@@ -10,8 +10,8 @@ import {
 import { Bill } from '../models/bill.model';
 
 const BASE_URL = 'https://spsws.bki.ir/spsws.asmx?WSDL';
-const DEFAULT_USERNAME = '10103740920';
-const DEFAULT_PASSWORD = 'exon@321';
+const DEFAULT_USERNAME = '10103012748';
+const DEFAULT_PASSWORD = '$@10103012748';
 
 async function parseXMLToJSON(data: string): Promise<any> {
   const parser = new xml2js.Parser();
@@ -150,18 +150,6 @@ export const insert = async (
   const calcCreatedDate =
     (['9', '8', '7'].includes(bill.bill.date[0]) ? '13' : '14') + bill.bill.date;
 
-  console.log('\nCalling Insert:', {
-    username,
-    password,
-    billNumber: bill.bill.number,
-    billSerial: bill.bill.serial,
-    saveDate: bill.saveDate,
-    barDate: bill.bill.date,
-    issueDateValid: calcCreatedDate,
-    weight: bill.bill.weight,
-    purchaseId: bill.purchaseId,
-    assignmentId: bill.assignmentId,
-  });
 
   const xml = insertXML(
     username,

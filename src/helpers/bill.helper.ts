@@ -1,7 +1,6 @@
 import moment from 'jalali-moment'
 
 import { Bill } from '../models/bill.model'
-import { Draft } from '../models/draft.model';
 
 import { edit, insert } from '../services/SPSWSService'
 
@@ -118,52 +117,12 @@ const createSortObject = (sort: any) => {
   }
 }
 
-const createHamlSortObject = (sort: any) => {
-  const {
-    date: dateSort,
-    hamlCode: hamlCodeSort,
-    kotaj: kotajSort,
-    shipRecno: shipRecnoSort,
-    recno: recnoSort,
-    meli: meliSort,
-    tarekh: tarekhSort,
-    peygiri: peygiriSort,
-    shenaseh: shenasehSort
-  } = sort;
-
-  return {
-    ...(dateSort && { date: dateSort }),
-    ...(hamlCodeSort && { hamlCode: hamlCodeSort }),
-    ...(kotajSort && { kotaj: kotajSort }),
-    ...(shipRecnoSort && { shipRecno: shipRecnoSort }),
-    ...(recnoSort && { recno: recnoSort }),
-    ...(meliSort && { meli: meliSort }),
-    ...(tarekhSort && { tarekh: tarekhSort }),
-    ...(peygiriSort && { peygiri: peygiriSort }),
-    ...(shenasehSort && { shenaseh: shenasehSort })
-  };
-};
-
-
 const formatDate: (date: string) => { miladi: string; mongo: string } = (date: string) => {
   return {
     miladi: moment.from(date, 'fa', 'YYYY/MM/DD').locale('en').format('YYYY-MM-DD'),
     mongo: moment.from(date, 'fa', 'YYYY/MM/DD').locale('en').format('YYYY-M-D HH:mm:ss'),
   }
 }
-
-const createDraftInstance = (draftData: any, dbName: string) => {
-  const calculatedDate = (['9', '8', '7', '6'].includes(draftData.tarekh[0]) ? '13' : '14') + draftData.saveDate;
-  const mongoDate = new Date(moment.from(calculatedDate, 'fa', 'YYYY/MM/DD').locale('en').format('YYYY-M-D HH:mm:ss'));
-
-  return new Draft({
-    ...draftData,
-    dbName: dbName,
-    date: mongoDate,
-    status: draftData.status ?? -1,
-  });
-};
-
 
 const createBillInstance = (bill: any, dbName: string) => {
   const calculatedDate = (['9', '8', '7', '6'].includes(bill.barDate[0]) ? '13' : '14') + bill.barDate
@@ -236,9 +195,7 @@ const createBillInstance = (bill: any, dbName: string) => {
 
 export {
   createBillInstance,
-  createDraftInstance,
   createDateQuery,
-  createHamlSortObject,
   createSortObject,
   formatDate,
   handleBillNotFound,
