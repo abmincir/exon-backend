@@ -28,7 +28,7 @@ export interface IDraft {
   shenaseh: string;
   customerName:string;
 
-  status?: string;
+  status: string;
   lastMessage?: string;
 }
 

@@ -10,7 +10,6 @@ import {
 } from '../helpers/draft.helper'
 import {createDateQuery} from '../helpers/bill.helper'
 import { FetchData } from '../services/SQLService';
-import { Database } from '../models/database.model';
 import { Draft } from '../models/draft.model';
 
 
