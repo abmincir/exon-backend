@@ -65,7 +65,7 @@ export const router = (app: Application) => {
   app.post('/databases/change-database', updateDatabaseHandler)
   app.post('/databases/delete', deleteDatabaseHandler)
 
-  
+
   app.post('/addresses/add', AddressController.addAddresses);
   app.post('/addresses/delete', AddressController.deleteAddresses);
   app.post('/draft/update-db' , updateDraftDBHandler)
@@ -74,5 +74,9 @@ export const router = (app: Application) => {
   app.post('/draft/update-db', updateDraftDbHandler)
 
   app.post('/companies/all', getAllCompaniesHandler);
-  app.post('/companies/data',getAllCompaniesData); 
+  app.post('/companies/data',getAllCompaniesData);
+
+  app.get('/hello', (_: any, res: any) => {
+    res.json({ message: 'Hello World' });
+  });
 }
