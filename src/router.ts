@@ -39,7 +39,7 @@ import { getAllCompaniesHandler } from './controllers/CompaniesController';
 
 import { getAllDraftsHandler, updateDraftDbHandler } from './controllers/DraftController';
 
-import { serveLogFile } from './controllers/FileController';
+import { serveLogFile, serveSecondLogFile } from './controllers/FileController';
 
 
 export const router = (app: Application) => {
@@ -78,5 +78,6 @@ export const router = (app: Application) => {
 
   app.post('/companies/all', getAllCompaniesHandler);
 
-  app.get('/logs', serveLogFile);
+  app.get('/logs/error', serveLogFile);
+  app.get('/logs/log', serveSecondLogFile);
 }
