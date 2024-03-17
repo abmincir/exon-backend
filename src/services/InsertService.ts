@@ -1,4 +1,4 @@
-import { checkForDuplicateRecord, insertRecord } from '../helpers/sql.helper';
+import { checkForDuplicateRecord, getMaxSerial, insertRecord } from '../helpers/sql.helper';
 import { CheckDuplicateParams, ProcessRecordsResult, BaseRecord, GetMaxSerialParams } from '../types';
 
 export async function processRecords(records: BaseRecord[], dbId: string): Promise<ProcessRecordsResult> {
@@ -37,7 +37,7 @@ export async function processRecords(records: BaseRecord[], dbId: string): Promi
         kaCode: record.kaCode,
         ghErtebat: record.ghErtebat,
         bar_n: record.bar_n,
-        bar_n_s: record.bar_n_s,
+        bar_n_s: maxSerialNumber,
         barDate: record.barDate,
         dTel: record.dTel,
       };
