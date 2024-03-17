@@ -35,7 +35,7 @@ import {
   updateDraftDB as updateDraftDBHandler
 } from './controllers/BillController'
 
-import { getAllCompaniesData, getAllCompaniesHandler } from './controllers/CompaniesController';
+import { getAllCompaniesData, getAllCompaniesHandler, insertCompaniesHandler } from './controllers/CompaniesController';
 
 import { getAllDraftsHandler, updateDraftDbHandler } from './controllers/DraftController';
 
@@ -75,8 +75,5 @@ export const router = (app: Application) => {
 
   app.post('/companies/all', getAllCompaniesHandler);
   app.post('/companies/data',getAllCompaniesData);
-
-  app.get('/hello', (_: any, res: any) => {
-    res.json({ message: 'Hello World' });
-  });
+  app.post('/insert-companies', insertCompaniesHandler);
 }
