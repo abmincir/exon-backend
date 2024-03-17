@@ -22,12 +22,13 @@ export const getAllCompaniesHandler = async (req: Request, res: Response): Promi
   try {
     const { companyCode, date1, time1, date2, time2, reportName, dbId } = req.body;
     const data: CompaniesApiResponse = await fetchCompanyData({ companyCode, date1, time1, date2, time2, reportName });
-    
-    if (data.statusCode !== 200) {
-      throw new Error('Invalid response status code');
-    }
+
+    console.log("\n\nRESULT FROM API: ", data)
 
     const records: BaseRecord[] = mapApiResponseToBaseRecords(data);
+
+
+    console.log("\n\nMAPPED VALUES: ", records)
 
     const result = await processRecords(records, dbId);
     console.log({
