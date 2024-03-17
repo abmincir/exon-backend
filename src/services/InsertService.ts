@@ -1,5 +1,5 @@
-import { checkForDuplicateRecord, getMaxSerial, insertRecord } from '../helpers/sql.helper';
-import { CheckDuplicateParams, InsertRecordParams, GetMaxSerialParams, ProcessRecordsResult, BaseRecord } from '../types';
+import { checkForDuplicateRecord, insertRecord } from '../helpers/sql.helper';
+import { CheckDuplicateParams, ProcessRecordsResult, BaseRecord } from '../types';
 
 export async function processRecords(records: BaseRecord[], dbId: string): Promise<ProcessRecordsResult> {
   let acknowledgedInserts = 0;
@@ -21,28 +21,18 @@ export async function processRecords(records: BaseRecord[], dbId: string): Promi
         continue;
       }
 
-      const maxSerialParams: GetMaxSerialParams = {
-        ghErtebat: record.ghErtebat,
-        kaCode: record.kaCode,
-        dbId,
-      };
-
-      const maxSerialNumber = await getMaxSerial(maxSerialParams);
-
-      const insertRecordParams: InsertRecordParams = {
+      const insertRecordParams: BaseRecord = {
         tplk: record.tplk,
         netT: record.netT,
         kaCode: record.kaCode,
         ghErtebat: record.ghErtebat,
-        // FIXME check if this logic is what we want for SinIran
-        serial: maxSerialNumber + 1, // Assuming you want to increment the serial number
         bar_n: record.bar_n,
+        bar_n_s: record.bar_n_s,
         barDate: record.barDate,
         dTel: record.dTel,
-        dbId,
       };
 
-      await insertRecord(insertRecordParams);
+      await insertRecord(insertRecordParams, dbId);
       acknowledgedInserts++;
     } catch (error) {
       console.error('Error processing record:', record, error);

@@ -1,8 +1,9 @@
-import { ConnectionPool, VarChar, Int, Numeric } from 'mssql';
+import { ConnectionPool, VarChar, Int } from 'mssql';
+import moment from 'moment';
 
 import { SecureVersion } from "tls";
 import { Database } from "../models/database.model";
-import { CheckDuplicateParams, GetMaxSerialParams, InsertRecordParams } from '../types';
+import { BaseRecord, CheckDuplicateParams, } from '../types';
 
 export async function getConfigByDbId(dbId: string) {
     const foundedDb = await Database.findById(dbId).exec();
@@ -77,68 +78,40 @@ export const checkForDuplicateRecord = async (params: CheckDuplicateParams) => {
     }
   };
 
-  export const getMaxSerial = async (params: GetMaxSerialParams) => {
-    let pool;
+  export const insertRecord = async (params: BaseRecord, dbId: string): Promise<void> => {
+    let pool: ConnectionPool | undefined;
   
     try {
-      const { kaCode, ghErtebat, dbId } = params;
-  
       const config = await getConfigByDbId(dbId);
       pool = new ConnectionPool(config);
       await pool.connect();
-  
-      const getMaxSerialSql = `
-        SELECT MAX(serial) AS maxSerial
-        FROM salbarno
-        WHERE hamlcode = @ghErtebat
-          AND code = @kaCode
-      `;
   
       const request = pool.request();
-      request.input('ghErtebat', VarChar, ghErtebat);
-      request.input('kaCode', VarChar, kaCode);
+      const datedo = moment().locale('fa').format('YY/MM/DD');
   
-      const result = await request.query(getMaxSerialSql);
-      const maxSerial = result.recordset[0].maxSerial;
-  
-      // Return the maximum serial number
-      return maxSerial;
-    } catch (error) {
-      console.error('Error retrieving maximum serial:', error);
-      throw error;
-    } finally {
-      if (pool) await pool.close();
-    }
-  };
-
-  export const insertRecord = async (params: InsertRecordParams) => {
-    let pool;
-  
-    try {
-      const { tplk, netT, kaCode, ghErtebat, serial, bar_n, barDate, dTel, dbId } = params;
-  
-      const config = await getConfigByDbId(dbId);
-      pool = new ConnectionPool(config);
-      await pool.connect();
+      request.input('tplk', VarChar, params.tplk);
+      request.input('weight', Int, params.netT);
+      request.input('code', VarChar, params.kaCode);
+      request.input('hamlcode', VarChar, params.ghErtebat);
+      request.input('serial', VarChar, params.bar_n_s);
+      request.input('barno', Int, params.bar_n);
+      request.input('tarekh', VarChar, params.barDate);
+      request.input('tel', VarChar, params.dTel);
+      request.input('datedo', VarChar, datedo);
+      request.input('accdo', Int, 0);
+      request.input('FacRecno', Int, 1);
+      request.input('FacNeed', Int, 0);
+      request.input('notification', Int, 0);
+      request.input('send', Int, 0);
+      request.input('LockDate', VarChar, null);
+      request.input('lock', Int, 0);
   
       const sqlCommand = `
-        INSERT INTO salbarno (carno, weight, code, hamlcode, serial, barno, tarekh, tel)
-        VALUES (@carno, @weight, @code, @hamlcode, @serial, @barno, @tarekh, @tel)
+          INSERT INTO salbarno (carno, weight, code, hamlcode, serial, barno, tarekh, tel, datedo, accdo, FacRecno, FacNeed, notification, send, LockDate, lock)
+          VALUES (@tplk, @weight, @code, @hamlcode, @serial, @barno, @tarekh, @tel, @datedo, @accdo, @FacRecno, @FacNeed, @notification, @send, @LockDate, @lock)
       `;
   
-      const request = pool.request();
-      request.input('carno', VarChar, tplk);
-      request.input('weight', Numeric, netT);
-      request.input('code', VarChar, kaCode);
-      request.input('hamlcode', VarChar, ghErtebat);
-      request.input('serial', Numeric, serial);
-      request.input('barno', Numeric, bar_n);
-      request.input('tarekh', VarChar, barDate);
-      request.input('tel', VarChar, dTel);
-  
       await request.query(sqlCommand);
-  
-      console.log('Record inserted successfully.');
     } catch (error) {
       console.error('Error inserting record:', error);
       throw error;
@@ -146,3 +119,4 @@ export const checkForDuplicateRecord = async (params: CheckDuplicateParams) => {
       if (pool) await pool.close();
     }
   };
+  

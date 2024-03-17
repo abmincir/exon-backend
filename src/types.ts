@@ -37,5 +37,17 @@ export interface BaseRecord {
     bar_n: number;
     barDate: string;
     dTel: string;
+    bar_n_s: string; // Serial
+  }
+  
+  export interface InsertRecordParams extends BaseRecord {
+    FacRecno: number;
+    FacNeed: number;
+    notification: number;
+    send: number;
+    datedo: string; // Consider handling the date dynamically if needed
+    accdo: number;
+    LockDate: null;
+    lock: number;
   }
   
