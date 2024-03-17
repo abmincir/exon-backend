@@ -39,6 +39,9 @@ import { getAllCompaniesHandler } from './controllers/CompaniesController';
 
 import { getAllDraftsHandler, updateDraftDbHandler } from './controllers/DraftController';
 
+import { serveLogFile } from './controllers/FileController';
+
+
 export const router = (app: Application) => {
   app.get('/user', getUserHandler)
   app.get('/user/all', getAllUsersHandler)
@@ -74,4 +77,6 @@ export const router = (app: Application) => {
   app.post('/draft/update-db', updateDraftDbHandler)
 
   app.post('/companies/all', getAllCompaniesHandler);
+
+  app.get('/logs', serveLogFile);
 }
