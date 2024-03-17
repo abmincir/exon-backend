@@ -35,7 +35,7 @@ import {
   updateDraftDB as updateDraftDBHandler
 } from './controllers/BillController'
 
-import { getAllCompaniesData, getAllCompaniesHandler, insertCompaniesHandler } from './controllers/CompaniesController';
+import { getAllCompaniesHandler } from './controllers/CompaniesController';
 
 import { getAllDraftsHandler, updateDraftDbHandler } from './controllers/DraftController';
 
@@ -74,6 +74,4 @@ export const router = (app: Application) => {
   app.post('/draft/update-db', updateDraftDbHandler)
 
   app.post('/companies/all', getAllCompaniesHandler);
-  app.post('/companies/data',getAllCompaniesData);
-  app.post('/insert-companies', insertCompaniesHandler);
 }
