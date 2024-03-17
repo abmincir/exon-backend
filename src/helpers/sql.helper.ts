@@ -37,36 +37,36 @@ export async function getConfigByDbId(dbId: string) {
 
 export const checkForDuplicateRecord = async (params: CheckDuplicateParams) => {
     let pool;
-  
+
     try {
       const { tplk, netT, kaCode, ghErtebat, dbId } = params;
-  
+
       const config = await getConfigByDbId(dbId);
       pool = new ConnectionPool(config);
       await pool.connect();
-  
+
       // Prepare the SQL command for checking duplicates
       const checkDuplicateSql = `
         SELECT COUNT(code) AS count
-        FROM salbarno 
-        WHERE carno = @tplk 
-          AND weight = @netT 
-          AND code = @kaCode 
-          AND hamlcode = @ghErtebat 
+        FROM salbarno
+        WHERE carno = @tplk
+          AND weight = @netT
+          AND code = @kaCode
+          AND hamlcode = @ghErtebat
           AND LEN(carno) > 3
       `;
-  
+
       // Create a request for executing the SQL command
       const request = pool.request();
       request.input('tplk', VarChar, tplk);
       request.input('netT', Int, netT);
       request.input('kaCode', VarChar, kaCode);
       request.input('ghErtebat', VarChar, ghErtebat);
-  
+
       // Execute the query
       const result = await request.query(checkDuplicateSql);
       const isDuplicate = result.recordset[0].count > 0;
-  
+
       // Return whether it is a duplicate
       return isDuplicate;
     } catch (error) {
@@ -78,17 +78,51 @@ export const checkForDuplicateRecord = async (params: CheckDuplicateParams) => {
     }
   };
 
+    export const getMaxSerial = async (params: GetMaxSerialParams) => {
+    let pool;
+
+    try {
+      const { kaCode, ghErtebat, dbId } = params;
+
+      const config = await getConfigByDbId(dbId);
+      pool = new ConnectionPool(config);
+      await pool.connect();
+
+      const getMaxSerialSql = `
+        SELECT MAX(serial) AS maxSerial
+        FROM salbarno
+        WHERE hamlcode = @ghErtebat
+          AND code = @kaCode
+      `;
+
+      const request = pool.request();
+      request.input('ghErtebat', VarChar, ghErtebat);
+      request.input('kaCode', VarChar, kaCode);
+
+      const result = await request.query(getMaxSerialSql);
+      const maxSerial = result.recordset[0].maxSerial;
+
+      // Return the maximum serial number
+      return maxSerial;
+    } catch (error) {
+      console.error('Error retrieving maximum serial:', error);
+      throw error;
+    } finally {
+      if (pool) await pool.close();
+    }
+  };
+
   export const insertRecord = async (params: BaseRecord, dbId: string): Promise<void> => {
     let pool: ConnectionPool | undefined;
-  
+
     try {
       const config = await getConfigByDbId(dbId);
       pool = new ConnectionPool(config);
       await pool.connect();
-  
+
       const request = pool.request();
       const datedo = moment().locale('fa').format('YY/MM/DD');
-  
+
       request.input('tplk', VarChar, params.tplk);
       request.input('weight', Int, params.netT);
       request.input('code', VarChar, params.kaCode);
@@ -105,12 +139,12 @@ export const checkForDuplicateRecord = async (params: CheckDuplicateParams) => {
       request.input('send', Int, 0);
       request.input('LockDate', VarChar, null);
       request.input('lock', Int, 0);
-  
+
       const sqlCommand = `
           INSERT INTO salbarno (carno, weight, code, hamlcode, serial, barno, tarekh, tel, datedo, accdo, FacRecno, FacNeed, notification, send, LockDate, lock)
           VALUES (@tplk, @weight, @code, @hamlcode, @serial, @barno, @tarekh, @tel, @datedo, @accdo, @FacRecno, @FacNeed, @notification, @send, @LockDate, @lock)
       `;
-  
+
       await request.query(sqlCommand);
     } catch (error) {
       console.error('Error inserting record:', error);
@@ -119,4 +153,4 @@ export const checkForDuplicateRecord = async (params: CheckDuplicateParams) => {
       if (pool) await pool.close();
     }
   };
-  
+

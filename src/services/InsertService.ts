@@ -1,5 +1,5 @@
 import { checkForDuplicateRecord, insertRecord } from '../helpers/sql.helper';
-import { CheckDuplicateParams, ProcessRecordsResult, BaseRecord } from '../types';
+import { CheckDuplicateParams, ProcessRecordsResult, BaseRecord, GetMaxSerialParams } from '../types';
 
 export async function processRecords(records: BaseRecord[], dbId: string): Promise<ProcessRecordsResult> {
   let acknowledgedInserts = 0;
@@ -20,6 +20,16 @@ export async function processRecords(records: BaseRecord[], dbId: string): Promi
         console.log('Duplicate record found, skipping:', record);
         continue;
       }
+
+      const maxSerialParams: GetMaxSerialParams = {
+        ghErtebat: record.ghErtebat,
+        kaCode: record.kaCode,
+        dbId,
+      };
+
+      const maxSerialNumber = await getMaxSerial(maxSerialParams);
+      // TODO use this value
+
 
       const insertRecordParams: BaseRecord = {
         tplk: record.tplk,
