@@ -6,7 +6,11 @@ import { CompaniesApiResponse } from '../services/Company.interface';
 import { BaseRecord } from '../types';
 
 const mapApiResponseToBaseRecords = (apiResponse: CompaniesApiResponse): BaseRecord[] => {
-  return apiResponse.value.map((record): BaseRecord => ({
+  console.log("-----------try here-----------")
+  console.log(apiResponse);
+  console.log('-----------data----------------')
+  console.log(apiResponse.data.value)
+  return apiResponse.data.value.map((record): BaseRecord => ({
     tplk: record.tplk,
     netT: record.netT,
     kaCode: record.kaCode,
@@ -15,6 +19,7 @@ const mapApiResponseToBaseRecords = (apiResponse: CompaniesApiResponse): BaseRec
     bar_n_s: record.bar_n_s,
     barDate: record.barDate,
     dTel: record.dTel,
+    kaGrp: record.kaGrp
   }));
 };
 

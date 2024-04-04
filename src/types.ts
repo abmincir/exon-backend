@@ -2,13 +2,13 @@ export interface CheckDuplicateParams {
     tplk: string;
     netT: number;
     kaCode: string;
-    ghErtebat: string;
+    kaGrp: string;
     dbId: string;
 }
   
 export interface GetMaxSerialParams {
     kaCode: string;
-    ghErtebat: string;
+    kaGrp: string;
     dbId: string;
 }
 
@@ -38,6 +38,7 @@ export interface BaseRecord {
     barDate: string;
     dTel: string;
     bar_n_s: string; // Serial
+    kaGrp: string;
   }
   
   export interface InsertRecordParams extends BaseRecord {

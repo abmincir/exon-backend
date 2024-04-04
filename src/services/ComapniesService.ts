@@ -21,6 +21,8 @@ export const fetchCompanyData = async (params: {
     const response = await axios.post(BASE_URL, params, {
       headers: DEFAULT_HEADERS,
     });
+    console.log('-------------pure response-----------------')
+    console.log(response)
     return response;
   } catch (error) {
     console.error('Error fetching company data:', error);

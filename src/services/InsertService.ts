@@ -11,7 +11,7 @@ export async function processRecords(records: BaseRecord[], dbId: string): Promi
         tplk: record.tplk,
         netT: record.netT,
         kaCode: record.kaCode,
-        ghErtebat: record.ghErtebat,
+        kaGrp: record.kaGrp,
         dbId,
       };
 
@@ -22,7 +22,7 @@ export async function processRecords(records: BaseRecord[], dbId: string): Promi
       }
 
       const maxSerialParams: GetMaxSerialParams = {
-        ghErtebat: record.ghErtebat,
+        kaGrp: record.kaGrp,
         kaCode: record.kaCode,
         dbId,
       };
@@ -40,6 +40,7 @@ export async function processRecords(records: BaseRecord[], dbId: string): Promi
         bar_n_s: maxSerialNumber,
         barDate: record.barDate,
         dTel: record.dTel,
+        kaGrp: record.kaGrp
       };
 
       await insertRecord(insertRecordParams, dbId);

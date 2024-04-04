@@ -69,8 +69,12 @@ export interface CompanyRecord {
     billOfLadingCoutageCode: string;
 }
 
-export interface CompaniesApiResponse {
+interface CompaniesApiData{
     value: CompanyRecord[];
+}
+
+export interface CompaniesApiResponse {
+    data:CompaniesApiData;
     formatters: any[];
     contentTypes: any[];
     declaredType: null;
