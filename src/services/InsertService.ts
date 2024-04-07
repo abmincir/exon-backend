@@ -4,14 +4,21 @@ import { CheckDuplicateParams, ProcessRecordsResult, BaseRecord, GetMaxSerialPar
 export async function processRecords(records: BaseRecord[], dbId: string): Promise<ProcessRecordsResult> {
   let acknowledgedInserts = 0;
   let failedInserts = 0;
-
+  
   for (const record of records) {
     try {
+
+      const hamlCodeParams : GetHamlCodeParams = {
+        billOfLadingCoutageCode: record.billOfLadingCoutageCode,
+        dbId
+      }
+      const hamlCode = await getHamlCode(hamlCodeParams)
+
       const duplicateCheckParams: CheckDuplicateParams = {
         tplk: record.tplk,
         netT: record.netT,
         kaCode: record.kaCode,
-        kaGrp: record.kaGrp,
+        kaGrp: hamlCode,
         dbId,
       };
 
@@ -22,7 +29,7 @@ export async function processRecords(records: BaseRecord[], dbId: string): Promi
       }
 
       const maxSerialParams: GetMaxSerialParams = {
-        kaGrp: record.kaGrp,
+        kaGrp: hamlCode,
         kaCode: record.kaCode,
         dbId,
       };
@@ -30,11 +37,6 @@ export async function processRecords(records: BaseRecord[], dbId: string): Promi
       const maxSerialNumber = await getMaxSerial(maxSerialParams);
       // TODO use this value
 
-      const testParams : GetHamlCodeParams = {
-        billOfLadingCoutageCode: record.billOfLadingCoutageCode,
-        dbId
-      }
-      const hamlCode = await getHamlCode(testParams)
 
 
       const insertRecordParams: BaseRecord = {
