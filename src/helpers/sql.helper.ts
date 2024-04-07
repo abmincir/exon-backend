@@ -3,7 +3,7 @@ import moment from 'moment';
 
 import { SecureVersion } from "tls";
 import { Database } from "../models/database.model";
-import { BaseRecord, CheckDuplicateParams, GetMaxSerialParams, } from '../types';
+import { BaseRecord, CheckDuplicateParams, GetHamlCodeParams, GetMaxSerialParams, } from '../types';
 
 export async function getConfigByDbId(dbId: string) {
   const foundedDb = await Database.findById(dbId).exec();
@@ -113,6 +113,42 @@ export const getMaxSerial = async (params: GetMaxSerialParams) => {
     if (pool) await pool.close();
   }
 };
+
+
+export const getHamlCode = async (params: GetHamlCodeParams) => {
+  let pool;
+
+  try {
+    const { billOfLadingCoutageCode, dbId } = params;
+
+    const config = await getConfigByDbId(dbId);
+    pool = new ConnectionPool(config);
+    await pool.connect();
+
+    const getHamlCodeSql = `
+        SELECT Code AS hamlCode
+        FROM SalHaml
+        WHERE kotaj = @billOfLadingCoutageCode
+      `;
+
+    const request = pool.request();
+    request.input('billOfLadingCoutageCode', VarChar, billOfLadingCoutageCode);
+
+    const result = await request.query(getHamlCodeSql);
+    console.log('-------------------------haml Code-------------------')
+    console.log(result.recordset[0])
+    const hamlCode = result.recordset[0].hamlCode ;
+
+    // Return the current hamlcode
+    return hamlCode;
+  } catch (error) {
+    console.error('Error retrieving maximum serial:', error);
+    throw error;
+  } finally {
+    if (pool) await pool.close();
+  }
+};
+
 
 export const insertRecord = async (params: BaseRecord, dbId: string): Promise<void> => {
   let pool: ConnectionPool | undefined;

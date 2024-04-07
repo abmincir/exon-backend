@@ -19,7 +19,8 @@ const mapApiResponseToBaseRecords = (apiResponse: CompaniesApiResponse): BaseRec
     bar_n_s: record.bar_n_s,
     barDate: record.barDate,
     dTel: record.dTel,
-    kaGrp: record.kaGrp
+    kaGrp: record.kaGrp,
+    billOfLadingCoutageCode: record.billOfLadingCoutageCode
   }));
 };
 

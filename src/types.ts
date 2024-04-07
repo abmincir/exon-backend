@@ -12,6 +12,11 @@ export interface GetMaxSerialParams {
     dbId: string;
 }
 
+export interface GetHamlCodeParams{
+  billOfLadingCoutageCode: string;
+  dbId: string;
+}
+
 export interface InsertRecordParams {
     tplk: string; // carno
     netT: number; // weight
@@ -39,6 +44,7 @@ export interface BaseRecord {
     dTel: string;
     bar_n_s: string; // Serial
     kaGrp: string;
+    billOfLadingCoutageCode: string;
   }
   
   export interface InsertRecordParams extends BaseRecord {

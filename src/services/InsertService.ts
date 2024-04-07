@@ -1,5 +1,5 @@
-import { checkForDuplicateRecord, getMaxSerial, insertRecord } from '../helpers/sql.helper';
-import { CheckDuplicateParams, ProcessRecordsResult, BaseRecord, GetMaxSerialParams } from '../types';
+import { checkForDuplicateRecord, getHamlCode, getMaxSerial, insertRecord } from '../helpers/sql.helper';
+import { CheckDuplicateParams, ProcessRecordsResult, BaseRecord, GetMaxSerialParams, GetHamlCodeParams } from '../types';
 
 export async function processRecords(records: BaseRecord[], dbId: string): Promise<ProcessRecordsResult> {
   let acknowledgedInserts = 0;
@@ -30,6 +30,12 @@ export async function processRecords(records: BaseRecord[], dbId: string): Promi
       const maxSerialNumber = await getMaxSerial(maxSerialParams);
       // TODO use this value
 
+      const testParams : GetHamlCodeParams = {
+        billOfLadingCoutageCode: record.billOfLadingCoutageCode,
+        dbId
+      }
+      const hamlCode = await getHamlCode(testParams)
+
 
       const insertRecordParams: BaseRecord = {
         tplk: record.tplk,
@@ -40,7 +46,8 @@ export async function processRecords(records: BaseRecord[], dbId: string): Promi
         bar_n_s: maxSerialNumber,
         barDate: record.barDate,
         dTel: record.dTel,
-        kaGrp: record.kaGrp
+        kaGrp: hamlCode,
+        billOfLadingCoutageCode: record.billOfLadingCoutageCode
       };
 
       await insertRecord(insertRecordParams, dbId);
