@@ -63,7 +63,7 @@ export const checkForDuplicateRecord = async (params: CheckDuplicateParams) => {
     modifiedPlateNumber = modifiedPlateNumber.trim();
     console.log('---------modified plate number----------')
     console.log(modifiedPlateNumber)
-    request.input('tplk', VarChar, modifiedPlateNumber);
+    request.input('tplk', NVarChar, modifiedPlateNumber);
     request.input('netT', Float, netT);
     request.input('kaCode', Int, Number(kaCode));
     request.input('kaGrp', SmallInt, kaGrp);
