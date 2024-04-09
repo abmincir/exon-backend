@@ -1,4 +1,4 @@
-import { ConnectionPool, VarChar, Int, Float, SmallInt, Numeric, Bit } from 'mssql';
+import { ConnectionPool, VarChar, Int, Float, SmallInt, Numeric, Bit, NVarChar } from 'mssql';
 import moment from 'moment';
 
 import { SecureVersion } from "tls";
@@ -53,12 +53,17 @@ export const checkForDuplicateRecord = async (params: CheckDuplicateParams) => {
           AND Weight = @netT
           AND Code = @kaCode
           AND Hamlcode = @kaGrp
-          AND LEN(carno) > 3
+          AND LEN(Carno) > 3
       `;
 
     // Create a request for executing the SQL command
     const request = pool.request();
-    request.input('tplk', VarChar, tplk);
+    let modifiedPlateNumber = tplk.replace(/[^0-9]/g, 'ع');
+    modifiedPlateNumber = modifiedPlateNumber.replace('ع','').slice(0,3) + 'ع' + modifiedPlateNumber.replace('ع','').slice(3) ;
+    modifiedPlateNumber = modifiedPlateNumber.trim();
+    console.log('---------modified plate number----------')
+    console.log(modifiedPlateNumber)
+    request.input('tplk', VarChar, modifiedPlateNumber);
     request.input('netT', Float, netT);
     request.input('kaCode', Int, Number(kaCode));
     request.input('kaGrp', SmallInt, kaGrp);
@@ -131,8 +136,15 @@ export const getHamlCode = async (params: GetHamlCodeParams) => {
         WHERE kotaj = @billOfLadingCoutageCode
       `;
 
+      let currentCoutage =  billOfLadingCoutageCode;
+
+      if(billOfLadingCoutageCode.includes('-')){
+        const coutageArray = billOfLadingCoutageCode.split('-');
+        currentCoutage = coutageArray[coutageArray.length - 1]; 
+      }
+
     const request = pool.request();
-    request.input('billOfLadingCoutageCode', VarChar, billOfLadingCoutageCode);
+    request.input('billOfLadingCoutageCode', VarChar, currentCoutage );
 
     const result = await request.query(getHamlCodeSql);
     console.log('-------------------------haml Code-------------------')
@@ -160,8 +172,13 @@ export const insertRecord = async (params: BaseRecord, dbId: string): Promise<vo
 
     const request = pool.request();
     const datedo = moment().locale('fa').format('YY/MM/DD');
+    let modifiedPlateNumber = params.tplk.replace(/[^0-9]/g, 'ع');
+    modifiedPlateNumber = modifiedPlateNumber.replace('ع','').slice(0,3) + 'ع' + modifiedPlateNumber.replace('ع','').slice(3) ;
+    modifiedPlateNumber = modifiedPlateNumber.trim();
+    console.log('---------modified plate number----------');
+    console.log(modifiedPlateNumber);
 
-    request.input('Carno', VarChar, params.tplk);
+    request.input('Carno', NVarChar, modifiedPlateNumber);
     request.input('Weight', Float, params.netT);
     request.input('Code', Int, params.kaCode);
     request.input('Hamlcode', SmallInt, params.kaGrp);
