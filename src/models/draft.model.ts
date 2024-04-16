@@ -22,10 +22,10 @@ export interface IDraft {
   trail: boolean;
   send: number;
   recno: number;
-  yekta: string;
-  bargah: string;
+  yekta: number;
+  bargah: number;
   peygiri: number;
-  shenaseh: string;
+  shenaseh: number;
   customerName:string;
 
   status: string;
@@ -57,10 +57,10 @@ const DraftSchema = new Schema<IDraftDocument>(
     trail: Boolean,
     send: Number,
     recno: Number,
-    yekta: String,
-    bargah: String,
+    yekta: Number,
+    bargah: Number,
     peygiri: Number,
-    shenaseh: String,
+    shenaseh: Number,
     customerName: String,
 
     status: { type: String, default: 'unknown' },

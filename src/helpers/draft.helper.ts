@@ -9,7 +9,6 @@ const createHamlSortObject = (sort: any) => {
     code: codeSort,
     yekta: yektaSort,
     hamlCode: hamlCodeSort,
-    meli: meliSort,
     bargah: bargahSort,
     shenaseh: shenasehSort
   } = sort;
@@ -19,7 +18,6 @@ const createHamlSortObject = (sort: any) => {
     ...(codeSort && { code: codeSort }),
     ...(yektaSort && { yekta: yektaSort }),
     ...(hamlCodeSort && { hamlCode: hamlCodeSort }),
-    ...(meliSort && { meli: meliSort }),
     ...(bargahSort && { bargah: bargahSort }),
     ...(shenasehSort && { shenaseh: shenasehSort })
   };
