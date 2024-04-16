@@ -4,7 +4,7 @@ import { CheckDuplicateParams, ProcessRecordsResult, BaseRecord, GetMaxSerialPar
 export async function processRecords(records: BaseRecord[], dbId: string): Promise<ProcessRecordsResult> {
   let acknowledgedInserts = 0;
   let failedInserts = 0;
-  
+
   for (const record of records) {
     try {
 
@@ -35,10 +35,8 @@ export async function processRecords(records: BaseRecord[], dbId: string): Promi
       };
 
       const maxSerialNumber = await getMaxSerial(maxSerialParams);
+
       // TODO use this value
-
-
-
       const insertRecordParams: BaseRecord = {
         tplk: record.tplk,
         netT: record.netT,

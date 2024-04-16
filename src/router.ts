@@ -77,6 +77,7 @@ export const router = (app: Application) => {
   app.post('/draft/update-db', updateDraftDbHandler)
 
   app.post('/companies/all', getAllCompaniesHandler);
+  app.post('/companies/process', getAllCompaniesHandler);
 
   app.get('/logs/error', serveLogFile);
   app.get('/logs/log', serveSecondLogFile);
