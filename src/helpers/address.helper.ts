@@ -27,8 +27,15 @@ export function addressMapper(addresses: AddressResponse[]): DraftUpdateDTO[] {
 
 export async function updateDraftsIndividually(updates: DraftUpdateDTO[]): Promise<any[]> {
     const updateOperations = updates.map(async ([searchParams, status]) => {
+        // Correct the types in searchParams before querying
+        const query: any = {
+            shenaseh: searchParams.shenaseh,
+            bargah: parseInt(searchParams.bargah, 10), // Assuming bargah should be a number
+            code: searchParams.code,
+        };
+
         // Find drafts based on search parameters.
-        const draftsToUpdate = await Draft.find(searchParams);
+        const draftsToUpdate = await Draft.find(query);
 
         // Update each found draft with the new status.
         const updatePromises = draftsToUpdate.map(({ _id }) =>
